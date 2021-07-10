@@ -46,8 +46,8 @@ typedef enum {
 } LineType;
 
 typedef enum {
-    FlagExtern  = 1 << 0,
-    FlagSymbol  = 1 << 1,
+    FlagExternDecleration  = 1 << 0,
+    FlagSymbolDeclaration  = 1 << 1,
 } LineFlags;
 
 typedef struct AssemblyLine AssemblyLine;
@@ -86,11 +86,11 @@ void handle_assembly_file(char* path) {
                 break;
 
             case TypeData:
-                if (line->flags & FlagSymbol && line->flags & FlagExtern) {
+                if (line->flags & FlagSymbolDeclaration && line->flags & FlagExternDecleration) {
                     Symbol* sym = newSymbol(line->label, 0, false, SymbolSection_Data);
                     err = symtab->insert(symtab, sym);
                 } 
-                else if (line->flags & FlagSymbol) {
+                else if (line->flags & FlagSymbolDeclaration) {
                     Symbol* sym = newSymbol(line->label, data_counter, false, SymbolSection_Data);
                     err = symtab->insert(symtab, sym);
                 }
@@ -100,18 +100,46 @@ void handle_assembly_file(char* path) {
                 break;
 
             case TypeCode:
-                if (line->flags & FlagSymbol) {
+                if (line->flags & FlagSymbolDeclaration) {
                     Symbol* sym = newSymbol(line->label, instruction_counter, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
                 }
 
-                Instruction inst;
-                memcpy(output + instruction_counter, (void*) &inst.instruction, sizeof(inst.instruction));
-                instruction_counter += INSTRUCTION_SIZE;
                 break;
         }
 
-        AssemblyLine *line = parseLine();
+        line = parseLine();
+    }
+
+    /* end of first pass, start second pass */
+    /* TODO maybe seek line back or just use stored parsed lines instead of reparsing */
+    line = parseLine();
+    while (line != NULL) {
+        switch(line->type) {
+            case TypeData:
+                /* ignore data lines in the second pass */
+                break;
+
+            case TypeEntry:
+                {
+                    Symbol* sym = symtab->find(symtab, line->data);
+                    if (sym != NULL) {
+                        sym->is_entry = true;
+                    }
+                }
+                
+                break;
+
+            case TypeCode:
+                {
+                    Instruction* inst = line->data;
+                    memcpy(output + instruction_counter, (void*) &inst->instruction, sizeof(inst->instruction));
+                    instruction_counter += INSTRUCTION_SIZE;
+                }
+                break;
+        }
+
+        line = parseLine();
     }
 
 }
