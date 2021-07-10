@@ -1,23 +1,45 @@
-/*
- * ### Instructions ###
- *
- * R (add, sub, and, or, nor, move, mvhi, mvlo)
- *  0-5 unused
- *  6-10 funct
- *  11-15 rd
- *  16-20 rt
- *  21-25 rs
- *  26-31 opcode
- *
- *
- * I (addi, subi, andi, ori, nori, beg, bne, blt, bgt, lb, sb, lw, sw, lh,sh)
- *   0-15 immed
- *   16-20 rt
- *   21-25 rs
- *   26-31 opcode
- *
- * J (jmp, la, call, stop)
- *   0-24 address
- *   25 reg
- *   26-31 opcode
- */
+
+typedef enum {
+    R,
+    I,
+    J,
+} InstructionType;
+
+typedef struct RInstruction RInstruction;
+typedef struct IInstruction IInstruction;
+typedef struct JInstruction JInstruction;
+typedef struct Instruction Instruction;
+
+/* R Instructions: add, sub, and, or, nor, move, mvhi, mvlo */
+struct RInstruction {
+    unsigned int unused: 6;
+    unsigned int funct: 5;
+    unsigned int rd: 5;
+    unsigned int rt: 5;
+    unsigned int rs: 5;
+    unsigned opcode: 6;
+};
+
+/* I Instructions: addi, subi, andi, ori, nori, beg, bne, blt, bgt, lb, sb, lw, sw, lh, sh */
+struct IInstruction {
+    unsigned int immed: 16;
+    unsigned int rt: 5;
+    unsigned int rs: 5;
+    unsigned int opcode: 6;
+};
+
+/* J Instructions: jmp, la, call, stop */
+struct JInstruction {
+    unsigned int address: 25;
+    unsigned int reg: 1;
+    unsigned int opcode: 6;
+};
+
+struct Instruction {
+    InstructionType type;
+    union {
+        RInstruction r_inst;
+        IInstruction i_inst;
+        JInstruction j_inst;
+    };
+};
