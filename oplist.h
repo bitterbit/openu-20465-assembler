@@ -2,6 +2,7 @@
 
 #include "bool.h"
 #include "list.h"
+#include "err.h"
 
 typedef enum {
     SymbolSection_Code, SymbolSection_Data
@@ -12,10 +13,12 @@ struct Opcode {
     size_t value; // TODO make sure value is not bigger than 24bit?
     bool is_entry;
     SymbolSection section;
+    void (*free)(Opcode* self);
 };
 
 typedef Opcode Opcode;
 
+// TODO implement new and free
 Opcode* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section);
 
 struct OpcodeList {

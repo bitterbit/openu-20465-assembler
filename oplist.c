@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "oplist.h"
-#include "err.h"
 
 
 bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
@@ -24,7 +23,7 @@ bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
 }
 
 bool OpcodeList_exists(OpcodeList* self, char* symbol_name) {
-    return false;
+    return (bool) (self->find(self, symbol_name) != NULL);
 }
 
 Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
@@ -33,14 +32,33 @@ Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
     }
 
     ListIterator *iterator = newListIterator(self->head);
-    ListNode *next = iterator->next(iterator);
+    ListNode *node = iterator->next(iterator);
 
-    while(next != NULL) {
-        
-        next = iterator->next(iterator);
+    bool found = false;
+
+    while(node != NULL) {
+        if (node->data == NULL) {
+            continue;
+        }
+
+        Opcode* op = node->data;
+        if (op->sybmol == NULL) {
+            continue;
+        }
+
+        if (strcmp(op->sybmol, symbol_name) == 0) {
+            found = true;
+            break;
+        }
+
+        node = iterator->next(iterator);
     }
 
-    free(iterator);
+    iterator->free(iterator);
+
+    if (found == true) {
+        return (Opcode*) node->data;
+    }
 
     return NULL;
 }
@@ -48,14 +66,18 @@ Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
 void OpcodeList_free(OpcodeList* self) {
     if (self->head != NULL) {
         ListIterator *iterator = newListIterator(self->head);
-        ListNode *next = iterator->next(iterator);
+        ListNode *node = iterator->next(iterator);
 
-        while(next != NULL) {
-            free(next->data);
-            next = iterator->next(iterator);
+        while(node != NULL) {
+            Opcode *op = node->data;
+            if (op != NULL) {
+                op->free(op);
+            }
+
+            node = iterator->next(iterator);
         }
 
-        free(iterator);
+        iterator->free(iterator);
     }
 
     self->insert = NULL;
