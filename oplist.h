@@ -8,19 +8,20 @@ typedef enum {
     SymbolSection_Code, SymbolSection_Data
 } SymbolSection;
 
+typedef struct Opcode Opcode;
 struct Opcode {
     char* sybmol;
-    size_t value; // TODO make sure value is not bigger than 24bit?
+    size_t value; /* TODO make sure value is not bigger than 24bit? */
     bool is_entry;
     SymbolSection section;
     void (*free)(Opcode* self);
 };
 
-typedef Opcode Opcode;
 
-// TODO implement new and free
+/* TODO implement new and free */
 Opcode* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section);
 
+typedef struct OpcodeList OpcodeList;
 struct OpcodeList {
     ListNode* head;
 
@@ -36,6 +37,5 @@ struct OpcodeList {
     void (*free)(OpcodeList* self);
 };
 
-typedef OpcodeList OpcodeList;
 
 OpcodeList* newOpcodeList();

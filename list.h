@@ -1,18 +1,19 @@
 #include <stdlib.h>
 
+typedef struct ListNode ListNode;
 struct ListNode {
     ListNode* next;
     void* data;
 };
 
+
+typedef struct ListIterator ListIterator;
 struct ListIterator {
     ListNode* head;
     ListNode* (*next)(ListIterator *self);
     void (*free)(ListIterator *self);
 };
 
-typedef ListNode ListNode;
-typedef ListIterator ListIterator;
 
 ListNode* newListNode(void* data);
 ListIterator* newListIterator(ListNode *list);

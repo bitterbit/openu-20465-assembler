@@ -2,8 +2,14 @@
 #include <string.h>
 #include "oplist.h"
 
+Opcode* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section) {
+    return NULL;
+}
+
 
 bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
+    ListNode *node = NULL;
+
     if (self->head == NULL) { 
         self->head = newListNode(opcode);
         return OK;
@@ -15,7 +21,7 @@ bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
     }
 
     /* put our new opcode first in list */
-    ListNode *node = newListNode(opcode);
+    node = newListNode(opcode);
     node->next = self->head;
     self->head = node;
 
@@ -27,21 +33,24 @@ bool OpcodeList_exists(OpcodeList* self, char* symbol_name) {
 }
 
 Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
+    ListIterator *iterator = NULL;
+    ListNode *node = NULL;
+    bool found = false;
+
     if (self->head == NULL) {
         return NULL;
     }
 
-    ListIterator *iterator = newListIterator(self->head);
-    ListNode *node = iterator->next(iterator);
-
-    bool found = false;
+    iterator = newListIterator(self->head);
+    node = iterator->next(iterator);
 
     while(node != NULL) {
+        Opcode *op = NULL;
         if (node->data == NULL) {
             continue;
         }
 
-        Opcode* op = node->data;
+        op = node->data;
         if (op->sybmol == NULL) {
             continue;
         }
