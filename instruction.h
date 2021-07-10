@@ -41,5 +41,5 @@ struct Instruction {
         RInstruction r_inst;
         IInstruction i_inst;
         JInstruction j_inst;
-    };
+    } instruction;
 };

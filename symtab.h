@@ -5,7 +5,8 @@
 #include "err.h"
 
 typedef enum {
-    SymbolSection_Code, SymbolSection_Data
+    SymbolSection_Code, 
+    SymbolSection_Data
 } SymbolSection;
 
 typedef struct Symbol Symbol;
