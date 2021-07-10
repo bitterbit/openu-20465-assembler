@@ -17,6 +17,14 @@
        + entry files  `.ent` with all symbols that were marked as entry points
  *
  * for each file name in argv assemble the file
+ *
+ *
+ *
+ * concepts:
+     * code section
+     * memory - nice wrapper around buffer with cur pointer
+     * instruction queue
+ *  
  */
 
 int main(int argc, char** argv) {
