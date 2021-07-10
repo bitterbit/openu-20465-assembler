@@ -49,6 +49,7 @@ typedef enum {
     FlagSymbolDeclaration  = 1 << 1
 } LineFlags;
 
+/* TODO implement allocation and free functions */
 typedef struct AssemblyLine AssemblyLine;
 struct AssemblyLine {
     LineType type;
