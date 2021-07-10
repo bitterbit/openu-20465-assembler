@@ -1,8 +1,10 @@
+#ifndef _H_INSTRUCTION_
+#define _H_INSTRUCTION_
 
 typedef enum {
     R,
     I,
-    J,
+    J
 } InstructionType;
 
 typedef struct RInstruction RInstruction;
@@ -20,7 +22,9 @@ struct RInstruction {
     unsigned opcode: 6;
 };
 
-/* I Instructions: addi, subi, andi, ori, nori, beg, bne, blt, bgt, lb, sb, lw, sw, lh, sh */
+/* I Instructions: 
+ *   regular: addi, subi, andi, ori, nori, 
+ *   labels: beg, bne, blt, bgt, lb, sb, lw, sw, lh, sh */
 struct IInstruction {
     unsigned int immed: 16;
     unsigned int rt: 5;
@@ -43,3 +47,5 @@ struct Instruction {
         JInstruction j_inst;
     } instruction;
 };
+
+#endif

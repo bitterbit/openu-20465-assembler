@@ -1,3 +1,5 @@
+#ifndef _H_SYMTAB_
+#define _H_SYMTAB_
 #include <stdio.h>
 
 #include "bool.h"
@@ -38,3 +40,4 @@ struct SymbolTable {
 
 
 SymbolTable* newSymbolTable();
+#endif

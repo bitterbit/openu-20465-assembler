@@ -1,3 +1,6 @@
+#ifndef _H_LIST_
+#define _H_LIST_
+
 #include <stdlib.h>
 
 typedef struct ListNode ListNode;
@@ -17,3 +20,5 @@ struct ListIterator {
 
 ListNode* newListNode(void* data);
 ListIterator* newListIterator(ListNode *list);
+
+#endif

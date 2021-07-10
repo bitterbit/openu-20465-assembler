@@ -32,49 +32,55 @@
 #include <string.h>
 #include "err.h"
 #include "symtab.h"
+#include "memory.h"
 #include "instruction.h"
 
 int main(int argc, char** argv) {
 }
 
-
-
 typedef enum {
     TypeData,
     TypeCode,
-    TypeEntry,
+    TypeEntry
 } LineType;
 
 typedef enum {
     FlagExternDecleration  = 1 << 0,
-    FlagSymbolDeclaration  = 1 << 1,
+    FlagSymbolDeclaration  = 1 << 1
 } LineFlags;
 
 typedef struct AssemblyLine AssemblyLine;
 struct AssemblyLine {
     LineType type;
     LineFlags flags;
+
     char* label;
-    void* data;
-    size_t data_size;
+    char* opcode_name;
+    char** args;
+    size_t arg_count;
 };
 
 AssemblyLine* parseLine() {
     return NULL;
 }
 
+unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
+    return NULL;
+}
+
+Instruction* decodeInstructionLine(AssemblyLine* line) {
+    return NULL;
+}
+
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
-#define INSTRUCTION_COUNTER_INITIAL_VALUE 100
 
 void handle_assembly_file(char* path) {
-    unsigned char *output = malloc(MAX_SIZE);
-    
-    size_t instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
-    size_t data_counter = 0;
+    SymbolTable* symtab = newSymbolTable();
+    Memory* memory = newMemory();
     Error err = OK;
 
-    SymbolTable* symtab = newSymbolTable();
+    size_t code_size = 0;
 
     /* This is an outline of first pass */
     AssemblyLine *line = parseLine();
@@ -86,25 +92,33 @@ void handle_assembly_file(char* path) {
                 break;
 
             case TypeData:
-                if (line->flags & FlagSymbolDeclaration && line->flags & FlagExternDecleration) {
-                    Symbol* sym = newSymbol(line->label, 0, false, SymbolSection_Data);
-                    err = symtab->insert(symtab, sym);
-                } 
-                else if (line->flags & FlagSymbolDeclaration) {
-                    Symbol* sym = newSymbol(line->label, data_counter, false, SymbolSection_Data);
-                    err = symtab->insert(symtab, sym);
-                }
+                {
+                    size_t size = 0;
+                    unsigned char* data = NULL;
 
-                memcpy(output + data_counter, line->data, line->data_size);
-                data_counter += line->data_size;
+                    if (line->flags & FlagSymbolDeclaration && line->flags & FlagExternDecleration) {
+                        Symbol* sym = newSymbol(line->label, 0, false, SymbolSection_Data);
+                        err = symtab->insert(symtab, sym);
+                    } 
+                    else if (line->flags & FlagSymbolDeclaration) {
+                        Symbol* sym = newSymbol(line->label, memory->data_counter, false, SymbolSection_Data);
+                        err = symtab->insert(symtab, sym);
+                    }
+
+                    data = decodeDataLine(line, &size);
+                    memory->writeData(memory, data, size);
+                    free(data);
+                }
                 break;
 
             case TypeCode:
                 if (line->flags & FlagSymbolDeclaration) {
-                    Symbol* sym = newSymbol(line->label, instruction_counter, false, SymbolSection_Code);
+                    Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
                 }
 
+                /* count instructions here so we know what the final code size is before second pass */
+                code_size += INSTRUCTION_SIZE;
                 break;
         }
 
@@ -120,21 +134,31 @@ void handle_assembly_file(char* path) {
                 /* ignore data lines in the second pass */
                 break;
 
+            /* .entry SYM_NAME */
             case TypeEntry:
                 {
-                    Symbol* sym = symtab->find(symtab, line->data);
-                    if (sym != NULL) {
-                        sym->is_entry = true;
+                    Symbol* sym = NULL;
+                    if (line->arg_count < 1) {
+                        err = ERR_INVALID_ENTRY;
+                        break;
                     }
+
+                    sym = symtab->find(symtab, line->args[0]);
+                    if (sym == NULL) {
+                        err = ERR_ENTRY_SYM_NOT_FOUND;
+                        break;
+                    }
+
+                    sym->is_entry = true;
                 }
                 
                 break;
 
             case TypeCode:
                 {
-                    Instruction* inst = line->data;
-                    memcpy(output + instruction_counter, (void*) &inst->instruction, sizeof(inst->instruction));
-                    instruction_counter += INSTRUCTION_SIZE;
+                    /* TODO check if instruction references .data section and calculate offset to it */
+                    Instruction *inst = decodeInstructionLine(line);
+                    memory->writeCode(memory, inst);
                 }
                 break;
         }
