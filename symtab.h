@@ -17,14 +17,14 @@ struct Symbol {
     void (*free)(Symbol* self);
 };
 
-Symbol* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section);
+Symbol* newSymbol(char* symbol, size_t value, bool is_entry, SymbolSection section);
 
 typedef struct SymbolTable SymbolTable;
 struct SymbolTable {
     ListNode* head;
 
     /* insert opcode to list, this function takes ownership of this opcode structure */
-    Error (*insert) (SymbolTable* self, Symbol* opcode);
+    Error (*insert) (SymbolTable* self, Symbol* sym);
 
     /* check if a opcode with a given symbol name exists in list */
     bool (*exists)(SymbolTable* self, char* symbol_name);

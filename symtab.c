@@ -24,21 +24,21 @@ void Symbol_free(Symbol* self) {
 }
 
 
-bool SymbolTable_insert(SymbolTable* self, Symbol* opcode) {
+bool SymbolTable_insert(SymbolTable* self, Symbol* sym) {
     ListNode *node = NULL;
 
     if (self->head == NULL) { 
-        self->head = newListNode(opcode);
+        self->head = newListNode(sym);
         return OK;
     }
 
-    if (self->exists(self, opcode->symbol) == true) {
-        /* should not insert two opcodes with same symbol */
+    if (self->exists(self, sym->symbol) == true) {
+        /* should not insert two symbols with same name */
         return ERR_DUPLICATE_SYMBOL;
     }
 
-    /* put our new opcode first in list */
-    node = newListNode(opcode);
+    /* put our new symbor first in list */
+    node = newListNode(sym);
     node->next = self->head;
     self->head = node;
 
@@ -62,17 +62,17 @@ Symbol* SymbolTable_find(SymbolTable* self, char* symbol_name) {
     node = iterator->next(iterator);
 
     while(node != NULL) {
-        Symbol *op = NULL;
+        Symbol *sym = NULL;
         if (node->data == NULL) {
             continue;
         }
 
-        op = node->data;
-        if (op->symbol == NULL) {
+        sym = node->data;
+        if (sym->symbol == NULL) {
             continue;
         }
 
-        if (strcmp(op->symbol, symbol_name) == 0) {
+        if (strcmp(sym->symbol, symbol_name) == 0) {
             found = true;
             break;
         }
@@ -95,9 +95,9 @@ void SymbolTable_free(SymbolTable* self) {
         ListNode *node = iterator->next(iterator);
 
         while(node != NULL) {
-            Symbol *op = node->data;
-            if (op != NULL) {
-                op->free(op);
+            Symbol *sym = node->data;
+            if (sym != NULL) {
+                sym->free(sym);
             }
 
             node = iterator->next(iterator);
