@@ -1,7 +1,7 @@
 CFLAGS=-Wall -ansi -pedantic
 LDFLAGS=
 
-CFILES=main.c list.c oplist.c
+CFILES=main.c list.c symtab.c
 OBJS:=$(CFILES:%.c=%.o)
 
 

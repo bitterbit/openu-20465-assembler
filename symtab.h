@@ -8,32 +8,32 @@ typedef enum {
     SymbolSection_Code, SymbolSection_Data
 } SymbolSection;
 
-typedef struct Opcode Opcode;
-struct Opcode {
+typedef struct Symbol Symbol;
+struct Symbol {
     char* symbol;
     size_t value; /* TODO make sure value is not bigger than 24bit? */
     bool is_entry;
     SymbolSection section;
-    void (*free)(Opcode* self);
+    void (*free)(Symbol* self);
 };
 
-Opcode* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section);
+Symbol* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section);
 
-typedef struct OpcodeList OpcodeList;
-struct OpcodeList {
+typedef struct SymbolTable SymbolTable;
+struct SymbolTable {
     ListNode* head;
 
     /* insert opcode to list, this function takes ownership of this opcode structure */
-    Error (*insert) (OpcodeList* self, Opcode* opcode);
+    Error (*insert) (SymbolTable* self, Symbol* opcode);
 
     /* check if a opcode with a given symbol name exists in list */
-    bool (*exists)(OpcodeList* self, char* symbol_name);
+    bool (*exists)(SymbolTable* self, char* symbol_name);
 
     /* get opcode by symbol name */
-    Opcode* (*find)(OpcodeList* self, char* symbol_name);
+    Symbol* (*find)(SymbolTable* self, char* symbol_name);
 
-    void (*free)(OpcodeList* self);
+    void (*free)(SymbolTable* self);
 };
 
 
-OpcodeList* newOpcodeList();
+SymbolTable* newOpcodeList();

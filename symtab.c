@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
-#include "oplist.h"
+#include "symtab.h"
 
-Opcode* newOpcode(char* sym, size_t value, bool is_entry, SymbolSection section) {
-    Opcode* op = malloc(sizeof(Opcode));
+Symbol* newOpcode(char* sym, size_t value, bool is_entry, SymbolSection section) {
+    Symbol* op = malloc(sizeof(Symbol));
 
     size_t len = strlen(sym) + 1;
     char* symbols_name = malloc(len);
@@ -18,13 +18,13 @@ Opcode* newOpcode(char* sym, size_t value, bool is_entry, SymbolSection section)
     return op;
 }
 
-void Opcode_free(Opcode* self) {
+void Opcode_free(Symbol* self) {
     free(self->symbol);
     free(self);
 }
 
 
-bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
+bool OpcodeList_insert(SymbolTable* self, Symbol* opcode) {
     ListNode *node = NULL;
 
     if (self->head == NULL) { 
@@ -45,11 +45,11 @@ bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
     return OK;
 }
 
-bool OpcodeList_exists(OpcodeList* self, char* symbol_name) {
+bool OpcodeList_exists(SymbolTable* self, char* symbol_name) {
     return (bool) (self->find(self, symbol_name) != NULL);
 }
 
-Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
+Symbol* OpcodeList_find(SymbolTable* self, char* symbol_name) {
     ListIterator *iterator = NULL;
     ListNode *node = NULL;
     bool found = false;
@@ -62,7 +62,7 @@ Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
     node = iterator->next(iterator);
 
     while(node != NULL) {
-        Opcode *op = NULL;
+        Symbol *op = NULL;
         if (node->data == NULL) {
             continue;
         }
@@ -83,19 +83,19 @@ Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
     iterator->free(iterator);
 
     if (found == true) {
-        return (Opcode*) node->data;
+        return (Symbol*) node->data;
     }
 
     return NULL;
 }
 
-void OpcodeList_free(OpcodeList* self) {
+void OpcodeList_free(SymbolTable* self) {
     if (self->head != NULL) {
         ListIterator *iterator = newListIterator(self->head);
         ListNode *node = iterator->next(iterator);
 
         while(node != NULL) {
-            Opcode *op = node->data;
+            Symbol *op = node->data;
             if (op != NULL) {
                 op->free(op);
             }
@@ -114,8 +114,8 @@ void OpcodeList_free(OpcodeList* self) {
     free(self);
 }
 
-OpcodeList* newOpcodeList() {
-    OpcodeList* list = malloc(sizeof(OpcodeList));
+SymbolTable* newOpcodeList() {
+    SymbolTable* list = malloc(sizeof(SymbolTable));
 
     list->head = NULL;
     list->insert = OpcodeList_insert;
