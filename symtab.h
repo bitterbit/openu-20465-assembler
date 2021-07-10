@@ -36,4 +36,4 @@ struct SymbolTable {
 };
 
 
-SymbolTable* newOpcodeList();
+SymbolTable* newSymbolTable();
