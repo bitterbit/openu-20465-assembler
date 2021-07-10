@@ -2,8 +2,25 @@
 #include <string.h>
 #include "oplist.h"
 
-Opcode* newOpcode(char* symbol, size_t value, bool is_entry, SymbolSection section) {
-    return NULL;
+Opcode* newOpcode(char* sym, size_t value, bool is_entry, SymbolSection section) {
+    Opcode* op = malloc(sizeof(Opcode));
+
+    size_t len = strlen(sym) + 1;
+    char* symbols_name = malloc(len);
+    memset(symbols_name, '\0', len); 
+    strcpy(symbols_name, sym);
+
+    op->symbol = symbols_name;
+    op->value = value;
+    op->is_entry = is_entry;
+    op->section = section;
+
+    return op;
+}
+
+void Opcode_free(Opcode* self) {
+    free(self->symbol);
+    free(self);
 }
 
 
@@ -15,7 +32,7 @@ bool OpcodeList_insert(OpcodeList* self, Opcode* opcode) {
         return OK;
     }
 
-    if (self->exists(self, opcode->sybmol) == true) {
+    if (self->exists(self, opcode->symbol) == true) {
         /* should not insert two opcodes with same symbol */
         return ERR_DUPLICATE_SYMBOL;
     }
@@ -51,11 +68,11 @@ Opcode* OpcodeList_find(OpcodeList* self, char* symbol_name) {
         }
 
         op = node->data;
-        if (op->sybmol == NULL) {
+        if (op->symbol == NULL) {
             continue;
         }
 
-        if (strcmp(op->sybmol, symbol_name) == 0) {
+        if (strcmp(op->symbol, symbol_name) == 0) {
             found = true;
             break;
         }
