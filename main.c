@@ -34,43 +34,11 @@
 #include "symtab.h"
 #include "memory.h"
 #include "instruction.h"
+#include "assembly_line.h"
+#include "str_utils.h"
 
 int main(int argc, char** argv) {
-}
-
-typedef enum {
-    TypeData,
-    TypeCode,
-    TypeEntry
-} LineType;
-
-typedef enum {
-    FlagExternDecleration  = 1 << 0,
-    FlagSymbolDeclaration  = 1 << 1
-} LineFlags;
-
-/* TODO implement allocation and free functions */
-typedef struct AssemblyLine AssemblyLine;
-struct AssemblyLine {
-    LineType type;
-    LineFlags flags;
-
-    char* label;
-    char* opcode_name;
-    char** args;
-    size_t arg_count;
-};
-
-AssemblyLine* parseLine() {
-    return NULL;
-}
-
-unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
-    return NULL;
-}
-
-Instruction* decodeInstructionLine(AssemblyLine* line) {
-    return NULL;
+    /* TODO: do we need to catch all memory allocation errors? */
 }
 
 #define MAX_SIZE 65535
@@ -83,8 +51,16 @@ void handle_assembly_file(char* path) {
 
     size_t code_size = 0;
 
+    /* TODO: remember to close file */
+    FILE *file = openfile(path, &err);
+
+    /* TODO: probably better to break out of this function with an error and print all errors at one point */
+    if (err != SUCCESS){
+        print_error(err);
+    }
+
     /* This is an outline of first pass */
-    AssemblyLine *line = parseLine();
+    AssemblyLine *line = parseLine(file);
 
     while (line != NULL) {
         switch(line->type) {
@@ -123,6 +99,7 @@ void handle_assembly_file(char* path) {
                 break;
         }
 
+        /* TODO err is not checked in this loop */
         line = parseLine();
     }
 
