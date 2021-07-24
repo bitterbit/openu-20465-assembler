@@ -37,7 +37,7 @@ bool SymbolTable_insert(SymbolTable* self, Symbol* sym) {
         return ERR_DUPLICATE_SYMBOL;
     }
 
-    /* put our new symbor first in list */
+    /* put our new symbol first in list */
     node = newListNode(sym);
     node->next = self->head;
     self->head = node;

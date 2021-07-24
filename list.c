@@ -8,6 +8,7 @@ ListNode* newListNode(void* data) {
 }
 
 void ListIterator_free(ListIterator* self) {
+    /* TODO: can't we free all the nodes in this function? */
     self->head = NULL;
     self->next = NULL;
     free(self);

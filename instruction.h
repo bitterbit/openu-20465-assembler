@@ -19,12 +19,12 @@ struct RInstruction {
     unsigned int rd: 5;
     unsigned int rt: 5;
     unsigned int rs: 5;
-    unsigned opcode: 6;
+    unsigned int opcode: 6;
 };
 
 /* I Instructions: 
  *   regular: addi, subi, andi, ori, nori, 
- *   labels: beg, bne, blt, bgt, lb, sb, lw, sw, lh, sh */
+ *   labels: beq, bne, blt, bgt, lb, sb, lw, sw, lh, sh */
 struct IInstruction {
     unsigned int immed: 16;
     unsigned int rt: 5;
