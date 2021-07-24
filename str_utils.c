@@ -5,6 +5,7 @@
 #include "assembly_line.h"
 #include "err.h"
 #include "ctype.h"
+#include "bool.h"
 
 char *seperate_string_by_token(char **string, char *delimeters) {
   char *string_start = *string;
@@ -66,13 +67,13 @@ void remove_leading_and_trailing_spaces(char **str) {
   *string_end = '\0';
 }
 
-int contains_space(char *str) {
-  /* return 1 if str contains space, 0 otherwise */
-  int ret = 0;
+bool contains_space(char *str) {
+  /* return true if str contains space, false otherwise */
+  bool ret = false;
   if (str != NULL) {
     while (*str != '\0') {
       if (isspace(*str)) {
-        ret = 1;
+        ret = true;
         break;
       }
       str++;
@@ -136,4 +137,15 @@ FILE* openfile(char *path, ErrorType *err){
         *err = FILE_OPEN_ERROR;
     }
     return file;
+}
+
+
+bool str_in_str_array(char* str, char* str_arr[], int arr_len){
+    int i;
+    for(i = 0; i < arr_len; i++) {
+      if(strncmp(str_arr[i], str, strlen(str)) == 0) {
+        return true;
+      }
+    }
+    return false;
 }

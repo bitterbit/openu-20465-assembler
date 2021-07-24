@@ -28,8 +28,8 @@ struct AssemblyLine {
     LineType type;
     LineFlags flags;
 
-    char* label;
-    char* opcode_name;
+    char label[32];
+    char opcode_name[7]; /* Longest opcode is 6 chars long */
     char** args;
     size_t arg_count;
 };

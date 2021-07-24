@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
 
-void handle_assembly_file(char* path) {
+ErrorType handle_assembly_file(char* path) {
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
     ErrorType err = SUCCESS;
@@ -63,13 +63,10 @@ void handle_assembly_file(char* path) {
     /* This is an outline of first pass */
     err = parseLine(file, &line);
 
-    /* TODO: check err */
     while (err == SUCCESS) {
         switch(line.type) {
-
-            /* TODO: handle empty lines */
             case TypeEmpty:
-                /* ignore on first pass */
+                /* ignore on Empty or comment lines */
                 break;
 
             case TypeEntry:
@@ -107,20 +104,22 @@ void handle_assembly_file(char* path) {
                 break;
         }
 
-        /* TODO: err is not checked in this loop */
         err = parseLine(file, &line);
+    }
+
+    if (err != SUCCESS) {
+        print_error(err);
+        return err;
     }
 
     /* end of first pass, start second pass */
     /* TODO maybe seek line back or just use stored parsed lines instead of reparsing */
 
     err = parseLine(file, &line);
-    /* TODO: check err */
     while (err == SUCCESS) {
         switch(line.type) {
-            /* TODO: handle empty lines */
             case TypeEmpty:
-                /* ignore on first pass */
+                /* ignore on Empty or comment lines */
                 break;
 
             case TypeData:
@@ -155,8 +154,13 @@ void handle_assembly_file(char* path) {
                 }
                 break;
         }
-        /* TODO: err is not checked in this loop */
         err = parseLine(file, &line);
     }
 
+    if (err != SUCCESS) {
+        print_error(err);
+        return err;
+    }
+
+    return err;
 }
