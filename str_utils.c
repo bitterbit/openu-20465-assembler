@@ -4,6 +4,7 @@
 #include "str_utils.h"
 #include "assembly_line.h"
 #include "err.h"
+#include "ctype.h"
 
 char *seperate_string_by_token(char **string, char *delimeters) {
   char *string_start = *string;
@@ -128,7 +129,7 @@ ErrorType readline(FILE *file, char *buf) {
   return SUCCESS;
 }
 
-ErrorType openfile(char *path, ErrorType *err){
+FILE* openfile(char *path, ErrorType *err){
     FILE *file = fopen(path, "r");
 
     if (file == NULL){

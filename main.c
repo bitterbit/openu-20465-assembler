@@ -47,9 +47,10 @@ int main(int argc, char** argv) {
 void handle_assembly_file(char* path) {
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
-    Error err = OK;
+    ErrorType err = SUCCESS;
 
     size_t code_size = 0;
+    AssemblyLine line;
 
     /* TODO: remember to close file */
     FILE *file = openfile(path, &err);
@@ -60,10 +61,17 @@ void handle_assembly_file(char* path) {
     }
 
     /* This is an outline of first pass */
-    AssemblyLine *line = parseLine(file);
+    err = parseLine(file, &line);
 
-    while (line != NULL) {
-        switch(line->type) {
+    /* TODO: check err */
+    while (err == SUCCESS) {
+        switch(line.type) {
+
+            /* TODO: handle empty lines */
+            case TypeEmpty:
+                /* ignore on first pass */
+                break;
+
             case TypeEntry:
                 /* ignore on first pass */
                 break;
@@ -73,24 +81,24 @@ void handle_assembly_file(char* path) {
                     size_t size = 0;
                     unsigned char* data = NULL;
 
-                    if (line->flags & FlagSymbolDeclaration && line->flags & FlagExternDecleration) {
-                        Symbol* sym = newSymbol(line->label, 0, false, SymbolSection_Data);
+                    if (line.flags & FlagSymbolDeclaration && line.flags & FlagExternDecleration) {
+                        Symbol* sym = newSymbol(line.label, 0, false, SymbolSection_Data);
                         err = symtab->insert(symtab, sym);
                     } 
-                    else if (line->flags & FlagSymbolDeclaration) {
-                        Symbol* sym = newSymbol(line->label, memory->data_counter, false, SymbolSection_Data);
+                    else if (line.flags & FlagSymbolDeclaration) {
+                        Symbol* sym = newSymbol(line.label, memory->data_counter, false, SymbolSection_Data);
                         err = symtab->insert(symtab, sym);
                     }
 
-                    data = decodeDataLine(line, &size);
+                    data = decodeDataLine(&line, &size);
                     memory->writeData(memory, data, size);
                     free(data);
                 }
                 break;
 
             case TypeCode:
-                if (line->flags & FlagSymbolDeclaration) {
-                    Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, SymbolSection_Code);
+                if (line.flags & FlagSymbolDeclaration) {
+                    Symbol* sym = newSymbol(line.label, memory->instruction_counter, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
                 }
 
@@ -99,15 +107,22 @@ void handle_assembly_file(char* path) {
                 break;
         }
 
-        /* TODO err is not checked in this loop */
-        line = parseLine();
+        /* TODO: err is not checked in this loop */
+        err = parseLine(file, &line);
     }
 
     /* end of first pass, start second pass */
     /* TODO maybe seek line back or just use stored parsed lines instead of reparsing */
-    line = parseLine();
-    while (line != NULL) {
-        switch(line->type) {
+
+    err = parseLine(file, &line);
+    /* TODO: check err */
+    while (err == SUCCESS) {
+        switch(line.type) {
+            /* TODO: handle empty lines */
+            case TypeEmpty:
+                /* ignore on first pass */
+                break;
+
             case TypeData:
                 /* ignore data lines in the second pass */
                 break;
@@ -116,12 +131,12 @@ void handle_assembly_file(char* path) {
             case TypeEntry:
                 {
                     Symbol* sym = NULL;
-                    if (line->arg_count < 1) {
+                    if (line.arg_count < 1) {
                         err = ERR_INVALID_ENTRY;
                         break;
                     }
 
-                    sym = symtab->find(symtab, line->args[0]);
+                    sym = symtab->find(symtab, line.args[0]);
                     if (sym == NULL) {
                         err = ERR_ENTRY_SYM_NOT_FOUND;
                         break;
@@ -135,13 +150,13 @@ void handle_assembly_file(char* path) {
             case TypeCode:
                 {
                     /* TODO check if instruction references .data section and calculate offset to it */
-                    Instruction *inst = decodeInstructionLine(line);
+                    Instruction *inst = decodeInstructionLine(&line);
                     memory->writeCode(memory, inst);
                 }
                 break;
         }
-
-        line = parseLine();
+        /* TODO: err is not checked in this loop */
+        err = parseLine(file, &line);
     }
 
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "instruction.h"
+#include "err.h"
 
 #define COMMENT_CHAR ';'
 #define MAX_LINE_LENGTH 80
@@ -12,7 +13,8 @@
 typedef enum {
     TypeData,
     TypeCode,
-    TypeEntry
+    TypeEntry,
+    TypeEmpty
 } LineType;
 
 typedef enum {

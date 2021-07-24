@@ -1,11 +1,11 @@
 #include "memory.h"
 
-Error Memory_writeData(Memory* self, unsigned char* data, size_t size) {
-    return OK;
+ErrorType Memory_writeData(Memory* self, unsigned char* data, size_t size) {
+    return SUCCESS;
 }
 
-Error Memory_writeCode(Memory* self, Instruction* instruction) {
-    return OK;
+ErrorType Memory_writeCode(Memory* self, Instruction* instruction) {
+    return SUCCESS;
 }
 
 void Memory_free(Memory* self) {

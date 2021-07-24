@@ -24,12 +24,12 @@ void Symbol_free(Symbol* self) {
 }
 
 
-bool SymbolTable_insert(SymbolTable* self, Symbol* sym) {
+ErrorType SymbolTable_insert(SymbolTable* self, Symbol* sym) {
     ListNode *node = NULL;
 
     if (self->head == NULL) { 
         self->head = newListNode(sym);
-        return OK;
+        return SUCCESS;
     }
 
     if (self->exists(self, sym->symbol) == true) {
@@ -42,7 +42,7 @@ bool SymbolTable_insert(SymbolTable* self, Symbol* sym) {
     node->next = self->head;
     self->head = node;
 
-    return OK;
+    return SUCCESS;
 }
 
 bool SymbolTable_exists(SymbolTable* self, char* symbol_name) {

@@ -5,11 +5,15 @@
 #include "str_utils.h"
 #include "err.h"
 
+static const AssemblyLine EmptyLineStruct;
+
 
 ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;
+    char buf[BUFFER_SIZE]=  {0};
 
-    char buf[BUFFER_SIZE] = {0};
+    /* Clean the line before parsing a new line into it */
+    *line = EmptyLineStruct;
 
     /* TODO: how should longer lines be handled? */
     err = readline(file, buf);
@@ -21,7 +25,8 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     /* Handle empty and commented lines */
     if(check_for_empty_line(buf) == 0 || buf[0] == COMMENT_CHAR){
         /* TODO: this function returns an error, maybe i can set the type of the line to empty line? */
-        return NULL;
+        line->type = TypeEmpty;
+        return err;
     }
 
     /* TODO: start parsing */
@@ -33,7 +38,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     /* TODO: parse name */
     /* TODO: args and args count*/
     
-    return NULL;
+    return err;
 }
 
 /* TODO: Implement  */

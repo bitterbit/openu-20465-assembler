@@ -27,7 +27,7 @@ struct SymbolTable {
     ListNode* head;
 
     /* insert opcode to list, this function takes ownership of this opcode structure */
-    Error (*insert) (SymbolTable* self, Symbol* sym);
+    ErrorType (*insert) (SymbolTable* self, Symbol* sym);
 
     /* check if a opcode with a given symbol name exists in list */
     bool (*exists)(SymbolTable* self, char* symbol_name);

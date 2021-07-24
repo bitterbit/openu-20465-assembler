@@ -15,8 +15,8 @@ struct Memory {
     size_t data_counter;
     size_t instruction_counter;
 
-    Error (*writeData)(Memory* self, unsigned char* data, size_t size);
-    Error (*writeCode)(Memory* self, Instruction* instruction);
+    ErrorType (*writeData)(Memory* self, unsigned char* data, size_t size);
+    ErrorType (*writeCode)(Memory* self, Instruction* instruction);
     void (*free)(Memory* self);
 };
 
