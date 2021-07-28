@@ -3,6 +3,19 @@
 #include "str_utils.h"
 
 
+/* TODO: probably not the nicest way to do this */
+const char* r_commands[] = {"add", "sub", "and", "or", "nor", "move", "mvhi", "mvlo"};
+const int r_commands_len = 8;
+const char* i_commands[] = {"addi", "subi", "andi", "ori", "nori", "beq", "bne", "blt", "bgt", "lb", "sb", "lw", "sw", "lh", "sh"};
+const int i_commands_len = 15;
+const char* j_commands[] = {"jmp", "la", "call", "stop"};
+const int j_commands_len = 4;
+const char* data_directive_commands[] = {"dd", "dw", "db", "asciz"};
+const int data_directive_commands_len = 4;
+const char* entry_directive_commands[] = {"entry", "extern"};
+const int entry_directive_commands_len = 2;
+
+
 /* TODO: make efficient? */
 bool is_code_opcode(char* str){
     /* is i instruction */

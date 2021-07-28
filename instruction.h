@@ -24,8 +24,8 @@ struct RInstruction {
     unsigned int opcode: 6;
 };
 
-const char* r_commands[] = {"add", "sub", "and", "or", "nor", "move", "mvhi", "mvlo"};
-const int r_commands_len = 8;
+extern const char* r_commands[];
+extern const int r_commands_len;
 
 /* I Instructions: 
  *   regular: addi, subi, andi, ori, nori, 
@@ -37,8 +37,8 @@ struct IInstruction {
     unsigned int opcode: 6;
 };
 
-const char* i_commands[] = {"addi", "subi", "andi", "ori", "nori", "beq", "bne", "blt", "bgt", "lb", "sb", "lw", "sw", "lh", "sh"};
-const int i_commands_len = 15;
+extern const char* i_commands[];
+extern const int i_commands_len;
 
 /* J Instructions: jmp, la, call, stop */
 struct JInstruction {
@@ -47,8 +47,8 @@ struct JInstruction {
     unsigned int opcode: 6;
 };
 
-const char* j_commands[] = {"jmp", "la", "call", "stop"};
-const int j_commands_len = 4;
+extern const char* j_commands[];
+extern const int j_commands_len;
 
 struct Instruction {
     InstructionType type;
@@ -61,11 +61,11 @@ struct Instruction {
 
 
 /* TODO: Move */
-const char* data_directive_commands[] = {"dd", "dw", "db", "asciz"};
-const int data_directive_commands_len = 4;
+extern const char* data_directive_commands[];
+extern const int data_directive_commands_len;
 
-const char* entry_directive_commands[] = {"entry", "extern"};
-const int entry_directive_commands_len = 2;
+extern const char* entry_directive_commands[];
+extern const int entry_directive_commands_len;
 
 bool is_reserved_keyword(char* str);
 bool is_code_opcode(char* str);
