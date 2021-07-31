@@ -134,15 +134,26 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     return err;
 }
 
-void clean_line(AssemblyLine *line){
+AssemblyLine* newLine() {
+    AssemblyLine *line = malloc(sizeof(AssemblyLine));
+    return line;
+}
+
+void freeLine(AssemblyLine *line) {
     /* Clean a line and release the args pointers */
-    for (int i=0; i < line->arg_count; i++){
+    int i;
+    for (i=0; i < line->arg_count; i++){
         free(line->args[i]);
     }
 
-    *line = EmptyLineStruct;
+    free(line);
 }
 
+/**
+ * Fill AssemblyLine struct with data describing a single assembly line.
+ * The caller is responsible for allocating and clearing.
+ * Returns error if applicable
+ */
 ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;
     char buf[BUFFER_SIZE]=  {0};

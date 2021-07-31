@@ -40,4 +40,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size);
 
 Instruction* decodeInstructionLine(AssemblyLine* line);
 
+AssemblyLine* newLine();
+void freeLine(AssemblyLine *line);
+
 #endif
