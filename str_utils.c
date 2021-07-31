@@ -43,10 +43,7 @@ void remove_all_spaces(char *str) {
   } while ((*str++ = *index++) != 0);
 }
 
-void remove_leading_and_trailing_spaces(char **str) {
-  /* Remove leading and trailing spaces from a string */
-  char *string_end;
-
+void remove_leading_spaces(char **str){
   if (str == NULL || *str == NULL) {
     return;
   }
@@ -55,9 +52,16 @@ void remove_leading_and_trailing_spaces(char **str) {
   while (**str != '\0' && isspace(**str)) {
     (*str)++;
   }
+}
 
+void remove_trailing_spaces(char **str){
   /* Remove trailing spaces */
-  string_end = *str + strlen(*str) - 1;
+
+  if (str == NULL || *str == NULL) {
+    return;
+  }
+
+  char *string_end = (*str + strlen(*str) - 1);
   while (string_end > (*str) && isspace(*string_end)) {
     string_end--;
   }
@@ -65,6 +69,11 @@ void remove_leading_and_trailing_spaces(char **str) {
   /* Found last char which isn't space - move one forward and cut the string */
   string_end++;
   *string_end = '\0';
+}
+
+void remove_leading_and_trailing_spaces(char **str) {
+  remove_leading_spaces(str);
+  remove_trailing_spaces(str);
 }
 
 bool contains_space(char *str) {

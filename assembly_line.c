@@ -97,7 +97,6 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
             line->type = TypeData;
             strcpy(line->opcode_name, command);
         }
-        /* TODO: in both of these types - verify label is empty */
         else if (str_in_str_array(command, (char**)entry_directive_commands, entry_directive_commands_len)){
             line->type = TypeEntry;
             strcpy(line->opcode_name, command);
@@ -129,8 +128,6 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     }
 
 
-
-
     return err;
 }
 
@@ -157,11 +154,6 @@ void freeLine(AssemblyLine *line) {
 ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;
     char buf[BUFFER_SIZE]=  {0};
-
-    /* Clean the line before parsing a new line into it */
-    /* TODO: need to free the args pointers (use the argcount) */
-    *line = EmptyLineStruct;
-
     err = readline(file, buf);
 
     if (err != SUCCESS){
@@ -187,7 +179,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     /* Remove leading spaces before command type */
-    remove_leading_and_trailing_spaces((char**)&buf);
+    remove_leading_spaces((char**)&buf);
     err = parseCommand(buf, line);
 
     if (err != SUCCESS){
@@ -195,7 +187,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     /* Remove leading spaces before args */
-    remove_leading_and_trailing_spaces((char**)&buf);
+    remove_leading_spaces((char**)&buf);
     err = parseArgs(buf, line);
 
     return err;

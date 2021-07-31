@@ -83,6 +83,7 @@ ErrorType handle_assembly_file(char* path) {
         queue->push(queue, line);
     }
 
+    /* TODO: we will need to print each of the errors - and add the line number, so this will be moved */
     if (err != SUCCESS) {
         print_error(err);
         return err;
