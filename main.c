@@ -35,6 +35,10 @@ ErrorType handle_assembly_file(char* path) {
     queue->push(queue, line);
 
     while (err == SUCCESS) {
+
+        printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n", line->opcode_name, line->label, line->arg_count);
+
+
         switch(line->type) {
             case TypeEmpty:
                 /* ignore on Empty or comment lines */

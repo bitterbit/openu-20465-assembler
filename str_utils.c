@@ -1,11 +1,11 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "str_utils.h"
 #include "assembly_line.h"
-#include "err.h"
-#include "ctype.h"
 #include "bool.h"
+#include "ctype.h"
+#include "err.h"
+#include "str_utils.h"
 
 char *seperate_string_by_token(char **string, char *delimeters) {
   char *string_start = *string;
@@ -43,19 +43,18 @@ void remove_all_spaces(char *str) {
   } while ((*str++ = *index++) != 0);
 }
 
-void remove_leading_spaces(char **str){
+void remove_leading_spaces(char **str) {
   if (str == NULL || *str == NULL) {
     return;
   }
 
   /* Remove leading spaces */
   while (**str != '\0' && isspace(**str)) {
-    printf("c=%c \n", **str);
     (*str)++;
   }
 }
 
-void remove_trailing_spaces(char **str){
+void remove_trailing_spaces(char **str) {
   /* Remove trailing spaces */
   char *string_end;
   if (str == NULL || *str == NULL) {
@@ -94,8 +93,12 @@ bool contains_space(char *str) {
 }
 
 int check_for_empty_line(char *line_str) {
-  /* Return 0 if line is empty, or containing only space chars, positive integer
-   * otherwise. */
+  /* Return 0 if line is empty or contains only space chars, 
+   * non zero int otherwise */
+  if (line_str == NULL) {
+      return 0;
+  }
+
   char cmd_copy[BUFFER_SIZE];
   int len;
   strcpy(cmd_copy, line_str);
@@ -105,7 +108,6 @@ int check_for_empty_line(char *line_str) {
 
   return len;
 }
-
 
 ErrorType readline(FILE *file, char *buf) {
   /* Read a line from stdin, and check for the end of input */
@@ -127,7 +129,8 @@ ErrorType readline(FILE *file, char *buf) {
     *string_end = '\0';
   }
 
-  /* Check for too long lines, if buf doesn't end with a newline, and the maximum bytes were read*/
+  /* Check for too long lines, if buf doesn't end with a newline, and the
+     maximum bytes were read*/
   else if (len == (BUFFER_SIZE - 1)) {
     /* skip to next line */
     while (fgets(buf, BUFFER_SIZE, file) != NULL) {
@@ -140,22 +143,21 @@ ErrorType readline(FILE *file, char *buf) {
   return SUCCESS;
 }
 
-FILE* openfile(char *path, ErrorType *err){
-    FILE *file = fopen(path, "r");
+FILE *openfile(char *path, ErrorType *err) {
+  FILE *file = fopen(path, "r");
 
-    if (file == NULL){
-        *err = FILE_OPEN_ERROR;
-    }
-    return file;
+  if (file == NULL) {
+    *err = FILE_OPEN_ERROR;
+  }
+  return file;
 }
 
-
-bool str_in_str_array(char* str, char* str_arr[], int arr_len){
-    int i;
-    for(i = 0; i < arr_len; i++) {
-      if(strncmp(str_arr[i], str, strlen(str)) == 0) {
-        return true;
-      }
+bool str_in_str_array(char *str, char *str_arr[], int arr_len) {
+  int i;
+  for (i = 0; i < arr_len; i++) {
+    if (strncmp(str_arr[i], str, strlen(str)) == 0) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }

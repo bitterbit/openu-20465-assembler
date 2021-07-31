@@ -9,8 +9,9 @@
 static const AssemblyLine EmptyLineStruct;
 
 
-ErrorType parseLabel(char *buf, AssemblyLine *line){
-    char* label = seperate_string_by_token(&buf, ":");
+ErrorType parseLabel(char **buf, AssemblyLine *line){
+    char* label = seperate_string_by_token(buf, ":");
+
 
     if (label == NULL){
         /* if token is not found, Set label to empty string */
@@ -78,9 +79,12 @@ bool is_register(char *token)
 
 
 
-ErrorType parseCommand(char *buf, AssemblyLine *line){
+ErrorType parseCommand(char **buf, AssemblyLine *line){
     ErrorType err = SUCCESS;
-    char* command = seperate_string_by_token(&buf, " \t");
+
+    /* split by space or tab */
+    char* command = seperate_string_by_token(buf, " \t"); 
+    printf("buf=%s buf after seperate_string_by_token \n", *buf);
     
     if (*command != '.') {
         if (is_code_opcode(command)){
@@ -116,47 +120,25 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
 
 /* Returns a new pointer to a token,
     caller is responsible for freeing */
-char* handleToken(char *buf, ErrorType *err) {
+char* handleToken(char **buf, ErrorType *err) {
     /* TODO: handle last token? */
 
     char *token;
     char *dyanimic_token = NULL;
 
     /* Remove leading spaces before arg */
-    remove_leading_spaces(&buf);
+    remove_leading_spaces(buf);
+    printf("after removing spaces '%s'\n", *buf);
 
     /* Handle string tokens */
-    if (*buf == '"') {
+    if (**buf == '"') {
         printf("strings not supported\n");
         exit(100);
-        
-        /* token = seperate_string_by_token(&buf, ','); */
-
-        /* Did not find seperator - token must end with quatation mark*/
-/*         if (token == buf) {
-            remove_trailing_spaces(token);
-            if (token[strlen(token) - 1] != '"') {
-                *err = ERR_UNTERMINATED_STRING_ARG;
-                return dyanimic_token;
-            }
-        }
-
-        else {
-
-            while (token[strlen(token) - 1] != '"'){
-            
-            if () {
-
-            }
-
-            strcpy(str_temp)
-        }
-        } */
     }
 
     /* Handle non string tokens */
     else {
-        token = seperate_string_by_token(&buf, ",");
+        token = seperate_string_by_token(buf, ",");
     }
 
     remove_trailing_spaces(&token);
@@ -180,8 +162,11 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     line->args = NULL;
 
     while (check_for_empty_line(buf) != 0) {
-        /* TODO: check errors */
-        token = handleToken(buf, &err);
+        /* token is heap allocated and should be freed when AssemblyLine is freed */
+        token = handleToken(&buf, &err); 
+        line->args = realloc(line->args, sizeof(void*) * (line->arg_count+1) );
+        line->args[line->arg_count] = token;
+        line->arg_count += 1;
     }
 
     return err;
@@ -225,7 +210,9 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
         return err;
     }
 
-    err = parseLabel(buf_p, line);
+    err = parseLabel(&buf_p, line);
+    printf("line after parse label: %s\n", buf_p);
+
     if (err != SUCCESS){
         return err;
     }
@@ -236,14 +223,16 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     /* Remove leading spaces before command type */
-    remove_leading_spaces((char**)&buf_p);
-    err = parseCommand(buf_p, line);
+    remove_leading_spaces(&buf_p);
+    err = parseCommand(&buf_p, line);
+    printf("line after parse command: %s\n", buf_p);
 
     if (err != SUCCESS){
         return err;
     }
 
     err = parseArgs(buf_p, line);
+    printf("line after parse args: %s\n", buf_p);
 
     return err;
 }
