@@ -12,13 +12,13 @@ static const AssemblyLine EmptyLineStruct;
 ErrorType parseLabel(char *buf, AssemblyLine *line){
     char* label = seperate_string_by_token(&buf, ":");
 
-    if (label == NULL || contains_space(label)){
-        /* if token is not found, or there is space before it, Set label to empty string */
+    if (label == NULL){
+        /* if token is not found, Set label to empty string */
         line->label[0] = '\0';
         return SUCCESS;
     }
 
-    if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label)){
+    if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || contains_space(label)){
         return ERR_INVALID_LABEL;
     }
 
@@ -28,12 +28,60 @@ ErrorType parseLabel(char *buf, AssemblyLine *line){
 }
 
 
+
+/* TODO: can be replaced with sscanf? */
+/* Check if a token is a valid number in the assembly spec */
+bool is_number(char *token)
+{
+    if(token == NULL || *token == '\0') return false;
+    /* Numbers can start with a sign, but never contain only a sign */
+    if(*token == '+' || *token == '-')
+    {
+        token++;
+        if(!isdigit(*token++)){
+            return false;
+        }
+    }
+
+    /* All other chars should represent digits */
+    while(*token != '\0')
+    {
+        if(!isdigit(*token++)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_register(char *token)
+{
+    int number;
+    int sscanf_success;
+
+    if ((*token++) != '$'){
+        return false;
+    }
+
+    sscanf_success = sscanf(token, "%d", number);
+
+    if (sscanf_success == 0){
+        return false;
+    }
+
+    /* TODO: bug with trailing zeroes */
+    if (number < 0 || number > 32){
+        return false;
+    }
+    return true;
+}
+
+
+
 ErrorType parseCommand(char *buf, AssemblyLine *line){
     ErrorType err = SUCCESS;
     char* command = seperate_string_by_token(&buf, " \t");
     
     /* TODO: what is FlagSymbolDeclaration? */
-    /* TODO: handle empty line? */
 
     if (*command != '.') {
         if (is_code_opcode(command)){
@@ -45,14 +93,17 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
         }
     }
     else{
-        command += 1;
+        command++;
         if (str_in_str_array(command, (char**)data_directive_commands, data_directive_commands_len)){
             line->type = TypeData;
             strcpy(line->opcode_name, command);
         }
         else if (str_in_str_array(command, (char**)entry_directive_commands, entry_directive_commands_len)){
             line->type = TypeEntry;
-            line->flags |= FlagExternDecleration;
+            strcpy(line->opcode_name, command);
+        }
+        else if (str_in_str_array(command, (char**)extern_directive_commands, extern_directive_commands_len)){
+            line->type = TypeExtern;
             strcpy(line->opcode_name, command);
         }
         else {
@@ -66,7 +117,17 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
 ErrorType parseArgs(char *buf, AssemblyLine *line){
     /* TODO: parse args by type of command */
     /* TODO: parse arg count where needed */
+
+
+    /* TODO: oh noez - a comma can also be inside a token*/
     ErrorType err = SUCCESS;
+    line->arg_count = 0;
+    line->args = NULL;
+
+    if(check_for_empty_line(buf) == 0){
+        return err;
+    }
+
 
 
 
@@ -79,6 +140,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     char buf[BUFFER_SIZE]=  {0};
 
     /* Clean the line before parsing a new line into it */
+    /* TODO: need to free the args pointers (use the argcount) */
     *line = EmptyLineStruct;
 
     err = readline(file, buf);
@@ -91,7 +153,6 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 
     /* Handle empty and commented lines */
     if(check_for_empty_line(buf) == 0 || buf[0] == COMMENT_CHAR){
-        /* TODO: this function returns an error, maybe i can set the type of the line to empty line? */
         line->type = TypeEmpty;
         return err;
     }
@@ -99,6 +160,11 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     err = parseLabel(buf, line);
     if (err != SUCCESS){
         return err;
+    }
+
+    /* If a line doesn't contain a command  - its invalid */
+    if(check_for_empty_line(buf) == 0){
+        return ERR_INVALID_COMMAND_FORMAT;
     }
 
     /* Remove leading spaces before command type */

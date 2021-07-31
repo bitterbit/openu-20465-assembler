@@ -14,12 +14,12 @@ typedef enum {
     TypeData,
     TypeCode,
     TypeEntry,
+    TypeExtern,
     TypeEmpty
 } LineType;
 
 typedef enum {
-    FlagExternDecleration  = 1 << 0,
-    FlagSymbolDeclaration  = 1 << 1
+    FlagSymbolDeclaration  = 1 << 0
 } LineFlags;
 
 /* TODO implement allocation and free functions */

@@ -66,6 +66,8 @@ extern const int data_directive_commands_len;
 
 extern const char* entry_directive_commands[];
 extern const int entry_directive_commands_len;
+extern const char* extern_directive_commands[];
+extern const int extern_directive_commands_len;
 
 bool is_reserved_keyword(char* str);
 bool is_code_opcode(char* str);
