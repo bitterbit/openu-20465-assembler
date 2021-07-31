@@ -28,5 +28,5 @@ ListIterator* newListIterator(ListNode *head) {
     iter->next = ListIterator_next;
     iter->free = ListIterator_free;
 
-    return NULL;
+    return iter;
 }
