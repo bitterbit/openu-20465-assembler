@@ -63,7 +63,7 @@ bool is_register(char *token)
         return false;
     }
 
-    sscanf_success = sscanf(token, "%d", number);
+    sscanf_success = sscanf(token, "%d", &number);
 
     if (sscanf_success == 0){
         return false;
@@ -157,7 +157,7 @@ char* handleToken(char *buf, ErrorType *err) {
 
     /* Handle non string tokens */
     else {
-        token = seperate_string_by_token(&buf, ',');
+        token = seperate_string_by_token(&buf, ",");
     }
 
     remove_trailing_spaces(&token);

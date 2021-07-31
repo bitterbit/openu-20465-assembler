@@ -56,12 +56,13 @@ void remove_leading_spaces(char **str){
 
 void remove_trailing_spaces(char **str){
   /* Remove trailing spaces */
+   char *string_end;
 
   if (str == NULL || *str == NULL) {
     return;
   }
 
-  char *string_end = (*str + strlen(*str) - 1);
+  string_end = (*str + strlen(*str) - 1);
   while (string_end > (*str) && isspace(*string_end)) {
     string_end--;
   }
