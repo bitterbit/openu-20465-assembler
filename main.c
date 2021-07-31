@@ -1,32 +1,3 @@
-/*
- * --- first pass
- *  + parse opecodes into queue
- *  + collect all labels
- *  + write data entries? 
- *
- * --- second pass
- *  + fix addresses of opcodes in queue that are unresolved (symbols)
- *  + resolve externals?
- *
- * --- end
- *  + dump to files
- *   + object file with `.ob` for machine code
- *   + textual files with "key value" lines
-       + externals files with data about unresolved symbols that were marked as externals. `.ext`
-       + entry files  `.ent` with all symbols that were marked as entry points
- *
- * for each file name in argv assemble the file
- *
- *
- *
- * concepts:
-     * code section
-     * memory - nice wrapper around buffer with cur pointer
-     * instruction queue
-         * Instruction struct
- *  
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,9 +9,6 @@
 #include "assembly_line.h"
 #include "str_utils.h"
 
-int main(int argc, char** argv) {
-    /* TODO: do we need to catch all memory allocation errors? */
-}
 
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
@@ -180,4 +148,19 @@ ErrorType handle_assembly_file(char* path) {
     }
 
     return err;
+}
+
+int main(int argc, char** argv) {
+    int i;
+    ErrorType err = SUCCESS;
+
+    /* skip first argument as it is binary name */
+    for (i=1; i<argc; i++) {
+        char *fname = argv[i];
+        err = handle_assembly_file(fname);
+
+        if (err != SUCCESS) {
+            print_error(err);
+        }
+    }
 }
