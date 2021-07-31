@@ -49,6 +49,7 @@ ErrorType handle_assembly_file(char* path) {
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
     LineQueue* queue = newLineQueue();
+    AssemblyLine *line;
 
     ErrorType err = SUCCESS;
 
@@ -61,7 +62,7 @@ ErrorType handle_assembly_file(char* path) {
     }
 
     /* lines are allocated on heap and owned by the queue */
-    AssemblyLine *line = newLine();
+    line = newLine();
     err = parseLine(file, line);
     queue->push(queue, line);
 
@@ -110,7 +111,7 @@ ErrorType handle_assembly_file(char* path) {
         }
 
         line = newLine();
-        err = parseLine(file, &line);
+        err = parseLine(file, line);
         queue->push(queue, line);
     }
 
@@ -131,6 +132,10 @@ ErrorType handle_assembly_file(char* path) {
 
             case TypeData:
                 /* ignore data lines in the second pass */
+                break;
+
+            case TypeExtern:
+                /* ignore extern declerations in the second pass */
                 break;
 
             /* .entry SYM_NAME */
