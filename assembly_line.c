@@ -22,6 +22,7 @@ ErrorType parseLabel(char *buf, AssemblyLine *line){
         return ERR_INVALID_LABEL;
     }
 
+    line->flags |= FlagSymbolDeclaration;
     strcpy(line->label, label);
 
     return SUCCESS;
@@ -81,8 +82,6 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
     ErrorType err = SUCCESS;
     char* command = seperate_string_by_token(&buf, " \t");
     
-    /* TODO: what is FlagSymbolDeclaration? */
-
     if (*command != '.') {
         if (is_code_opcode(command)){
             line->type = TypeCode;
@@ -98,6 +97,7 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
             line->type = TypeData;
             strcpy(line->opcode_name, command);
         }
+        /* TODO: in both of these types - verify label is empty */
         else if (str_in_str_array(command, (char**)entry_directive_commands, entry_directive_commands_len)){
             line->type = TypeEntry;
             strcpy(line->opcode_name, command);
@@ -134,6 +134,14 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     return err;
 }
 
+void clean_line(AssemblyLine *line){
+    /* Clean a line and release the args pointers */
+    for (int i=0; i < line->arg_count; i++){
+        free(line->args[i]);
+    }
+
+    *line = EmptyLineStruct;
+}
 
 ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;

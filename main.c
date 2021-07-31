@@ -103,7 +103,7 @@ ErrorType handle_assembly_file(char* path) {
                 code_size += INSTRUCTION_SIZE;
                 break;
         }
-
+        clean_line(&line);
         err = parseLine(file, &line);
     }
 
@@ -154,6 +154,7 @@ ErrorType handle_assembly_file(char* path) {
                 }
                 break;
         }
+        clean_line(&line);
         err = parseLine(file, &line);
     }
 
