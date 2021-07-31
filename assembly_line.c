@@ -91,7 +91,7 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
             err = ERR_INVALID_COMMAND_NAME;
         }
     }
-    else{
+    else {
         command++;
         if (str_in_str_array(command, (char**)data_directive_commands, data_directive_commands_len)){
             line->type = TypeData;
@@ -113,9 +113,66 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
     return err;
 }
 
+
+/* Returns a new pointer to a token,
+    caller is responsible for freeing */
+char* handleToken(char *buf, ErrorType *err) {
+    /* TODO: handle last token? */
+
+    char str_temp[MAX_LINE_LENGTH];
+    char *token;
+    char *dyanimic_token = NULL;
+
+    /* Remove leading spaces before arg */
+    remove_leading_spaces(&buf);
+
+    /* Handle string tokens */
+    if (*buf == '"') {
+        printf("strings not supported\n");
+        exit(100);
+        
+        /* token = seperate_string_by_token(&buf, ','); */
+
+        /* Did not find seperator - token must end with quatation mark*/
+/*         if (token == buf) {
+            remove_trailing_spaces(token);
+            if (token[strlen(token) - 1] != '"') {
+                *err = ERR_UNTERMINATED_STRING_ARG;
+                return dyanimic_token;
+            }
+        }
+
+        else {
+
+            while (token[strlen(token) - 1] != '"'){
+            
+            if () {
+
+            }
+
+            strcpy(str_temp)
+        }
+        } */
+    }
+
+    /* Handle non string tokens */
+    else {
+        token = seperate_string_by_token(&buf, ',');
+    }
+
+    remove_trailing_spaces(&token);
+
+    dyanimic_token = malloc(strlen(token)+1);
+    strcpy(dyanimic_token, token);
+
+    return dyanimic_token;
+
+}
+
 ErrorType parseArgs(char *buf, AssemblyLine *line){
     /* TODO: parse args by type of command */
     /* TODO: parse arg count where needed */
+    char *token = NULL;
 
 
     /* TODO: oh noez - a comma can also be inside a token*/
@@ -123,10 +180,10 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     line->arg_count = 0;
     line->args = NULL;
 
-    if(check_for_empty_line(buf) == 0){
-        return err;
+    while (check_for_empty_line(buf) != 0) {
+        /* TODO: check errors */
+        token = handleToken(buf, &err);
     }
-
 
     return err;
 }
@@ -186,8 +243,6 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
         return err;
     }
 
-    /* Remove leading spaces before args */
-    remove_leading_spaces((char**)&buf);
     err = parseArgs(buf, line);
 
     return err;
