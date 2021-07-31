@@ -38,7 +38,7 @@ struct AssemblyLine {
 ErrorType parseLine(FILE *file, AssemblyLine *line);
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size);
 
-Instruction* decodeInstructionLine(AssemblyLine* line);
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst);
 
 AssemblyLine* newLine();
 void freeLine(AssemblyLine *line);

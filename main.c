@@ -10,6 +10,7 @@
 #include "str_utils.h"
 
 
+
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
 
@@ -18,6 +19,7 @@ ErrorType handle_assembly_file(char* path) {
     Memory* memory = newMemory();
     LineQueue* queue = newLineQueue();
     AssemblyLine *line;
+    Instruction inst;
 
     ErrorType err = SUCCESS;
 
@@ -129,9 +131,11 @@ ErrorType handle_assembly_file(char* path) {
 
             case TypeCode:
                 {
+                    /* Clean inst */
+                    memset(&inst, 0, sizeof(Instruction));
                     /* TODO check if instruction references .data section and calculate offset to it */
-                    Instruction *inst = decodeInstructionLine(line);
-                    memory->writeCode(memory, inst);
+                    err = decodeInstructionLine(line, &inst);
+                    memory->writeCode(memory, &inst);
                 }
                 break;
         }
