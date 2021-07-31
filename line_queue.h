@@ -13,6 +13,7 @@ typedef struct LineQueue LineQueue;
 
 struct LineQueue {
     ListNode *head;
+    ListNode *tail;
     void (*push)(LineQueue *self, AssemblyLine *asm_line);
     AssemblyLine* (*pop)(LineQueue *self);
     void (*free)(LineQueue *self);

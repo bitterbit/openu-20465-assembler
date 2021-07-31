@@ -50,14 +50,14 @@ void remove_leading_spaces(char **str){
 
   /* Remove leading spaces */
   while (**str != '\0' && isspace(**str)) {
+    printf("c=%c \n", **str);
     (*str)++;
   }
 }
 
 void remove_trailing_spaces(char **str){
   /* Remove trailing spaces */
-   char *string_end;
-
+  char *string_end;
   if (str == NULL || *str == NULL) {
     return;
   }

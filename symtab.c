@@ -103,6 +103,7 @@ void SymbolTable_free(SymbolTable* self) {
             node = iterator->next(iterator);
         }
 
+        node->free(node);
         iterator->free(iterator);
     }
 

@@ -158,6 +158,7 @@ int main(int argc, char** argv) {
     /* skip first argument as it is binary name */
     for (i=1; i<argc; i++) {
         char *fname = argv[i];
+        printf("parsing file %s\n", fname);
         err = handle_assembly_file(fname);
 
         if (err != SUCCESS) {
