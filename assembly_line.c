@@ -119,7 +119,6 @@ ErrorType parseCommand(char *buf, AssemblyLine *line){
 char* handleToken(char *buf, ErrorType *err) {
     /* TODO: handle last token? */
 
-    char str_temp[MAX_LINE_LENGTH];
     char *token;
     char *dyanimic_token = NULL;
 
@@ -210,40 +209,41 @@ void freeLine(AssemblyLine *line) {
  */
 ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;
-    char buf[BUFFER_SIZE]=  {0};
+    char buf[BUFFER_SIZE] = {0};
+    char *buf_p = buf;
     err = readline(file, buf);
 
     if (err != SUCCESS){
         return err;
     }
 
-    remove_leading_and_trailing_spaces((char**)&buf);
+    remove_leading_and_trailing_spaces((char**)&buf_p);
 
     /* Handle empty and commented lines */
-    if(check_for_empty_line(buf) == 0 || buf[0] == COMMENT_CHAR){
+    if(check_for_empty_line(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
         line->type = TypeEmpty;
         return err;
     }
 
-    err = parseLabel(buf, line);
+    err = parseLabel(buf_p, line);
     if (err != SUCCESS){
         return err;
     }
 
     /* If a line doesn't contain a command  - its invalid */
-    if(check_for_empty_line(buf) == 0){
+    if(check_for_empty_line(buf_p) == 0){
         return ERR_INVALID_COMMAND_FORMAT;
     }
 
     /* Remove leading spaces before command type */
-    remove_leading_spaces((char**)&buf);
-    err = parseCommand(buf, line);
+    remove_leading_spaces((char**)&buf_p);
+    err = parseCommand(buf_p, line);
 
     if (err != SUCCESS){
         return err;
     }
 
-    err = parseArgs(buf, line);
+    err = parseArgs(buf_p, line);
 
     return err;
 }
