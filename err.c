@@ -1,10 +1,13 @@
 #include "err.h"
+#include "bool.h"
 
 
 /* TODO: maybe add parameter of the offending line to be printed as well */
 void print_error(ErrorType err) {
   /* print a string reflecting the error */
   char *str;
+  bool found = true;
+
   switch (err) {
 
   case INVALID_LABEL_NAME:
@@ -35,6 +38,10 @@ void print_error(ErrorType err) {
     str = "No entry specified, must specify an .entry";
     break;
 
+  case ERR_INVALID_LABEL:
+    str = "Invalid label";
+    break;
+
   case ERR_INVALID_COMMAND_NAME:
     str = "Invalid command name";
     break;
@@ -47,10 +54,30 @@ void print_error(ErrorType err) {
     str = "Unterminated string argument";
     break;
 
+  case ERR_INVALID_CODE_INSTRUCTION:
+    str = "Invalid code instruction";
+    break;
+
+  case ERR_INVALID_REGISTER:
+    str = "Invalid register";
+    break;
+
+  case ERR_INVALID_NUMBER_TOKEN:
+    str = "Invalid number token";
+    break;
+
+  case ERR_INVALID_NUMBER_SIZE:
+    str = "Invalid number size";
+    break;
+
   default:
     str = "Unknown error value";
+    found = false;
     break;
   }
 
   printf("Error: %s\n", str);
+  if (found == false) {
+      printf("Error number %d\n", err);
+  }
 }

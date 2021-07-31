@@ -19,6 +19,7 @@ ErrorType parseLabel(char **buf, AssemblyLine *line){
     }
 
     if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || contains_space(label)){
+        printf("invalid label: %s\n", label);
         return ERR_INVALID_LABEL;
     }
 
@@ -254,14 +255,11 @@ ErrorType number_from_string(char *str, int *immed, int number_of_bits){
     }
 
     if (!number_fits_in_bits(*immed, number_of_bits)) {
-        return ERR_INVLAID_NUMBER_SIZE;
+        return ERR_INVALID_NUMBER_SIZE;
     }
 
     return SUCCESS;
 }
-
-
-
 
 ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
