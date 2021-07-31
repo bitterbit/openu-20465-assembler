@@ -17,6 +17,7 @@ char *seperate_string_by_token(char **string, char *delimeters) {
 
   /* find the delimeter, and end the string at that point */
   string_end = string_start + strcspn(string_start, delimeters);
+
   if (*string_end) {
     /* add null to seperate the strings */
     *string_end = '\0';
@@ -90,6 +91,19 @@ bool contains_space(char *str) {
   }
 
   return ret;
+}
+
+bool contains_char(char *str, char c) {
+  if (str != NULL) {
+    while (*str != '\0') {
+      if (*str == c) {
+          return true;
+      }
+      str++;
+    }
+  }
+
+  return false;
 }
 
 int check_for_empty_line(char *line_str) {

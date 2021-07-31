@@ -9,14 +9,17 @@
 
 
 ErrorType parseLabel(char **buf, AssemblyLine *line){
-    char* label = seperate_string_by_token(buf, ":");
+    char *label;
 
-
-    if (label == NULL){
+    if (contains_char(*buf, ':') == false) {
         /* if token is not found, Set label to empty string */
         line->label[0] = '\0';
         return SUCCESS;
     }
+
+    /* seperate_string_by_token always returns a string even if delimiter not found */
+    label = seperate_string_by_token(buf, ":");
+    printf("parseLabel label: %s \n", label);
 
     if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || contains_space(label)){
         printf("invalid label: %s\n", label);
