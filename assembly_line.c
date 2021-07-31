@@ -3,10 +3,9 @@
 #include <ctype.h>
 
 #include "assembly_line.h"
+#include "bit_utils.h"
 #include "str_utils.h"
 #include "err.h"
-
-static const AssemblyLine EmptyLineStruct;
 
 
 ErrorType parseLabel(char **buf, AssemblyLine *line){
@@ -55,26 +54,28 @@ bool is_number(char *token)
     return true;
 }
 
-bool is_register(char *token)
+
+/* Return the register number if it is a valid register, -1 otherways */
+int register_from_string(char *str)
 {
     int number;
     int sscanf_success;
 
-    if ((*token++) != '$'){
-        return false;
+    if ((*str++) != '$'){
+        return -1;
     }
 
-    sscanf_success = sscanf(token, "%d", &number);
+    sscanf_success = sscanf(str, "%d", &number);
 
     if (sscanf_success == 0){
-        return false;
+        return -1;
     }
 
     /* TODO: bug with trailing zeroes */
     if (number < 0 || number > 32){
-        return false;
+        return -1;
     }
-    return true;
+    return number;
 }
 
 
@@ -242,7 +243,142 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
     return NULL;
 }
 
-/* TODO: Implement  */
-Instruction* decodeInstructionLine(AssemblyLine* line) {
-    return NULL;
+
+ErrorType number_from_string(char *str, int *immed, int number_of_bits){
+    int sscanf_success;
+
+    sscanf_success = sscanf(str, "%d", immed);
+
+    if (sscanf_success == 0){
+        return ERR_INVALID_NUMBER_TOKEN;
+    }
+
+    if (!number_fits_in_bits(*immed, number_of_bits)) {
+        return ERR_INVLAID_NUMBER_SIZE;
+    }
+
+    return SUCCESS;
+}
+
+
+
+
+ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
+    ErrorType err = SUCCESS;
+    int temp;
+    inst->type = I;
+
+
+    /* TODO: decode opcode */
+
+    /* Has 3 operands */
+    if (line->arg_count != 3){
+        return ERR_INVALID_CODE_INSTRUCTION;
+    }
+
+    /* First arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rs = temp;
+
+    /* Second arg is a number that can be inserted into 16 bits */
+    err = number_from_string(line->args[1], &temp, 16);
+
+    if (err != SUCCESS){
+        return err;
+    }
+    inst->instruction.i_inst.immed = temp;
+
+    /* Third arg is a register */
+    temp = register_from_string(line->args[2]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rt = temp;
+
+    return SUCCESS;
+
+}
+
+ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
+    int temp;
+    inst->type = R;
+
+    /* All R instructions have opcode = 1 */
+    inst->instruction.r_inst.opcode = 1;
+
+    /* TODO: decode func */
+ 
+    /* TODO: depands on type - some have only 2 operands */
+    /* Has 3 operands */
+    if (line->arg_count != 3){
+        return ERR_INVALID_CODE_INSTRUCTION;
+    }
+
+    /* First arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.r_inst.rs = temp;
+
+    /* Second arg is a register */
+    temp = register_from_string(line->args[1]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.r_inst.rt = temp;
+
+    /* Thirds arg is a register */
+    temp = register_from_string(line->args[2]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.r_inst.rd = temp;
+
+    return SUCCESS;
+
+}
+
+ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
+    inst->type = J;
+
+    /* TODO: decode opcode */
+    /* TODO: decode reg */
+
+    /* TODO: if the argument is a label, we need to get its address */
+
+    return SUCCESS;
+}
+
+
+
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
+
+    ErrorType err = SUCCESS;
+
+    /* is i instruction */
+    if (str_in_str_array(line->opcode_name, (char**)i_commands, i_commands_len)) {
+        err = decodeIInstruction(line, inst);
+    }
+
+    /* is r instruction */
+    else if (str_in_str_array(line->opcode_name, (char**)r_commands, r_commands_len)) {
+        err = decodeIInstruction(line, inst);
+    }
+    
+    /* is j instruction */
+    else if (str_in_str_array(line->opcode_name, (char**)j_commands, j_commands_len)) {
+        err = decodeIInstruction(line, inst);
+    }
+
+    /* ERR */
+    else {
+
+    }
+
+
+    return err;
 }

@@ -1,7 +1,7 @@
 CFLAGS=-Wall -ansi -pedantic -g
 LDFLAGS=
 
-CFILES=main.c list.c symtab.c memory.c err.c instruction.c assembly_line.c str_utils.c line_queue.c
+CFILES=main.c list.c symtab.c memory.c err.c instruction.c assembly_line.c str_utils.c line_queue.c bit_utils.c
 OBJS:=$(CFILES:%.c=%.o)
 
 
