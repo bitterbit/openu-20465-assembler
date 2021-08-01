@@ -296,7 +296,6 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
 
 ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
     int temp;
-    ErrorType err = SUCCESS;
 
     /* First arg is a register */
     temp = register_from_string(line->args[0]);
@@ -356,7 +355,6 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
 
 ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
-    int temp;
     inst->type = I;
 
     /* TODO: decode opcode */
@@ -435,6 +433,8 @@ ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
         return ERR_INVALID_REGISTER;
     }
     inst->instruction.r_inst.rs = temp;
+
+    return SUCCESS;
 }
 
 
@@ -442,7 +442,6 @@ ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
 
 ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
-    int temp;
     inst->type = R;
 
     /* All R instructions have opcode = 1 */
@@ -534,7 +533,6 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
 
 
 ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
-
     ErrorType err = SUCCESS;
 
     /* is i instruction */
@@ -552,11 +550,9 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
         err = decodeJInstruction(line, inst);
     }
 
-    /* ERR */
     else {
-        
+        err = ERR_INVALID_INSTRUCTION_TYPE;
     }
-
 
     return err;
 }

@@ -10,7 +10,6 @@
 #include "str_utils.h"
 
 
-
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
 
@@ -25,7 +24,6 @@ ErrorType handle_assembly_file(char* path) {
 
     size_t code_size = 0;
 
-    /* TODO: probably better to break out of this function with an error and print all errors at one point */
     FILE *file = openfile(path, &err);
     if (err != SUCCESS){
         print_error(err);
@@ -39,7 +37,6 @@ ErrorType handle_assembly_file(char* path) {
     while (err == SUCCESS) {
 
         printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n", line->opcode_name, line->label, line->arg_count);
-
 
         switch(line->type) {
             case TypeEmpty:

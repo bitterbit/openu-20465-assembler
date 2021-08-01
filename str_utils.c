@@ -110,12 +110,13 @@ bool contains_char(char *str, char c) {
 int check_for_empty_line(char *line_str) {
   /* Return 0 if line is empty or contains only space chars, 
    * non zero int otherwise */
+  char cmd_copy[BUFFER_SIZE];
+  int len;
+
   if (line_str == NULL) {
       return 0;
   }
-
-  char cmd_copy[BUFFER_SIZE];
-  int len;
+  
   strcpy(cmd_copy, line_str);
 
   remove_all_spaces(cmd_copy);

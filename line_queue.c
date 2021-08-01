@@ -20,12 +20,15 @@ void LineQueue_push(LineQueue *self, AssemblyLine *line) {
 }
 
 AssemblyLine* LineQueue_pop(LineQueue *self) {
+    AssemblyLine *first;
+    ListNode *next;
+    
     if (self->head == NULL) {
         return NULL;
     }
 
-    AssemblyLine *first = self->head->data;
-    ListNode *next = self->head->next;
+    first = self->head->data;
+    next = self->head->next;
 
     /* this will free only the node and not its data */
     self->head->free(self->head); 
