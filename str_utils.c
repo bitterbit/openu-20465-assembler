@@ -93,6 +93,7 @@ bool contains_space(char *str) {
   return ret;
 }
 
+/* TODO: why not strchr? */
 bool contains_char(char *str, char c) {
   if (str != NULL) {
     while (*str != '\0') {

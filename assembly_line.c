@@ -264,18 +264,10 @@ ErrorType number_from_string(char *str, int *immed, int number_of_bits){
     return SUCCESS;
 }
 
-ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
-    ErrorType err = SUCCESS;
+
+ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     int temp;
-    inst->type = I;
-
-
-    /* TODO: decode opcode */
-
-    /* Has 3 operands */
-    if (line->arg_count != 3){
-        return ERR_INVALID_CODE_INSTRUCTION;
-    }
+    ErrorType err = SUCCESS;
 
     /* First arg is a register */
     temp = register_from_string(line->args[0]);
@@ -300,19 +292,100 @@ ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
     inst->instruction.i_inst.rt = temp;
 
     return SUCCESS;
-
 }
 
-ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
+ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
     int temp;
-    inst->type = R;
+    ErrorType err = SUCCESS;
 
-    /* All R instructions have opcode = 1 */
-    inst->instruction.r_inst.opcode = 1;
+    /* First arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rs = temp;
 
-    /* TODO: decode func */
- 
-    /* TODO: depands on type - some have only 2 operands */
+
+    /* Second arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rt = temp;
+
+    /* Third arg is a label */
+    /* TODO: parse label:
+       Need to get the distance to the label, and verify that it is a local label 
+       The distance must fit in 16 bits*/
+
+    return SUCCESS;
+}
+
+
+/* TODO: Duplicate of IArithmetic */
+ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
+    int temp;
+    ErrorType err = SUCCESS;
+
+    /* First arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rs = temp;
+
+    /* Second arg is a number that can be inserted into 16 bits */
+    err = number_from_string(line->args[1], &temp, 16);
+
+    if (err != SUCCESS){
+        return err;
+    }
+    inst->instruction.i_inst.immed = temp;
+
+    /* Third arg is a register */
+    temp = register_from_string(line->args[2]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.i_inst.rt = temp;
+
+    return SUCCESS;
+}
+
+
+
+ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
+    ErrorType err = SUCCESS;
+    int temp;
+    inst->type = I;
+
+    /* TODO: decode opcode */
+
+    /* Has 3 operands */
+    if (line->arg_count != 3){
+        return ERR_INVALID_CODE_INSTRUCTION;
+    }
+
+    /* TODO: If command is an arithmetic command */
+    if (true) {
+        err = decodeIArithmetic(line, inst);
+    }
+
+    /* TODO: If command is a branch command */
+    else if (true) {
+        err = decodeIBranch(line, inst);
+    }
+
+    else {
+        err = decodeIMem(line, inst);
+    }
+
+    return err;
+}
+
+
+ErrorType decodeRArithmetic(AssemblyLine* line, Instruction* inst) {
+    int temp;
     /* Has 3 operands */
     if (line->arg_count != 3){
         return ERR_INVALID_CODE_INSTRUCTION;
@@ -340,16 +413,120 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
     inst->instruction.r_inst.rd = temp;
 
     return SUCCESS;
-
 }
 
+ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
+    int temp;
+    /* Has 2 operands */
+    if (line->arg_count != 2){
+        return ERR_INVALID_CODE_INSTRUCTION;
+    }
+
+    /* First arg is a register */
+    temp = register_from_string(line->args[0]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.r_inst.rd = temp;
+
+    /* Second arg is a register */
+    temp = register_from_string(line->args[1]);
+    if (temp == -1) {
+        return ERR_INVALID_REGISTER;
+    }
+    inst->instruction.r_inst.rs = temp;
+}
+
+
+
+
+ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
+    ErrorType err = SUCCESS;
+    int temp;
+    inst->type = R;
+
+    /* All R instructions have opcode = 1 */
+    /* TODO: the docs say its 1 and also say its zero 😢, pages 20-21 */
+    inst->instruction.r_inst.opcode = 1;
+
+    /* TODO: decode func */
+    
+    /* TODO: If command is an arithmetic command*/
+    if (true) {
+        err = decodeRArithmetic(line, inst);
+    }
+
+    else {
+        err = decodeRMove(line, inst);
+    }
+
+    return err;
+}
+
+
 ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
+    int temp;
     inst->type = J;
 
     /* TODO: decode opcode */
-    /* TODO: decode reg */
 
-    /* TODO: if the argument is a label, we need to get its address */
+    /* Use reg = 0 as default as only jumpt to register changes it to 1 */
+    inst->instruction.j_inst.reg = 0;
+
+    /* TODO: if command is stop */
+    if (true) {
+        /* Has 0 operands */
+        if (line->arg_count != 0){
+            return ERR_INVALID_CODE_INSTRUCTION;
+        }
+        return SUCCESS;
+    }
+
+    /* TODO: maybe split to functions */
+    else {
+        /* Has 1 operands */
+        if (line->arg_count != 1){
+            return ERR_INVALID_CODE_INSTRUCTION;
+        }
+
+
+        /* JUMP */
+        if (true) {
+            /* Try to decode a register */
+            temp = register_from_string(line->args[0]);
+            if (temp != -1) {
+                inst->instruction.j_inst.address = temp;
+                inst->instruction.j_inst.reg = 1;
+            }
+            else {
+                /* Get label */
+
+                /* TODO: if label is local, fill address with offset */
+
+                /* TODO: if label is external - fill adress with zeros - no need to implement */
+            }
+        }
+
+        /* LA */
+        else  if (true) {
+            /* TODO: same as second option in JUMP */
+            /* Get label */
+
+            /* TODO: if label is local, fill address with offset */
+
+            /* TODO: if label is external - fill adress with zeros - no need to implement */
+        }
+
+        /* CALL */
+        else {
+            /* TODO: same as second option in JUMP */
+            /* Get label */
+
+            /* TODO: if label is local, fill address with offset */
+
+            /* TODO: if label is external - fill adress with zeros - no need to implement */
+        }
+    }
 
     return SUCCESS;
 }
@@ -367,17 +544,17 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
 
     /* is r instruction */
     else if (str_in_str_array(line->opcode_name, (char**)r_commands, r_commands_len)) {
-        err = decodeIInstruction(line, inst);
+        err = decodeRInstruction(line, inst);
     }
     
     /* is j instruction */
     else if (str_in_str_array(line->opcode_name, (char**)j_commands, j_commands_len)) {
-        err = decodeIInstruction(line, inst);
+        err = decodeJInstruction(line, inst);
     }
 
     /* ERR */
     else {
-
+        
     }
 
 
