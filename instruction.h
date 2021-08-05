@@ -3,11 +3,66 @@
 
 #include "bool.h"
 
+
+/* Define all constant command and directive names */
+#define ADD "add"
+#define SUB "sub"
+#define AND "and"
+#define OR "or"
+#define NOR "nor"
+#define MOVE "move"
+#define MVHI "mvhi"
+#define MVLO "mvlo"
+
+#define ADDI "addi"
+#define SUBI "subi"
+#define ANDI "andi"
+#define ORI "ori"
+#define NORI "nori"
+#define BEQ "beq"
+#define BNE "bne"
+#define BLT "blt"
+#define BGT "bgt"
+#define LB "lb"
+#define SB "sb"
+#define LW "lw"
+#define SW "sw"
+#define LH "lh"
+#define SH "sh"
+
+#define JMP "jmp"
+#define LA "la"
+#define CALL "call"
+#define STOP "stop"
+
+#define DD "dd"
+#define DW "dw"
+#define DB "db"
+#define ASCIZ "asciz"
+
+#define ENTRY "entry"
+
+#define EXTERN "extern"
+
+
 typedef enum {
     R,
     I,
     J
 } InstructionType;
+
+
+typedef enum {
+    RArithmetic,
+    RMove
+} RInstructionSubType;
+
+typedef enum {
+    IArithmetic,
+    IBranch,
+    IMem
+} IInstructionSubType;
+
 
 typedef struct RInstruction RInstruction;
 typedef struct IInstruction IInstruction;
@@ -71,5 +126,12 @@ extern const int extern_directive_commands_len;
 
 bool is_reserved_keyword(char* str);
 bool is_code_opcode(char* str);
+bool is_i_command(char *command);
+bool is_r_command(char *command);
+bool is_j_command(char *command);
+int command_to_opcode(char *command);
+int r_command_to_func(char *command);
+RInstructionSubType r_command_to_subtype(char *command);
+IInstructionSubType i_command_to_subtype(char *command);
 
 #endif

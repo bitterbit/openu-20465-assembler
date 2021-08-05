@@ -168,6 +168,8 @@ FILE *openfile(char *path, ErrorType *err) {
   return file;
 }
 
+
+/* TODO: redundant when we have string_index_in_string_array, or maybe can just wrap it */
 bool str_in_str_array(char *str, char *str_arr[], int arr_len) {
   int i;
   for (i = 0; i < arr_len; i++) {
@@ -176,4 +178,14 @@ bool str_in_str_array(char *str, char *str_arr[], int arr_len) {
     }
   }
   return false;
+}
+
+
+int string_index_in_string_array(char *str, char *str_arr[], int arr_len) { 
+    int i;
+    for (i=0; i < arr_len; i++) {
+        if (strncmp(str, str_arr[i], strlen(str)) == 0)
+            return i;
+    }
+    return -1;
 }
