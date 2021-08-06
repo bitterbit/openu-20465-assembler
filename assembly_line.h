@@ -43,5 +43,6 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst);
 
 AssemblyLine* newLine();
 void freeLine(AssemblyLine *line);
+void dumpAssemblyLine(AssemblyLine *line);
 
 #endif

@@ -123,6 +123,13 @@ ErrorType parseCommand(char **buf, AssemblyLine *line){
 }
 
 
+char* handleStringToken(char **buf, ErrorType *err) {
+    char* token;
+    splitString(buf, "\"");          /* skip the first quote char */
+    token = splitString(buf, "\"");  /* take the value from current buf pointer until next quote */
+    return token;
+}
+
 /* Returns a new pointer to a token,
     caller is responsible for freeing */
 char* handleToken(char **buf, ErrorType *err) {
@@ -137,8 +144,7 @@ char* handleToken(char **buf, ErrorType *err) {
 
     /* Handle string tokens */
     if (**buf == '"') {
-        printf("strings not supported\n");
-        exit(100);
+        token = handleStringToken(buf, err);
     }
 
     /* Handle non string tokens */
@@ -152,12 +158,11 @@ char* handleToken(char **buf, ErrorType *err) {
     strcpy(dyanimic_token, token);
 
     return dyanimic_token;
-
 }
+
 
 ErrorType parseArgs(char *buf, AssemblyLine *line){
     /* TODO: parse args by type of command */
-    /* TODO: parse arg count where needed */
     char *token = NULL;
 
 
@@ -594,4 +599,16 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
     }
 
     return err;
+}
+
+void dumpAssemblyLine(AssemblyLine *line) {
+        int i;
+
+        printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n", line->opcode_name, line->label, line->arg_count);
+
+        for (i=0; i<line->arg_count; i++) {
+            if (i==0) { printf("\t"); }
+            printf("arg: %s ", line->args[i]);
+        }
+        printf("\n");
 }

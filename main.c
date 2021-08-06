@@ -36,7 +36,7 @@ ErrorType handle_assembly_file(char* path) {
 
     while (err == SUCCESS) {
 
-        printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n", line->opcode_name, line->label, line->arg_count);
+        dumpAssemblyLine(line);
 
         switch(line->type) {
             case TypeEmpty:
