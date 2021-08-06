@@ -19,10 +19,10 @@ ErrorType parseLabel(char **buf, AssemblyLine *line){
 
     /* splitString always returns a string even if delimiter not found */
     label = splitString(buf, ":");
-    printf("parseLabel label: %s \n", label);
+    /* printf("parseLabel label: %s \n", label); */
 
     if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || containsSpace(label)){
-        printf("invalid label: %s\n", label);
+        /* printf("invalid label: %s\n", label); */
         return ERR_INVALID_LABEL;
     }
 
@@ -89,7 +89,7 @@ ErrorType parseCommand(char **buf, AssemblyLine *line){
 
     /* split by space or tab */
     char* command = splitString(buf, " \t"); 
-    printf("buf=%s buf after splitString\n", *buf);
+    /* printf("buf=%s buf after splitString\n", *buf); */
     
     if (*command != '.') {
         if (is_code_opcode(command)){
@@ -140,7 +140,7 @@ char* handleToken(char **buf, ErrorType *err) {
 
     /* Remove leading spaces before arg */
     removeLeadingSpaces(buf);
-    printf("after removing spaces '%s'\n", *buf);
+    /* printf("after removing spaces '%s'\n", *buf); */
 
     /* Handle string tokens */
     if (**buf == '"') {
@@ -214,6 +214,10 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 
     removeLeadingAndTrailingSpaces((char**)&buf_p);
 
+    if (strlen(buf_p) == 0) {
+        return ERR_EOF;
+    }
+
     /* Handle empty and commented lines */
     if(checkForEmptyLine(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
         line->type = TypeEmpty;
@@ -221,7 +225,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     err = parseLabel(&buf_p, line);
-    printf("line after parse label: %s\n", buf_p);
+    /* printf("line after parse label: %s\n", buf_p); */
 
     if (err != SUCCESS){
         return err;
@@ -235,14 +239,14 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     /* Remove leading spaces before command type */
     removeLeadingSpaces(&buf_p);
     err = parseCommand(&buf_p, line);
-    printf("line after parse command: %s\n", buf_p);
+    /* printf("line after parse command: %s\n", buf_p); */
 
     if (err != SUCCESS){
         return err;
     }
 
     err = parseArgs(buf_p, line);
-    printf("line after parse args: %s\n", buf_p);
+    /* printf("line after parse args: %s\n", buf_p); */
 
     return err;
 }

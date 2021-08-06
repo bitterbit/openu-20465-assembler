@@ -34,7 +34,7 @@ ErrorType handle_assembly_file(char* path) {
     err = parseLine(file, line);
     queue->push(queue, line);
 
-    while (err == SUCCESS) {
+    while (err == SUCCESS && err != ERR_EOF) {
 
         dumpAssemblyLine(line);
 
@@ -87,10 +87,13 @@ ErrorType handle_assembly_file(char* path) {
     }
 
     /* TODO: we will need to print each of the errors - and add the line number, so this will be moved */
-    if (err != SUCCESS) {
+    if (err != SUCCESS && err != ERR_EOF) {
         print_error(err);
         return err;
     }
+
+    /* reset error state to a valid state */
+    err = SUCCESS;
 
     /* end of first pass, start second pass */
 
