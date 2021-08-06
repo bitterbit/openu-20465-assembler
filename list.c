@@ -1,9 +1,15 @@
 #include "list.h"
 
+/* will free the node but not its data! */
+void ListNode_free(ListNode *self) {
+    free(self);
+}
+
 ListNode* newListNode(void* data) {
     ListNode* node = malloc(sizeof(ListNode));
     node->next = NULL;
     node->data = data;
+    node->free = ListNode_free;
     return node;
 }
 

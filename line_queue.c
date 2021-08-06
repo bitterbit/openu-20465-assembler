@@ -2,6 +2,7 @@
 
 
 void LineQueue_push(LineQueue *self, AssemblyLine *line) {
+    /* printf("queue->push\n"); */
     ListNode *node = newListNode(line);
 
     /* add our item to the end of the list 
@@ -20,21 +21,23 @@ void LineQueue_push(LineQueue *self, AssemblyLine *line) {
 }
 
 AssemblyLine* LineQueue_pop(LineQueue *self) {
-    AssemblyLine *first;
+    /* printf("queue->pop\n"); */
+    AssemblyLine *first_line;
     ListNode *next;
     
     if (self->head == NULL) {
         return NULL;
     }
 
-    first = self->head->data;
     next = self->head->next;
+    /* printf("next node: %p\n", next); */
+    first_line = self->head->data;
 
     /* this will free only the node and not its data */
     self->head->free(self->head); 
     self->head = next;
 
-    return first;
+    return first_line;
 }
 
 void LineQueue_free(LineQueue *self) {

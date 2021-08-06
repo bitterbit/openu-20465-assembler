@@ -7,6 +7,7 @@ typedef struct ListNode ListNode;
 struct ListNode {
     ListNode* next;
     void* data;
+    /* free only the node and not its data */
     void (*free)(ListNode *self);
 };
 
