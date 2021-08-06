@@ -292,7 +292,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
 
         for (i=0; i < line->arg_count; i++) {
             /* TODO: handle error */
-            err = number_from_string(line->args[i], &number, data_chunk_size);
+            err = numberFromString(line->args[i], &number, data_chunk_size);
 
             /* TODO: If my impl has bugs, try itoa (copy source)*/
             write_binary_stream_to_buffer(number, data_chunk_size, tmp);
@@ -304,7 +304,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
 }
 
 
-ErrorType number_from_string(char *str, int *number, int number_of_bits){
+ErrorType numberFromString(char *str, int *number, int number_of_bits){
     int sscanf_success;
 
     sscanf_success = sscanf(str, "%d", number);
@@ -333,7 +333,7 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     inst->instruction.i_inst.rs = temp;
 
     /* Second arg is a number that can be inserted into 16 bits */
-    err = number_from_string(line->args[1], &temp, 16);
+    err = numberFromString(line->args[1], &temp, 16);
 
     if (err != SUCCESS){
         return err;
@@ -392,7 +392,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
     inst->instruction.i_inst.rs = temp;
 
     /* Second arg is a number that can be inserted into 16 bits */
-    err = number_from_string(line->args[1], &temp, 16);
+    err = numberFromString(line->args[1], &temp, 16);
 
     if (err != SUCCESS){
         return err;
