@@ -88,7 +88,7 @@ int command_to_opcode(char *command){
         return command_to_mapped_value(command, (char**)j_commands, j_commands_len, (int*)j_commands_opcode);
     }
     /* TODO: else? */
-
+    return 0;
 }
 
 int r_command_to_func(char *command){

@@ -6,8 +6,7 @@ Symbol* newSymbol(char* name, size_t value, bool is_entry, SymbolSection section
     Symbol* sym = malloc(sizeof(Symbol));
 
     size_t len = strlen(name) + 1;
-    char* symbols_name = malloc(len);
-    memset(symbols_name, '\0', len); 
+    char* symbols_name = calloc(1, len);
     strcpy(symbols_name, name);
 
     sym->symbol = symbols_name;

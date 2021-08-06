@@ -183,8 +183,7 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
 }
 
 AssemblyLine* newLine() {
-    AssemblyLine *line = malloc(sizeof(AssemblyLine));
-    memset(line, '\0', sizeof(AssemblyLine));
+    AssemblyLine *line = calloc(1, sizeof(AssemblyLine));
     return line;
 }
 
@@ -216,9 +215,10 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 
     removeLeadingAndTrailingSpaces((char**)&buf_p);
 
-    if (strlen(buf_p) == 0) {
-        return ERR_EOF;
-    }
+    /* TODO: Isn't that just an empty line? which should be valid? that should be an error from readline*/
+    // if (strlen(buf_p) == 0) {
+    //     return ERR_EOF;
+    // }
 
     /* Handle empty and commented lines */
     if(checkForEmptyLine(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
@@ -261,7 +261,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     Caller is responsible for freeing the buffer
 */
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
-    int i, number, data_chunk_size;
+    int i, number, data_chunk_size = -1;
 
     /* TODO: Return the err somehow */
     ErrorType err;

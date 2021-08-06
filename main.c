@@ -22,7 +22,8 @@ ErrorType handle_assembly_file(char* path) {
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
     LineQueue* queue = newLineQueue();
-    AssemblyLine *line;
+    /* lines are allocated on heap and owned by the queue */
+    AssemblyLine *line = newLine();
     Instruction inst;
     int line_counter = 1;
 
@@ -38,8 +39,6 @@ ErrorType handle_assembly_file(char* path) {
 
     printf("starting stage 1\n");
 
-    /* lines are allocated on heap and owned by the queue */
-    line = newLine();
     err = parseLine(file, line);
     queue->push(queue, line);
 
@@ -167,7 +166,6 @@ ErrorType handle_assembly_file(char* path) {
 
 int main(int argc, char** argv) {
     int i;
-    ErrorType err = SUCCESS;
 
     /* skip first argument as it is binary name */
     for (i=1; i<argc; i++) {
