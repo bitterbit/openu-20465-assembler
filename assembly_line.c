@@ -244,7 +244,10 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 
 /* TODO: Implement  */
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
-    return NULL;
+    /* db, dw, dd, asciz */
+
+    /* TODO: check for the dd that the numbers make sense using number_fits_in_bits, with 8,  */
+
 }
 
 
@@ -320,6 +323,8 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
     return SUCCESS;
 }
 
+
+/* TODO: check after fix in definitions (page 23) */
 
 /* TODO: Duplicate of IArithmetic */
 ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {

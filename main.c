@@ -99,15 +99,9 @@ ErrorType handle_assembly_file(char* path) {
     while (line != NULL && err == SUCCESS) {
         switch(line->type) {
             case TypeEmpty:
-                /* ignore on Empty or comment lines */
-                break;
-
             case TypeData:
-                /* ignore data lines in the second pass */
-                break;
-
             case TypeExtern:
-                /* ignore extern declerations in the second pass */
+                /* ignore empty, data, and extern lines in second pass */
                 break;
 
             /* .entry SYM_NAME */

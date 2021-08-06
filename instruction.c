@@ -22,7 +22,7 @@ const char* j_commands[] = {JMP, LA, CALL, STOP};
 const int j_commands_len = 4;
 const int j_commands_opcode[] = {30, 31, 32, 63};
 
-const char* data_directive_commands[] = {DD, DW, DB, ASCIZ};
+const char* data_directive_commands[] = {DB, DH, DW,  ASCIZ};
 const int data_directive_commands_len = 4;
 
 const char* entry_directive_commands[] = {ENTRY};

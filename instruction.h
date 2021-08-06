@@ -35,9 +35,9 @@
 #define CALL "call"
 #define STOP "stop"
 
-#define DD "dd"
-#define DW "dw"
 #define DB "db"
+#define DH "dh"
+#define DW "dw"
 #define ASCIZ "asciz"
 
 #define ENTRY "entry"
