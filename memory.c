@@ -1,9 +1,11 @@
 #include "memory.h"
 
+/* TODO: implement */
 ErrorType Memory_writeData(Memory* self, unsigned char* data, size_t size) {
     return SUCCESS;
 }
 
+/* TODO: implement */
 ErrorType Memory_writeCode(Memory* self, Instruction* instruction) {
     return SUCCESS;
 }

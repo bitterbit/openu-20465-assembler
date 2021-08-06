@@ -243,24 +243,77 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 }
 
 /* TODO: Implement  */
+
+
+/*  
+    Returns a buffer with the data that should be written to memory,
+    Caller is responsible for freeing the buffer
+*/
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
-    /* db, dw, dd, asciz */
+    int i, number, data_chunk_size;
 
-    /* TODO: check for the dd that the numbers make sense using number_fits_in_bits, with 8,  */
+    /* TODO: Return the err somehow */
+    ErrorType err;
+    unsigned char *buf = NULL;
+    unsigned char *tmp;
 
+    if (strncmp(ASCIZ, line->opcode_name, strlen(ASCIZ)) == 0) {
+        if (line->arg_count != 1) {
+            err = ERR_INVALID_DATA_INSTRUCTION;
+            /* TODO: return err */
+        }
+        /* TODO: just write string, and make sure a null byte is added */
+        /* TODO: also update out_size */
+    }
+
+    else {
+
+        /* TODO: is that right? */
+        if (line->arg_count == 0) {
+            err = ERR_INVALID_DATA_INSTRUCTION;
+            /* TODO: return err */
+        }
+
+        if (strncmp(DB, line->opcode_name, strlen(DB)) == 0) {
+            data_chunk_size = 1;
+        }
+        else if (strncmp(DH, line->opcode_name, strlen(DH)) == 0) {
+            data_chunk_size = 2;
+        }
+        else if (strncmp(DW, line->opcode_name, strlen(DW)) == 0) {
+            data_chunk_size = 4;
+        }
+
+        *out_size = line->arg_count * data_chunk_size;
+        
+        /* Add 1 more byte for the null byte written by int_to_binary_string */
+        buf = calloc(*out_size + 1 , 1);
+        tmp = buf;
+
+        for (i=0; i < line->arg_count; i++) {
+            /* TODO: handle error */
+            err = number_from_string(line->args[i], &number, data_chunk_size);
+
+            /* TODO: If my impl has bugs, try itoa (copy source)*/
+            write_binary_stream_to_buffer(number, data_chunk_size, tmp);
+            tmp += data_chunk_size;
+        }
+    }
+
+    return buf;
 }
 
 
-ErrorType number_from_string(char *str, int *immed, int number_of_bits){
+ErrorType number_from_string(char *str, int *number, int number_of_bits){
     int sscanf_success;
 
-    sscanf_success = sscanf(str, "%d", immed);
+    sscanf_success = sscanf(str, "%d", number);
 
     if (sscanf_success == 0){
         return ERR_INVALID_NUMBER_TOKEN;
     }
 
-    if (!number_fits_in_bits(*immed, number_of_bits)) {
+    if (!number_fits_in_bits(*number, number_of_bits)) {
         return ERR_INVALID_NUMBER_SIZE;
     }
 

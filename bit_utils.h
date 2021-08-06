@@ -5,6 +5,7 @@
 #include "bool.h"
 
 bool number_fits_in_bits(int number, int number_of_bits);
+void write_binary_stream_to_buffer(int num, int number_of_bits, unsigned char* buffer);
 
 
 #endif
