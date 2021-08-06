@@ -22,6 +22,11 @@ typedef enum {
     FlagSymbolDeclaration  = 1 << 0
 } LineFlags;
 
+typedef struct DebugInfo DebugInfo;
+struct DebugInfo {
+    int line_number;
+};
+
 /* TODO implement allocation and free functions */
 typedef struct AssemblyLine AssemblyLine;
 struct AssemblyLine {
@@ -32,6 +37,8 @@ struct AssemblyLine {
     char opcode_name[7]; /* Longest opcode is 6 chars long */
     char** args;
     size_t arg_count;
+
+    DebugInfo debug_info;
 };
 
 

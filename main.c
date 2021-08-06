@@ -13,12 +13,18 @@
 #define MAX_SIZE 65535
 #define INSTRUCTION_SIZE 4
 
+void printError(ErrorType err, AssemblyLine *line) {
+    print_error(err);
+    dumpAssemblyLine(line);
+}
+
 ErrorType handle_assembly_file(char* path) {
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
     LineQueue* queue = newLineQueue();
     AssemblyLine *line;
     Instruction inst;
+    int line_counter = 1;
 
     ErrorType err = SUCCESS;
 
@@ -26,8 +32,11 @@ ErrorType handle_assembly_file(char* path) {
 
     FILE *file = openfile(path, &err);
     if (err != SUCCESS){
-        print_error(err);
+        printError(err, line);
+        return err;
     }
+
+    printf("starting stage 1\n");
 
     /* lines are allocated on heap and owned by the queue */
     line = newLine();
@@ -36,7 +45,7 @@ ErrorType handle_assembly_file(char* path) {
 
     while (err == SUCCESS && err != ERR_EOF) {
 
-        dumpAssemblyLine(line);
+        /* dumpAssemblyLine(line); */
 
         switch(line->type) {
             case TypeEmpty:
@@ -82,13 +91,15 @@ ErrorType handle_assembly_file(char* path) {
         }
 
         line = newLine();
+        line->debug_info.line_number = line_counter;
         err = parseLine(file, line);
         queue->push(queue, line);
+        line_counter++;
     }
 
     /* TODO: we will need to print each of the errors - and add the line number, so this will be moved */
     if (err != SUCCESS && err != ERR_EOF) {
-        print_error(err);
+        printError(err, line);
         return err;
     }
 
@@ -96,6 +107,7 @@ ErrorType handle_assembly_file(char* path) {
     err = SUCCESS;
 
     /* end of first pass, start second pass */
+    printf("starting stage 2\n");
 
     line = queue->pop(queue);
 
@@ -146,7 +158,7 @@ ErrorType handle_assembly_file(char* path) {
     fclose(file);
 
     if (err != SUCCESS) {
-        print_error(err);
+        printError(err, line);
         return err;
     }
 
@@ -161,10 +173,6 @@ int main(int argc, char** argv) {
     for (i=1; i<argc; i++) {
         char *fname = argv[i];
         printf("parsing file %s\n", fname);
-        err = handle_assembly_file(fname);
-
-        if (err != SUCCESS) {
-            print_error(err);
-        }
+        handle_assembly_file(fname);
     }
 }

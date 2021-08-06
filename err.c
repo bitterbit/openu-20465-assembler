@@ -1,5 +1,6 @@
 #include "err.h"
 #include "bool.h"
+#include "assembly_line.h"
 
 
 /* TODO: maybe add parameter of the offending line to be printed as well */

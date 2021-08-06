@@ -184,6 +184,7 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
 
 AssemblyLine* newLine() {
     AssemblyLine *line = malloc(sizeof(AssemblyLine));
+    memset(line, '\0', sizeof(AssemblyLine));
     return line;
 }
 
@@ -206,6 +207,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     ErrorType err = SUCCESS;
     char buf[BUFFER_SIZE] = {0};
     char *buf_p = buf;
+
     err = readline(file, buf);
 
     if (err != SUCCESS){
@@ -615,4 +617,5 @@ void dumpAssemblyLine(AssemblyLine *line) {
             printf("arg: %s ", line->args[i]);
         }
         printf("\n");
+        printf("\tLineNumber: %d\n", line->debug_info.line_number);
 }
