@@ -11,17 +11,17 @@
 ErrorType parseLabel(char **buf, AssemblyLine *line){
     char *label;
 
-    if (contains_char(*buf, ':') == false) {
+    if (containsChar(*buf, ':') == false) {
         /* if token is not found, Set label to empty string */
         line->label[0] = '\0';
         return SUCCESS;
     }
 
-    /* seperate_string_by_token always returns a string even if delimiter not found */
-    label = seperate_string_by_token(buf, ":");
+    /* splitString always returns a string even if delimiter not found */
+    label = splitString(buf, ":");
     printf("parseLabel label: %s \n", label);
 
-    if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || contains_space(label)){
+    if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) || containsSpace(label)){
         printf("invalid label: %s\n", label);
         return ERR_INVALID_LABEL;
     }
@@ -36,7 +36,7 @@ ErrorType parseLabel(char **buf, AssemblyLine *line){
 
 /* TODO: can be replaced with sscanf? */
 /* Check if a token is a valid number in the assembly spec */
-bool is_number(char *token)
+bool isNumber(char *token)
 {
     if(token == NULL || *token == '\0') return false;
     /* Numbers can start with a sign, but never contain only a sign */
@@ -60,7 +60,7 @@ bool is_number(char *token)
 
 
 /* Return the register number if it is a valid register, -1 otherways */
-int register_from_string(char *str)
+int registerFromString(char *str)
 {
     int number;
     int sscanf_success;
@@ -88,8 +88,8 @@ ErrorType parseCommand(char **buf, AssemblyLine *line){
     ErrorType err = SUCCESS;
 
     /* split by space or tab */
-    char* command = seperate_string_by_token(buf, " \t"); 
-    printf("buf=%s buf after seperate_string_by_token \n", *buf);
+    char* command = splitString(buf, " \t"); 
+    printf("buf=%s buf after splitString\n", *buf);
     
     if (*command != '.') {
         if (is_code_opcode(command)){
@@ -102,15 +102,15 @@ ErrorType parseCommand(char **buf, AssemblyLine *line){
     }
     else {
         command++;
-        if (str_in_str_array(command, (char**)data_directive_commands, data_directive_commands_len)){
+        if (strArrayIncludes(command, (char**)data_directive_commands, data_directive_commands_len)){
             line->type = TypeData;
             strcpy(line->opcode_name, command);
         }
-        else if (str_in_str_array(command, (char**)entry_directive_commands, entry_directive_commands_len)){
+        else if (strArrayIncludes(command, (char**)entry_directive_commands, entry_directive_commands_len)){
             line->type = TypeEntry;
             strcpy(line->opcode_name, command);
         }
-        else if (str_in_str_array(command, (char**)extern_directive_commands, extern_directive_commands_len)){
+        else if (strArrayIncludes(command, (char**)extern_directive_commands, extern_directive_commands_len)){
             line->type = TypeExtern;
             strcpy(line->opcode_name, command);
         }
@@ -132,7 +132,7 @@ char* handleToken(char **buf, ErrorType *err) {
     char *dyanimic_token = NULL;
 
     /* Remove leading spaces before arg */
-    remove_leading_spaces(buf);
+    removeLeadingSpaces(buf);
     printf("after removing spaces '%s'\n", *buf);
 
     /* Handle string tokens */
@@ -143,10 +143,10 @@ char* handleToken(char **buf, ErrorType *err) {
 
     /* Handle non string tokens */
     else {
-        token = seperate_string_by_token(buf, ",");
+        token = splitString(buf, ",");
     }
 
-    remove_trailing_spaces(&token);
+    removeTrailingSpaces(&token);
 
     dyanimic_token = malloc(strlen(token)+1);
     strcpy(dyanimic_token, token);
@@ -166,7 +166,7 @@ ErrorType parseArgs(char *buf, AssemblyLine *line){
     line->arg_count = 0;
     line->args = NULL;
 
-    while (check_for_empty_line(buf) != 0) {
+    while (checkForEmptyLine(buf) != 0) {
         /* token is heap allocated and should be freed when AssemblyLine is freed */
         token = handleToken(&buf, &err); 
         line->args = realloc(line->args, sizeof(void*) * (line->arg_count+1) );
@@ -207,10 +207,10 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
         return err;
     }
 
-    remove_leading_and_trailing_spaces((char**)&buf_p);
+    removeLeadingAndTrailingSpaces((char**)&buf_p);
 
     /* Handle empty and commented lines */
-    if(check_for_empty_line(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
+    if(checkForEmptyLine(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
         line->type = TypeEmpty;
         return err;
     }
@@ -223,12 +223,12 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     /* If a line doesn't contain a command  - its invalid */
-    if(check_for_empty_line(buf_p) == 0){
+    if(checkForEmptyLine(buf_p) == 0){
         return ERR_INVALID_COMMAND_FORMAT;
     }
 
     /* Remove leading spaces before command type */
-    remove_leading_spaces(&buf_p);
+    removeLeadingSpaces(&buf_p);
     err = parseCommand(&buf_p, line);
     printf("line after parse command: %s\n", buf_p);
 
@@ -326,7 +326,7 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
 
     /* First arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -341,7 +341,7 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     inst->instruction.i_inst.immed = temp;
 
     /* Third arg is a register */
-    temp = register_from_string(line->args[2]);
+    temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -354,7 +354,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
     int temp;
 
     /* First arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -362,7 +362,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
 
 
     /* Second arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -385,7 +385,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
 
     /* First arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -400,7 +400,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
     inst->instruction.i_inst.immed = temp;
 
     /* Third arg is a register */
-    temp = register_from_string(line->args[2]);
+    temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -449,21 +449,21 @@ ErrorType decodeRArithmetic(AssemblyLine* line, Instruction* inst) {
     }
 
     /* First arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
     inst->instruction.r_inst.rs = temp;
 
     /* Second arg is a register */
-    temp = register_from_string(line->args[1]);
+    temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
     inst->instruction.r_inst.rt = temp;
 
     /* Thirds arg is a register */
-    temp = register_from_string(line->args[2]);
+    temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -480,14 +480,14 @@ ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
     }
 
     /* First arg is a register */
-    temp = register_from_string(line->args[0]);
+    temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
     inst->instruction.r_inst.rd = temp;
 
     /* Second arg is a register */
-    temp = register_from_string(line->args[1]);
+    temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
@@ -549,7 +549,7 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
             return ERR_INVALID_CODE_INSTRUCTION;
         }
 
-        registed_number = register_from_string(line->args[0]);
+        registed_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
         if (strncmp(line->opcode_name, JMP, strlen(JMP)) == 0 && registed_number != -1) {
             inst->instruction.j_inst.address = registed_number;

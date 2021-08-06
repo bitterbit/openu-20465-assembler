@@ -7,7 +7,7 @@
 #include "err.h"
 #include "str_utils.h"
 
-char *seperate_string_by_token(char **string, char *delimeters) {
+char *splitString(char **string, char *delimeters) {
   char *string_start = *string;
   char *string_end;
 
@@ -30,7 +30,7 @@ char *seperate_string_by_token(char **string, char *delimeters) {
   return string_start;
 }
 
-void remove_all_spaces(char *str) {
+void removeAllSpaces(char *str) {
   /* Remove all spaces from a string, to simplify parsing */
   char *index = str;
   if (str == NULL) {
@@ -44,7 +44,7 @@ void remove_all_spaces(char *str) {
   } while ((*str++ = *index++) != 0);
 }
 
-void remove_leading_spaces(char **str) {
+void removeLeadingSpaces(char **str) {
   if (str == NULL || *str == NULL) {
     return;
   }
@@ -55,7 +55,7 @@ void remove_leading_spaces(char **str) {
   }
 }
 
-void remove_trailing_spaces(char **str) {
+void removeTrailingSpaces(char **str) {
   /* Remove trailing spaces */
   char *string_end;
   if (str == NULL || *str == NULL) {
@@ -72,12 +72,12 @@ void remove_trailing_spaces(char **str) {
   *string_end = '\0';
 }
 
-void remove_leading_and_trailing_spaces(char **str) {
-  remove_leading_spaces(str);
-  remove_trailing_spaces(str);
+void removeLeadingAndTrailingSpaces(char **str) {
+  removeLeadingSpaces(str);
+  removeTrailingSpaces(str);
 }
 
-bool contains_space(char *str) {
+bool containsSpace(char *str) {
   /* return true if str contains space, false otherwise */
   bool ret = false;
   if (str != NULL) {
@@ -93,33 +93,31 @@ bool contains_space(char *str) {
   return ret;
 }
 
-/* TODO: why not strchr? */
-bool contains_char(char *str, char c) {
-  if (str != NULL) {
-    while (*str != '\0') {
-      if (*str == c) {
-          return true;
-      }
-      str++;
-    }
+bool containsChar(char *str, char c) {
+  if (str == NULL) {
+    return false;
   }
 
-  return false;
+  if (strchr(str, c) == NULL) {
+    return false;
+  }
+
+  return true;
 }
 
-int check_for_empty_line(char *line_str) {
-  /* Return 0 if line is empty or contains only space chars, 
+int checkForEmptyLine(char *line_str) {
+  /* Return 0 if line is empty or contains only space chars,
    * non zero int otherwise */
   char cmd_copy[BUFFER_SIZE];
   int len;
 
   if (line_str == NULL) {
-      return 0;
+    return 0;
   }
-  
+
   strcpy(cmd_copy, line_str);
 
-  remove_all_spaces(cmd_copy);
+  removeAllSpaces(cmd_copy);
   len = strlen(cmd_copy);
 
   return len;
@@ -168,24 +166,21 @@ FILE *openfile(char *path, ErrorType *err) {
   return file;
 }
 
-
-/* TODO: redundant when we have string_index_in_string_array, or maybe can just wrap it */
-bool str_in_str_array(char *str, char *str_arr[], int arr_len) {
-  int i;
-  for (i = 0; i < arr_len; i++) {
-    if (strncmp(str_arr[i], str, strlen(str)) == 0) {
-      return true;
-    }
+/* TODO: redundant when we have findInArray, or maybe can just wrap it */
+bool strArrayIncludes(char *str, char *str_arr[], int arr_len) {
+  if (findInArray(str, str_arr, arr_len) == -1) {
+    return false;
   }
-  return false;
+
+  return true;
 }
 
-
-int string_index_in_string_array(char *str, char *str_arr[], int arr_len) { 
-    int i;
-    for (i=0; i < arr_len; i++) {
-        if (strncmp(str, str_arr[i], strlen(str)) == 0)
-            return i;
-    }
-    return -1;
+/* returns index of string in array if found, or -1 if not in array */
+int findInArray(char *str, char *str_arr[], int arr_len) {
+  int i;
+  for (i = 0; i < arr_len; i++) {
+    if (strncmp(str, str_arr[i], strlen(str)) == 0)
+      return i;
+  }
+  return -1;
 }

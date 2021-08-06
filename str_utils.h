@@ -6,17 +6,18 @@
 #include "err.h"
 #include "bool.h"
 
-char *seperate_string_by_token(char **string, char *delimeters);
-void remove_all_spaces(char *str);
-void remove_leading_spaces(char **str);
-void remove_trailing_spaces(char **str);
-void remove_leading_and_trailing_spaces(char **str);
-int contains_space(char *str);
-int contains_char(char *str, char c);
-int check_for_empty_line(char *command_str);
+char *splitString(char **string, char *delimeters);
+void removeAllSpaces(char *str);
+void removeLeadingSpaces(char **str);
+void removeTrailingSpaces(char **str);
+void removeLeadingAndTrailingSpaces(char **str);
+int containsSpace(char *str);
+int containsChar(char *str, char c);
+int checkForEmptyLine(char *command_str);
+bool strArrayIncludes(char* str, char* str_arr[], int arr_len);
+int findInArray(char *str, char *str_arr[], int arr_len);
+
 ErrorType readline(FILE *file, char *buf);
 FILE* openfile(char *path, ErrorType *err);
-bool str_in_str_array(char* str, char* str_arr[], int arr_len);
-int string_index_in_string_array(char *str, char *str_arr[], int arr_len);
 
 #endif

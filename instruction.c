@@ -44,9 +44,9 @@ bool is_reserved_keyword(char* str){
     bool is_reserved = is_code_opcode(str);
     
     /* is directive */
-    is_reserved |= str_in_str_array(str, (char**)data_directive_commands, data_directive_commands_len);
-    is_reserved |= str_in_str_array(str, (char**)entry_directive_commands, entry_directive_commands_len);
-    is_reserved |= str_in_str_array(str, (char**)extern_directive_commands, extern_directive_commands_len);
+    is_reserved |= strArrayIncludes(str, (char**)data_directive_commands, data_directive_commands_len);
+    is_reserved |= strArrayIncludes(str, (char**)entry_directive_commands, entry_directive_commands_len);
+    is_reserved |= strArrayIncludes(str, (char**)extern_directive_commands, extern_directive_commands_len);
 
     return is_reserved;
 }
@@ -54,24 +54,25 @@ bool is_reserved_keyword(char* str){
 
 
 bool is_i_command(char *command){
-    return str_in_str_array(command, (char**)i_commands, i_commands_len);
+    return strArrayIncludes(command, (char**)i_commands, i_commands_len);
 }
 
 bool is_r_command(char *command){
-    return str_in_str_array(command, (char**)r_commands, r_commands_len);
+    return strArrayIncludes(command, (char**)r_commands, r_commands_len);
 }
 
 bool is_j_command(char *command){
-    return str_in_str_array(command, (char**)j_commands, j_commands_len);
+    return strArrayIncludes(command, (char**)j_commands, j_commands_len);
 }
 
 int command_to_mapped_value(char *command, char **commands_array, int command_array_length, int *mapping){
-    int command_index = string_index_in_string_array(command, (char**)commands_array, command_array_length);
+    int command_index = findInArray(command, (char**)commands_array, command_array_length);
     
     if (command_index > 0){
         return mapping[command_index];
     }
     /* TODO: return error somehow ? */
+    return 0;
 }
 
 int command_to_opcode(char *command){
