@@ -139,7 +139,7 @@ bool handle_assembly_file(char* path) {
                         /* Clean inst */
                         memset(&inst, 0, sizeof(Instruction));
                         /* TODO check if instruction references .data section and calculate offset to it */
-                        err = decodeInstructionLine(line, &inst, symtab);
+                        err = decodeInstructionLine(line, &inst, symtab, memory->instruction_counter);
                         memory->writeCode(memory, &inst);
                     }
                     break;
