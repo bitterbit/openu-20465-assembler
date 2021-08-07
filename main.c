@@ -159,6 +159,10 @@ bool handle_assembly_file(char* path) {
         }
     }
 
+    FILE* outfile = fopen("output.ob", "w");
+    memory->toFile(memory, outfile);
+    fclose(outfile);
+
     /* TODO clean up even if we stop after first pass */
     queue->free(queue);
     memory->free(memory);

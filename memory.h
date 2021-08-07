@@ -36,6 +36,7 @@ struct Memory {
 
   ErrorType (*writeData)(Memory *self, unsigned char *data, size_t size);
   ErrorType (*writeCode)(Memory *self, Instruction *instruction);
+  ErrorType (*toFile)(Memory *self, FILE* file);
   void (*free)(Memory *self);
 };
 

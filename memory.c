@@ -17,7 +17,7 @@ ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   return SUCCESS;
 }
 
-ErrorType Memory_writeToFile(Memory *self, FILE *file) {
+ErrorType Memory_toFile(Memory *self, FILE *file) {
     int i;
     ObjectFile *objFile = newObjectFile(file, INSTRUCTION_COUNTER_INITIAL_VALUE);
 
@@ -60,6 +60,7 @@ Memory *newMemory() {
 
   memory->writeData = Memory_writeData;
   memory->writeCode = Memory_writeCode;
+  memory->toFile = Memory_toFile;
   memory->free = Memory_free;
   return memory;
 }

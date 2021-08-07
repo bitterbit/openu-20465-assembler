@@ -1,5 +1,6 @@
 .ccls-cache/
 *.o
 a.out
+*.ob
 
 .vscode
