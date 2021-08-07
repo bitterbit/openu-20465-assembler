@@ -2,13 +2,11 @@
 #include <string.h>
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
-  printf("writeData\n");
   self->data->append(self->data, data, size);
   return SUCCESS;
 }
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
-  printf("writeData\n");
   self->code->append(self->code, (unsigned char *)instruction,
                      sizeof(Instruction));
   return SUCCESS;
