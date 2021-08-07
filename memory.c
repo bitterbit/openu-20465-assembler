@@ -5,18 +5,16 @@
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
   printf("WriteData %p %lu \n", data, size);
-
-  self->data->append(self->data, data, size);
-  return SUCCESS;
+  return self->data->append(self->data, data, size);
 }
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   printf("WriteCode %p \n", instruction);
 
-  self->code->appendUnsignedInt(self->code, instruction->body.inst);
+  ErrorType err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
   self->instruction_counter += INSTRUCTION_SIZE;
 
-  return SUCCESS;
+  return err;
 }
 
 ErrorType Memory_toFile(Memory *self, FILE *file) {
@@ -67,43 +65,42 @@ Memory *newMemory() {
   return memory;
 }
 
-void ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
-  printf("ManagedArray data=%p size=%lu capacity=%lu \n", self->data,
-         self->size, self->capacity);
+ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
+  /* printf("ManagedArray data=%p size=%lu capacity=%lu \n", self->data, */
+  /*        self->size, self->capacity); */
 
   size_t leftover_size;
+
   if (self->size > self->capacity) {
-    /* TODO return error? */
-    return;
+      return ERR_MEMORY_INVALID_STATE;
   }
 
   leftover_size = self->capacity - self->size;
-  if (size > leftover_size) {
 
+  if (size > leftover_size) {
     /* make sure we will have enough space for new data */
-    size_t missing = size - leftover_size;
-    while (self->capacity < missing) {
+    while (leftover_size < size) {
       self->capacity *= 2;
+      leftover_size = self->capacity - self->size;
     }
 
     self->data = realloc(self->data, self->capacity);
   }
 
   if (self->data == NULL) {
-    /* TODO return error? */
-    return;
+      return ERR_OUT_OF_MEMEORY;
   }
 
   void *dst = self->data + self->size;
-
-  printf("dst=%p src=%p size=%lu\n", dst, data, size);
   memcpy(dst, data, size);
 
   self->size += size;
+
+  return SUCCESS;
 }
 
-void ManagedArray_appendUnsignedInt(ManagedArray *self, unsigned int data) {
-  self->append(self, (unsigned char *)&data, sizeof(data));
+ErrorType ManagedArray_appendUnsignedInt(ManagedArray *self, unsigned int data) {
+  return self->append(self, (unsigned char *)&data, sizeof(data));
 }
 
 void ManagedArray_writeToFile(ManagedArray *self, FILE *file) {
