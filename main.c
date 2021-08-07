@@ -21,6 +21,7 @@ void printError(ErrorType err, AssemblyLine *line) {
 /* TODO: we don't verify the semantics of entry and external lines? others? */
 
 bool handle_assembly_file(char* path) {
+    FILE* outfile;
     bool error_happened = false;
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
@@ -146,6 +147,14 @@ bool handle_assembly_file(char* path) {
                         memset(&inst, 0, sizeof(Instruction));
                         /* TODO check if instruction references .data section and calculate offset to it */
                         err = decodeInstructionLine(line, &inst, symtab, memory->instruction_counter);
+                        printf("__PRINTING_LINE__\n");
+                        dumpAssemblyLine(line);
+                        printf("%02x", (inst.body.inst >> (8*0)) & 0xff);
+                        printf(" %02x", (inst.body.inst >> (8*1)) & 0xff);
+                        printf(" %02x", (inst.body.inst >> (8*2)) & 0xff);
+                        printf(" %02x\n", (inst.body.inst >> (8*3)) & 0xff);
+                        printf("__FINSIHED_FINISHED__\n");
+
                         memory->writeCode(memory, &inst);
                     }
                     break;
@@ -160,7 +169,7 @@ bool handle_assembly_file(char* path) {
         }
     }
 
-    FILE* outfile = fopen("output.ob", "w");
+    outfile = fopen("output.ob", "w");
     memory->toFile(memory, outfile);
     fclose(outfile);
 

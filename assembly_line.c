@@ -546,7 +546,7 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
     inst->type = J;
 
     /* TODO: handle_error */
-    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.j_inst.opcode = command_to_opcode(line->opcode_name);
 
     /* Use reg = 0 as default as only jump to register changes it to 1 */
     inst->body.j_inst.reg = 0;

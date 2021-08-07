@@ -4,14 +4,15 @@
 #include <string.h>
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
-  printf("WriteData %p %lu \n", data, size);
+  /* printf("WriteData %p %lu \n", (void *)data, size); */
   return self->data->append(self->data, data, size);
 }
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
-  printf("WriteCode %p \n", instruction);
+  ErrorType err;
+  /* printf("WriteCode %p \n", (void *)instruction); */
 
-  ErrorType err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
+  err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
   self->instruction_counter += INSTRUCTION_SIZE;
 
   return err;
@@ -31,8 +32,7 @@ ErrorType Memory_toFile(Memory *self, FILE *file) {
   }
 
   /* flush file so we wont miss last bytes */
-  char newline[] = "\n";
-  fwrite(newline, 1, 1, file);
+  fwrite("\n", 1, 1, file);
   fflush(file);
 
   objFile->free(objFile);
@@ -75,6 +75,7 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t si
   /*        self->size, self->capacity); */
 
   size_t leftover_size;
+  void *dst;
 
   if (self->size > self->capacity) {
       return ERR_MEMORY_INVALID_STATE;
@@ -96,7 +97,7 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t si
       return ERR_OUT_OF_MEMEORY;
   }
 
-  void *dst = self->data + self->size;
+  dst = self->data + self->size;
   memcpy(dst, data, size);
 
   self->size += size;
