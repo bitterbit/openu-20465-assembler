@@ -17,6 +17,7 @@ struct ManagedArray {
   unsigned char *data;
 
   void (*append)(ManagedArray *self, unsigned char *data, size_t size);
+  void (*appendUnsignedInt)(ManagedArray *self, unsigned int data);
   void (*writeToFile)(ManagedArray *self, FILE *file);
   void (*free)(ManagedArray *self);
 };

@@ -3,6 +3,7 @@
 
 #include "bool.h"
 
+#define INSTRUCTION_SIZE 4
 
 /* Define all constant command and directive names */
 #define ADD "add"
@@ -111,7 +112,8 @@ struct Instruction {
         RInstruction r_inst;
         IInstruction i_inst;
         JInstruction j_inst;
-    } instruction;
+        unsigned int inst; /* typeless value of this instruction */
+    } body;
 };
 
 

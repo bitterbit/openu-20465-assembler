@@ -11,7 +11,6 @@
 
 
 #define MAX_SIZE 65535
-#define INSTRUCTION_SIZE 4
 
 void printError(ErrorType err, AssemblyLine *line) {
     print_error(err);

@@ -4,35 +4,37 @@
 #include <string.h>
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
+  printf("WriteData %p %lu \n", data, size);
+
   self->data->append(self->data, data, size);
   return SUCCESS;
 }
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
-  self->code->append(self->code, (unsigned char *)instruction,
-                     sizeof(Instruction));
-
-  self->instruction_counter += 4;
+  printf("WriteCode %p \n", instruction);
+  
+  self->code->appendUnsignedInt(self->code, instruction->body.inst);
+  self->instruction_counter += INSTRUCTION_SIZE;
 
   return SUCCESS;
 }
 
 ErrorType Memory_toFile(Memory *self, FILE *file) {
-    int i;
-    ObjectFile *objFile = newObjectFile(file, INSTRUCTION_COUNTER_INITIAL_VALUE);
+  int i;
+  ObjectFile *objFile = newObjectFile(file, INSTRUCTION_COUNTER_INITIAL_VALUE);
 
-    objFile->writeHeader(objFile, self->code->size, self->data->size);
-    for (i=0; i<self->code->size; i++) {
-        objFile->writeByte(objFile, self->code->data[i]);
-    }
+  objFile->writeHeader(objFile, self->code->size, self->data->size);
+  for (i = 0; i < self->code->size; i++) {
+    objFile->writeByte(objFile, self->code->data[i]);
+  }
 
-    for (i=0; i<self->data->size; i++) {
-        objFile->writeByte(objFile, self->data->data[i]);
-    }
+  for (i = 0; i < self->data->size; i++) {
+    objFile->writeByte(objFile, self->data->data[i]);
+  }
 
-    objFile->free(objFile);
+  objFile->free(objFile);
 
-    return SUCCESS;
+  return SUCCESS;
 }
 
 void Memory_free(Memory *self) {
@@ -84,7 +86,19 @@ void ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
     self->data = realloc(self->data, self->capacity);
   }
 
-  memcpy(self->data + self->size, data, size);
+  if (self->data == NULL) {
+    /* TODO return error? */
+      return;
+  }
+
+  void* dst = self->data + self->size;
+
+  printf("dst=%p src=%p size=%lu\n", dst, data, size);
+  memcpy(dst, data, size);
+}
+
+void ManagedArray_appendUnsignedInt(ManagedArray *self, unsigned int data) {
+    self->append(self, (unsigned char*) &data, sizeof(data));
 }
 
 void ManagedArray_writeToFile(ManagedArray *self, FILE *file) {
@@ -97,6 +111,7 @@ void ManagedArray_free(ManagedArray *self) {
   self->size = 0;
   self->capacity = 0;
   self->append = NULL;
+  self->appendUnsignedInt = NULL;
   self->writeToFile = NULL;
   self->free = NULL;
   free(self);
@@ -107,6 +122,7 @@ ManagedArray *newManagedArray() {
 
   arr->free = ManagedArray_free;
   arr->append = ManagedArray_append;
+  arr->appendUnsignedInt = ManagedArray_appendUnsignedInt;
   arr->writeToFile = ManagedArray_writeToFile;
 
   arr->capacity = MANAGED_ARRAY_MIN_CAPACITY;

@@ -327,7 +327,7 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rs = temp;
+    inst->body.i_inst.rs = temp;
 
     /* Second arg is a number that can be inserted into 16 bits */
     err = numberFromString(line->args[1], &temp, 16);
@@ -335,14 +335,14 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     if (err != SUCCESS){
         return err;
     }
-    inst->instruction.i_inst.immed = temp;
+    inst->body.i_inst.immed = temp;
 
     /* Third arg is a register */
     temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rt = temp;
+    inst->body.i_inst.rt = temp;
 
     return SUCCESS;
 }
@@ -357,7 +357,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symt
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rs = temp;
+    inst->body.i_inst.rs = temp;
 
 
     /* Second arg is a register */
@@ -365,7 +365,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symt
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rt = temp;
+    inst->body.i_inst.rt = temp;
 
     /* Third arg is a label */
 
@@ -386,7 +386,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symt
             return ERR_LABEL_TOO_FAR;
         }
 
-        inst->instruction.i_inst.immed = relative_distance;
+        inst->body.i_inst.immed = relative_distance;
     }
 
     return SUCCESS;
@@ -405,7 +405,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rs = temp;
+    inst->body.i_inst.rs = temp;
 
     /* Second arg is a number that can be inserted into 16 bits */
     err = numberFromString(line->args[1], &temp, 16);
@@ -413,14 +413,14 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
     if (err != SUCCESS){
         return err;
     }
-    inst->instruction.i_inst.immed = temp;
+    inst->body.i_inst.immed = temp;
 
     /* Third arg is a register */
     temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.i_inst.rt = temp;
+    inst->body.i_inst.rt = temp;
 
     return SUCCESS;
 }
@@ -432,7 +432,7 @@ ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
     inst->type = I;
 
     /* TODO: handle_error */
-    inst->instruction.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
 
     /* Has 3 operands */
     if (line->arg_count != 3){
@@ -469,21 +469,21 @@ ErrorType decodeRArithmetic(AssemblyLine* line, Instruction* inst) {
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.r_inst.rs = temp;
+    inst->body.r_inst.rs = temp;
 
     /* Second arg is a register */
     temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.r_inst.rt = temp;
+    inst->body.r_inst.rt = temp;
 
     /* Thirds arg is a register */
     temp = registerFromString(line->args[2]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.r_inst.rd = temp;
+    inst->body.r_inst.rd = temp;
 
     return SUCCESS;
 }
@@ -500,14 +500,14 @@ ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.r_inst.rd = temp;
+    inst->body.r_inst.rd = temp;
 
     /* Second arg is a register */
     temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->instruction.r_inst.rs = temp;
+    inst->body.r_inst.rs = temp;
 
     return SUCCESS;
 }
@@ -520,10 +520,10 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
     inst->type = R;
 
     /* TODO: handle_error */
-    inst->instruction.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
 
     /* TODO: handle_error */
-    inst->instruction.r_inst.funct = r_command_to_func(line->opcode_name);
+    inst->body.r_inst.funct = r_command_to_func(line->opcode_name);
 
     
     switch(r_command_to_subtype(line->opcode_name)) {
@@ -546,10 +546,10 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
     inst->type = J;
 
     /* TODO: handle_error */
-    inst->instruction.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
 
     /* Use reg = 0 as default as only jump to register changes it to 1 */
-    inst->instruction.j_inst.reg = 0;
+    inst->body.j_inst.reg = 0;
     
     /* STOP */
     if (strcmp(line->opcode_name, STOP) == 0 ) {
@@ -569,8 +569,8 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
         registed_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
         if (strcmp(line->opcode_name, JMP) == 0 && registed_number != -1) {
-            inst->instruction.j_inst.address = registed_number;
-            inst->instruction.j_inst.reg = 1;
+            inst->body.j_inst.address = registed_number;
+            inst->body.j_inst.reg = 1;
         }
          
          /* JMP with label, LA, CALL */
@@ -582,10 +582,10 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
             }
 
             if (sym->is_external == true){
-                inst->instruction.j_inst.address = 0;
+                inst->body.j_inst.address = 0;
             }
             else {
-                inst->instruction.j_inst.address = sym->value;
+                inst->body.j_inst.address = sym->value;
             }
 
         }
