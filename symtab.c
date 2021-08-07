@@ -2,7 +2,7 @@
 #include <string.h>
 #include "symtab.h"
 
-Symbol* newSymbol(char* name, size_t value, bool is_entry, SymbolSection section) {
+Symbol* newSymbol(char* name, size_t value, bool is_entry, bool is_external, SymbolSection section) {
     Symbol* sym = malloc(sizeof(Symbol));
 
     size_t len = strlen(name) + 1;
@@ -12,6 +12,7 @@ Symbol* newSymbol(char* name, size_t value, bool is_entry, SymbolSection section
     sym->symbol = symbols_name;
     sym->value = value;
     sym->is_entry = is_entry;
+    sym->is_external = is_external;
     sym->section = section;
 
     return sym;

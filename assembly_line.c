@@ -133,14 +133,11 @@ char* handleStringToken(char **buf, ErrorType *err) {
 /* Returns a new pointer to a token,
     caller is responsible for freeing */
 char* handleToken(char **buf, ErrorType *err) {
-    /* TODO: handle last token? */
-
     char *token;
     char *dynamic_token = NULL;
 
     /* Remove leading spaces before arg */
     removeLeadingSpaces(buf);
-    /* printf("after removing spaces '%s'\n", *buf); */
 
     /* Handle string tokens */
     if (**buf == '"') {
@@ -162,11 +159,8 @@ char* handleToken(char **buf, ErrorType *err) {
 
 
 ErrorType parseArgs(char *buf, AssemblyLine *line){
-    /* TODO: parse args by type of command */
     char *token = NULL;
 
-
-    /* TODO: oh noez - a comma can also be inside a token*/
     ErrorType err = SUCCESS;
     line->arg_count = 0;
     line->args = NULL;
@@ -249,9 +243,6 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     return err;
 }
 
-/* TODO: Implement  */
-
-
 /*  
     Returns a buffer with the data that should be written to memory,
     Caller is responsible for freeing the buffer
@@ -275,7 +266,6 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
 
     else {
 
-        /* TODO: is that right? */
         if (line->arg_count == 0) {
             err = ERR_INVALID_DATA_INSTRUCTION;
             /* TODO: return err */
@@ -357,8 +347,10 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     return SUCCESS;
 }
 
-ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
+ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     int temp;
+    int relative_distance;
+    Symbol *sym = NULL;
 
     /* First arg is a register */
     temp = registerFromString(line->args[0]);
@@ -369,16 +361,33 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst) {
 
 
     /* Second arg is a register */
-    temp = registerFromString(line->args[0]);
+    temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
     inst->instruction.i_inst.rt = temp;
 
     /* Third arg is a label */
-    /* TODO: parse label:
-       Need to get the distance to the label, and verify that it is a local label 
-       The distance must fit in 16 bits*/
+
+    sym = symtab->find(symtab, line->args[2]);
+
+    if (sym == NULL){
+        return ERR_UNKNOWN_LABEL_REFERENCED;
+    }
+
+    if (sym->is_external == true){
+        return ERR_INVALID_EXTERNAL_LABEL_REFERENCE;
+    }
+    else {
+        relative_distance = sym->value - instruction_counter;
+
+        /* Make sure relative distance fits immed */
+        if (number_fits_in_bits(relative_distance, 16) == false){
+            return ERR_LABEL_TOO_FAR;
+        }
+
+        inst->instruction.i_inst.immed = relative_distance;
+    }
 
     return SUCCESS;
 }
@@ -418,7 +427,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
 
 
 
-ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
+ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     ErrorType err = SUCCESS;
     inst->type = I;
 
@@ -436,7 +445,7 @@ ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst) {
             break;
 
         case IBranch:
-            err = decodeIBranch(line, inst);
+            err = decodeIBranch(line, inst, symtab, instruction_counter);
             break;
 
         case IMem:
@@ -531,8 +540,9 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
 }
 
 
-ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
+ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
     int registed_number;
+    Symbol *sym = NULL;
     inst->type = J;
 
     /* TODO: handle_error */
@@ -565,12 +575,19 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
          
          /* JMP with label, LA, CALL */
         else {
-            /* Get label */
+            sym = symtab->find(symtab, line->args[0]);
 
-            /* TODO: use address anyway */
-            /* TODO: if label is local, fill address with offset */
+            if (sym == NULL){
+                return ERR_UNKNOWN_LABEL_REFERENCED;
+            }
 
-            /* TODO: if label is external - fill adress with zeros - no need to implement */
+            if (sym->is_external == true){
+                inst->instruction.j_inst.address = 0;
+            }
+            else {
+                inst->instruction.j_inst.address = sym->value;
+            }
+
         }
     }
 
@@ -579,12 +596,12 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
 
 
 
-ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     ErrorType err = SUCCESS;
 
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
-        err = decodeIInstruction(line, inst);
+        err = decodeIInstruction(line, inst, symtab, instruction_counter);
     }
 
     /* is r instruction */
@@ -594,7 +611,7 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst) {
     
     /* is j instruction */
     else if (is_j_command(line->opcode_name)) {
-        err = decodeJInstruction(line, inst);
+        err = decodeJInstruction(line, inst, symtab);
     }
 
     else {

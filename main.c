@@ -18,6 +18,9 @@ void printError(ErrorType err, AssemblyLine *line) {
     dumpAssemblyLine(line);
 }
 
+
+/* TODO: we don't verify the semantics of entry and external lines? others? */
+
 bool handle_assembly_file(char* path) {
     bool error_happened = false;
     SymbolTable* symtab = newSymbolTable();
@@ -55,7 +58,8 @@ bool handle_assembly_file(char* path) {
 
             case TypeExtern:
                 {
-                    Symbol* sym = newSymbol(line->label, 0, false, SymbolSection_Data);
+                    /* The external label is the first arg */
+                    Symbol* sym = newSymbol(line->args[0], 0, false, true, SymbolSection_Data);
                     err = symtab->insert(symtab, sym);
                 }
                 break;
@@ -66,7 +70,7 @@ bool handle_assembly_file(char* path) {
                     unsigned char* data = NULL;
 
                     if (line->flags & FlagSymbolDeclaration) {
-                        Symbol* sym = newSymbol(line->label, memory->data_counter, false, SymbolSection_Data);
+                        Symbol* sym = newSymbol(line->label, memory->data_counter, false, false, SymbolSection_Data);
                         err = symtab->insert(symtab, sym);
                     }
 
@@ -78,7 +82,7 @@ bool handle_assembly_file(char* path) {
 
             case TypeCode:
                 if (line->flags & FlagSymbolDeclaration) {
-                    Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, SymbolSection_Code);
+                    Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
                 }
 
@@ -100,16 +104,6 @@ bool handle_assembly_file(char* path) {
         line_counter++;
     }
 
-    /* TODO: we will need to print each of the errors - and add the line number, so this will be moved */
-    if (err != SUCCESS && err != ERR_EOF) {
-        printError(err, line);
-        return err;
-    }
-
-    /* TODO: why? no reason to go to stage 2, if stage 1 failed */
-    /* reset error state to a valid state */
-    err = SUCCESS;
-
     /* end of first pass, start second pass */
     printf("starting stage 2\n");
     
@@ -121,6 +115,7 @@ bool handle_assembly_file(char* path) {
                 case TypeData:
                 case TypeExtern:
                     /* ignore empty, data, and extern lines in second pass */
+                    err = SUCCESS;
                     break;
 
                 /* .entry SYM_NAME */
@@ -132,6 +127,7 @@ bool handle_assembly_file(char* path) {
                             break;
                         }
 
+                        /* The entry label is the first arg */
                         sym = symtab->find(symtab, line->args[0]);
                         if (sym == NULL) {
                             err = ERR_ENTRY_SYM_NOT_FOUND;
@@ -148,7 +144,7 @@ bool handle_assembly_file(char* path) {
                         /* Clean inst */
                         memset(&inst, 0, sizeof(Instruction));
                         /* TODO check if instruction references .data section and calculate offset to it */
-                        err = decodeInstructionLine(line, &inst);
+                        err = decodeInstructionLine(line, &inst, symtab, memory->instruction_counter);
                         memory->writeCode(memory, &inst);
                     }
                     break;

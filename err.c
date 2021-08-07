@@ -75,6 +75,18 @@ void print_error(ErrorType err) {
     str = "Encountered end of file";
     break;
 
+  case ERR_UNKNOWN_LABEL_REFERENCED:
+    str = "An unknown label was referenced";
+    break;
+
+  case ERR_INVALID_EXTERNAL_LABEL_REFERENCE:
+    str = "An external label was referenced in and invalid manner";
+    break;
+
+  case ERR_LABEL_TOO_FAR:
+    str = "Invalid branch, label too far";
+    break;
+
   default:
     str = "Unknown error value";
     found = false;

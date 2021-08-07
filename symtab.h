@@ -16,11 +16,12 @@ struct Symbol {
     char* symbol;
     size_t value; /* TODO make sure value is not bigger than 24bit? */
     bool is_entry;
+    bool is_external;
     SymbolSection section;
     void (*free)(Symbol* self);
 };
 
-Symbol* newSymbol(char* symbol, size_t value, bool is_entry, SymbolSection section);
+Symbol* newSymbol(char* name, size_t value, bool is_entry, bool is_external, SymbolSection section);
 
 typedef struct SymbolTable SymbolTable;
 struct SymbolTable {
