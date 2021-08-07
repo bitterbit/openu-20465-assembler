@@ -115,7 +115,7 @@ bool handle_assembly_file(char* path) {
     
     /* TODO: ugly, move stages to functions? */
     if (!error_happened) {
-        while (line = queue->pop(queue)) {
+        while ((line = queue->pop(queue))) {
             switch(line->type) {
                 case TypeEmpty:
                 case TypeData:
