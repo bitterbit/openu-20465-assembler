@@ -136,7 +136,7 @@ char* handleToken(char **buf, ErrorType *err) {
     /* TODO: handle last token? */
 
     char *token;
-    char *dyanimic_token = NULL;
+    char *dynamic_token = NULL;
 
     /* Remove leading spaces before arg */
     removeLeadingSpaces(buf);
@@ -154,10 +154,10 @@ char* handleToken(char **buf, ErrorType *err) {
 
     removeTrailingSpaces(&token);
 
-    dyanimic_token = malloc(strlen(token)+1);
-    strcpy(dyanimic_token, token);
+    dynamic_token = malloc(strlen(token)+1);
+    strcpy(dynamic_token, token);
 
-    return dyanimic_token;
+    return dynamic_token;
 }
 
 
@@ -320,7 +320,7 @@ ErrorType numberFromString(char *str, int *number, int number_of_bits){
 
     sscanf_success = sscanf(str, "%d", number);
 
-    if (sscanf_success == 0){
+    if (sscanf_success != 1){
         return ERR_INVALID_NUMBER_TOKEN;
     }
 

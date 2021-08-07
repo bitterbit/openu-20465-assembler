@@ -102,6 +102,7 @@ ErrorType handle_assembly_file(char* path) {
         return err;
     }
 
+    /* TODO: why? no reason to go to stage 2, if stage 1 failed */
     /* reset error state to a valid state */
     err = SUCCESS;
 
@@ -110,6 +111,7 @@ ErrorType handle_assembly_file(char* path) {
 
     line = queue->pop(queue);
 
+    /* TODO: don't need to check for success here?  same for loop before*/
     while (line != NULL && err == SUCCESS) {
         switch(line->type) {
             case TypeEmpty:
@@ -149,6 +151,10 @@ ErrorType handle_assembly_file(char* path) {
                 break;
         }
 
+        if (err != SUCCESS) {
+            printError(err, line);
+        }
+
         freeLine(line);
         line = queue->pop(queue);
     }
@@ -156,10 +162,11 @@ ErrorType handle_assembly_file(char* path) {
     /* ==== cleanup ==== */
     fclose(file);
 
-    if (err != SUCCESS) {
+    /* TODO: we print errors in every iteration */
+/*     if (err != SUCCESS) {
         printError(err, line);
         return err;
-    }
+    } */
 
     return err;
 }
