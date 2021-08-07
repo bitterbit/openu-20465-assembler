@@ -68,7 +68,7 @@ bool is_j_command(char *command){
 int command_to_mapped_value(char *command, char **commands_array, int command_array_length, int *mapping){
     int command_index = findInArray(command, (char**)commands_array, command_array_length);
     
-    if (command_index > 0){
+    if (command_index >= 0){
         return mapping[command_index];
     }
     /* TODO: return error somehow ? */
