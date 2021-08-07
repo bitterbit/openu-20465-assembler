@@ -2,7 +2,7 @@
 
 
 void ObjectFile_writeHeader(ObjectFile *self, size_t code_size, size_t data_size) {
-  fprintf(self->file, "\t%lu %lu\n", code_size, data_size);
+  fprintf(self->file, "      %lu %lu", code_size, data_size);
 }
 
 void ObjectFile_writeByte(ObjectFile *self, unsigned char byte) {
