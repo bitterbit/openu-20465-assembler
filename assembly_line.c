@@ -347,7 +347,7 @@ ErrorType decodeIArithmetic(AssemblyLine* line, Instruction* inst) {
     return SUCCESS;
 }
 
-ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
+ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     int temp;
     int relative_distance;
     Symbol *sym = NULL;
@@ -379,8 +379,7 @@ ErrorType decodeIBranch(AssemblyLine* line, Instruction* inst, SymbolTable* symt
         return ERR_INVALID_EXTERNAL_LABEL_REFERENCE;
     }
     else {
-        /* TODO: calculate relative distance */
-        relative_distance = 0;
+        relative_distance = sym->value - instruction_counter;
 
         /* Make sure relative distance fits immed */
         if (number_fits_in_bits(relative_distance, 16) == false){
@@ -428,7 +427,7 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
 
 
 
-ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
+ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     ErrorType err = SUCCESS;
     inst->type = I;
 
@@ -446,7 +445,7 @@ ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
             break;
 
         case IBranch:
-            err = decodeIBranch(line, inst, symtab);
+            err = decodeIBranch(line, inst, symtab, instruction_counter);
             break;
 
         case IMem:
@@ -597,12 +596,12 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
 
 
 
-ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
     ErrorType err = SUCCESS;
 
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
-        err = decodeIInstruction(line, inst, symtab);
+        err = decodeIInstruction(line, inst, symtab, instruction_counter);
     }
 
     /* is r instruction */

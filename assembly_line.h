@@ -47,7 +47,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line);
 ErrorType numberFromString(char *str, int *number, int number_of_bits);
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size);
 
-ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab);
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter);
 
 AssemblyLine* newLine();
 void freeLine(AssemblyLine *line);
