@@ -12,7 +12,7 @@ ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   printf("WriteCode %p \n", instruction);
-  
+
   self->code->appendUnsignedInt(self->code, instruction->body.inst);
   self->instruction_counter += INSTRUCTION_SIZE;
 
@@ -68,6 +68,9 @@ Memory *newMemory() {
 }
 
 void ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
+  printf("ManagedArray data=%p size=%lu capacity=%lu \n", self->data,
+         self->size, self->capacity);
+
   size_t leftover_size;
   if (self->size > self->capacity) {
     /* TODO return error? */
@@ -88,17 +91,19 @@ void ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
 
   if (self->data == NULL) {
     /* TODO return error? */
-      return;
+    return;
   }
 
-  void* dst = self->data + self->size;
+  void *dst = self->data + self->size;
 
   printf("dst=%p src=%p size=%lu\n", dst, data, size);
   memcpy(dst, data, size);
+
+  self->size += size;
 }
 
 void ManagedArray_appendUnsignedInt(ManagedArray *self, unsigned int data) {
-    self->append(self, (unsigned char*) &data, sizeof(data));
+  self->append(self, (unsigned char *)&data, sizeof(data));
 }
 
 void ManagedArray_writeToFile(ManagedArray *self, FILE *file) {
