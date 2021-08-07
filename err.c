@@ -75,6 +75,10 @@ void print_error(ErrorType err) {
     str = "Encountered end of file";
     break;
 
+  case ERR_UNKNOWN_LABEL_REFERENCED:
+    str = "An unknown label was referenced";
+    break;
+
   default:
     str = "Unknown error value";
     found = false;

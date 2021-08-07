@@ -5,6 +5,7 @@
 
 #include "instruction.h"
 #include "err.h"
+#include "symtab.h"
 
 #define COMMENT_CHAR ';'
 #define MAX_LINE_LENGTH 80
@@ -46,7 +47,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line);
 ErrorType numberFromString(char *str, int *number, int number_of_bits);
 unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size);
 
-ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst);
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab);
 
 AssemblyLine* newLine();
 void freeLine(AssemblyLine *line);
