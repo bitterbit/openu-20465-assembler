@@ -111,6 +111,7 @@ bool handle_assembly_file(char* path) {
                 case TypeData:
                 case TypeExtern:
                     /* ignore empty, data, and extern lines in second pass */
+                    err = SUCCESS;
                     break;
 
                 /* .entry SYM_NAME */
