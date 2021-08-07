@@ -30,6 +30,11 @@ ErrorType Memory_toFile(Memory *self, FILE *file) {
     objFile->writeByte(objFile, self->data->data[i]);
   }
 
+  /* flush file so we wont miss last bytes */
+  char newline[] = "\n";
+  fwrite(newline, 1, 1, file);
+  fflush(file);
+
   objFile->free(objFile);
 
   return SUCCESS;
