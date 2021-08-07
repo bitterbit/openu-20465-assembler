@@ -179,7 +179,7 @@ bool strArrayIncludes(char *str, char *str_arr[], int arr_len) {
 int findInArray(char *str, char *str_arr[], int arr_len) {
   int i;
   for (i = 0; i < arr_len; i++) {
-    if (strncmp(str, str_arr[i], strlen(str)) == 0)
+    if (strcmp(str, str_arr[i]) == 0)
       return i;
   }
   return -1;

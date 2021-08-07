@@ -268,7 +268,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
     unsigned char *buf = NULL;
     unsigned char *tmp;
 
-    if (strncmp(ASCIZ, line->opcode_name, strlen(ASCIZ)) == 0) {
+    if (strcmp(ASCIZ, line->opcode_name) == 0) {
         if (line->arg_count != 1) {
             err = ERR_INVALID_DATA_INSTRUCTION;
             /* TODO: return err */
@@ -285,13 +285,13 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
             /* TODO: return err */
         }
 
-        if (strncmp(DB, line->opcode_name, strlen(DB)) == 0) {
+        if (strcmp(DB, line->opcode_name) == 0) {
             data_chunk_size = 1;
         }
-        else if (strncmp(DH, line->opcode_name, strlen(DH)) == 0) {
+        else if (strcmp(DH, line->opcode_name) == 0) {
             data_chunk_size = 2;
         }
-        else if (strncmp(DW, line->opcode_name, strlen(DW)) == 0) {
+        else if (strcmp(DW, line->opcode_name) == 0) {
             data_chunk_size = 4;
         }
 
@@ -544,9 +544,9 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
 
     /* Use reg = 0 as default as only jump to register changes it to 1 */
     inst->instruction.j_inst.reg = 0;
-
+    
     /* STOP */
-    if (strncmp(line->opcode_name, STOP, strlen(STOP))) {
+    if (strcmp(line->opcode_name, STOP) == 0 ) {
         /* Has 0 operands */
         if (line->arg_count != 0){
             return ERR_INVALID_CODE_INSTRUCTION;
@@ -562,7 +562,7 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
 
         registed_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
-        if (strncmp(line->opcode_name, JMP, strlen(JMP)) == 0 && registed_number != -1) {
+        if (strcmp(line->opcode_name, JMP) == 0 && registed_number != -1) {
             inst->instruction.j_inst.address = registed_number;
             inst->instruction.j_inst.reg = 1;
         }
