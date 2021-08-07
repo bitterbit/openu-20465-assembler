@@ -1,4 +1,6 @@
 #include "memory.h"
+#include "object_file.h"
+
 #include <string.h>
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
@@ -9,13 +11,28 @@ ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   self->code->append(self->code, (unsigned char *)instruction,
                      sizeof(Instruction));
+
+  self->instruction_counter += 4;
+
   return SUCCESS;
 }
 
 ErrorType Memory_writeToFile(Memory *self, FILE *file) {
-  self->code->writeToFile(self->code, file);
-  self->data->writeToFile(self->data, file);
-  return SUCCESS;
+    int i;
+    ObjectFile *objFile = newObjectFile(file, INSTRUCTION_COUNTER_INITIAL_VALUE);
+
+    objFile->writeHeader(objFile, self->code->size, self->data->size);
+    for (i=0; i<self->code->size; i++) {
+        objFile->writeByte(objFile, self->code->data[i]);
+    }
+
+    for (i=0; i<self->data->size; i++) {
+        objFile->writeByte(objFile, self->data->data[i]);
+    }
+
+    objFile->free(objFile);
+
+    return SUCCESS;
 }
 
 void Memory_free(Memory *self) {
