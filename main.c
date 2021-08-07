@@ -18,7 +18,8 @@ void printError(ErrorType err, AssemblyLine *line) {
     dumpAssemblyLine(line);
 }
 
-ErrorType handle_assembly_file(char* path) {
+bool handle_assembly_file(char* path) {
+    bool error_happened = false;
     SymbolTable* symtab = newSymbolTable();
     Memory* memory = newMemory();
     LineQueue* queue = newLineQueue();
@@ -42,10 +43,7 @@ ErrorType handle_assembly_file(char* path) {
     err = parseLine(file, line);
     queue->push(queue, line);
 
-    while (err == SUCCESS && err != ERR_EOF) {
-
-        /* dumpAssemblyLine(line); */
-
+    while (err != ERR_EOF) {
         switch(line->type) {
             case TypeEmpty:
                 /* ignore on Empty or comment lines */
@@ -92,6 +90,12 @@ ErrorType handle_assembly_file(char* path) {
         line = newLine();
         line->debug_info.line_number = line_counter;
         err = parseLine(file, line);
+
+        if (err != SUCCESS && err != ERR_EOF) {
+            error_happened = true;
+            printError(err, line);
+        }
+
         queue->push(queue, line);
         line_counter++;
     }
@@ -108,67 +112,61 @@ ErrorType handle_assembly_file(char* path) {
 
     /* end of first pass, start second pass */
     printf("starting stage 2\n");
+    
+    /* TODO: ugly, move stages to functions? */
+    if (!error_happened) {
+        while (line = queue->pop(queue)) {
+            switch(line->type) {
+                case TypeEmpty:
+                case TypeData:
+                case TypeExtern:
+                    /* ignore empty, data, and extern lines in second pass */
+                    break;
 
-    line = queue->pop(queue);
+                /* .entry SYM_NAME */
+                case TypeEntry:
+                    {
+                        Symbol* sym = NULL;
+                        if (line->arg_count < 1) {
+                            err = ERR_INVALID_ENTRY;
+                            break;
+                        }
 
-    /* TODO: don't need to check for success here?  same for loop before*/
-    while (line != NULL && err == SUCCESS) {
-        switch(line->type) {
-            case TypeEmpty:
-            case TypeData:
-            case TypeExtern:
-                /* ignore empty, data, and extern lines in second pass */
-                break;
+                        sym = symtab->find(symtab, line->args[0]);
+                        if (sym == NULL) {
+                            err = ERR_ENTRY_SYM_NOT_FOUND;
+                            break;
+                        }
 
-            /* .entry SYM_NAME */
-            case TypeEntry:
-                {
-                    Symbol* sym = NULL;
-                    if (line->arg_count < 1) {
-                        err = ERR_INVALID_ENTRY;
-                        break;
+                        sym->is_entry = true;
                     }
+                    
+                    break;
 
-                    sym = symtab->find(symtab, line->args[0]);
-                    if (sym == NULL) {
-                        err = ERR_ENTRY_SYM_NOT_FOUND;
-                        break;
+                case TypeCode:
+                    {
+                        /* Clean inst */
+                        memset(&inst, 0, sizeof(Instruction));
+                        /* TODO check if instruction references .data section and calculate offset to it */
+                        err = decodeInstructionLine(line, &inst);
+                        memory->writeCode(memory, &inst);
                     }
+                    break;
+            }
 
-                    sym->is_entry = true;
-                }
-                
-                break;
+            if (err != SUCCESS) {
+                error_happened = true;
+                printError(err, line);
+            }
 
-            case TypeCode:
-                {
-                    /* Clean inst */
-                    memset(&inst, 0, sizeof(Instruction));
-                    /* TODO check if instruction references .data section and calculate offset to it */
-                    err = decodeInstructionLine(line, &inst);
-                    memory->writeCode(memory, &inst);
-                }
-                break;
+            freeLine(line);
         }
-
-        if (err != SUCCESS) {
-            printError(err, line);
-        }
-
-        freeLine(line);
-        line = queue->pop(queue);
     }
 
     /* ==== cleanup ==== */
     fclose(file);
 
-    /* TODO: we print errors in every iteration */
-/*     if (err != SUCCESS) {
-        printError(err, line);
-        return err;
-    } */
-
-    return err;
+    return error_happened;
 }
 
 int main(int argc, char** argv) {

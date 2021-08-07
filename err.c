@@ -71,6 +71,10 @@ void print_error(ErrorType err) {
     str = "Invalid number size";
     break;
 
+  case ERR_EOF:
+    str = "Encountered end of file";
+    break;
+
   default:
     str = "Unknown error value";
     found = false;

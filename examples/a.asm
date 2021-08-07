@@ -1,4 +1,7 @@
+
+
 MAIN:   add $9,$5,$3
+
 LOOP:   ori $2,-5,$9 
         la val1
         jmp Next
@@ -16,3 +19,4 @@ LIST:   .db 6,-9
 .entry  K 
 K:     .dw -12,31
 .extern val1
+

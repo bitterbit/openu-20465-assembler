@@ -215,10 +215,6 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 
     removeLeadingAndTrailingSpaces((char**)&buf_p);
 
-    /* TODO: Isn't that just an empty line? which should be valid? that should be an error from readline*/
-    // if (strlen(buf_p) == 0) {
-    //     return ERR_EOF;
-    // }
 
     /* Handle empty and commented lines */
     if(checkForEmptyLine(buf_p) == 0 || buf_p[0] == COMMENT_CHAR){
@@ -571,6 +567,7 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst) {
         else {
             /* Get label */
 
+            /* TODO: use address anyway */
             /* TODO: if label is local, fill address with offset */
 
             /* TODO: if label is external - fill adress with zeros - no need to implement */
