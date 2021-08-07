@@ -163,6 +163,10 @@ bool handle_assembly_file(char* path) {
         }
     }
 
+    /* TODO clean up even if we stop after first pass */
+    queue->free(queue);
+    memory->free(memory);
+
     /* ==== cleanup ==== */
     fclose(file);
 
