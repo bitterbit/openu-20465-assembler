@@ -104,7 +104,9 @@ bool handle_assembly_file(char* path) {
     }
 
     /* end of first pass, start second pass */
+    printf("stage1 code_size=%lu\n", code_size);
     printf("starting stage 2\n");
+    err = SUCCESS;
     
     /* TODO: ugly, move stages to functions? */
     if (!error_happened) {
