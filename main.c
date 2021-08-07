@@ -18,6 +18,9 @@ void printError(ErrorType err, AssemblyLine *line) {
     dumpAssemblyLine(line);
 }
 
+
+/* TODO: we don't verify the semantics of entry and external lines? others? */
+
 bool handle_assembly_file(char* path) {
     bool error_happened = false;
     SymbolTable* symtab = newSymbolTable();
@@ -55,7 +58,8 @@ bool handle_assembly_file(char* path) {
 
             case TypeExtern:
                 {
-                    Symbol* sym = newSymbol(line->label, 0, false, true, SymbolSection_Data);
+                    /* The external label is the first arg */
+                    Symbol* sym = newSymbol(line->args[0], 0, false, true, SymbolSection_Data);
                     err = symtab->insert(symtab, sym);
                 }
                 break;
@@ -123,6 +127,7 @@ bool handle_assembly_file(char* path) {
                             break;
                         }
 
+                        /* The entry label is the first arg */
                         sym = symtab->find(symtab, line->args[0]);
                         if (sym == NULL) {
                             err = ERR_ENTRY_SYM_NOT_FOUND;
