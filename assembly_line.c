@@ -495,19 +495,21 @@ ErrorType decodeRMove(AssemblyLine* line, Instruction* inst) {
         return ERR_INVALID_CODE_INSTRUCTION;
     }
 
+    /* TODO: rd and rs are confused in the explanation?! i switched them now*/
+
     /* First arg is a register */
     temp = registerFromString(line->args[0]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->body.r_inst.rd = temp;
+    inst->body.r_inst.rs = temp;
 
     /* Second arg is a register */
     temp = registerFromString(line->args[1]);
     if (temp == -1) {
         return ERR_INVALID_REGISTER;
     }
-    inst->body.r_inst.rs = temp;
+    inst->body.r_inst.rd = temp;
 
     return SUCCESS;
 }
