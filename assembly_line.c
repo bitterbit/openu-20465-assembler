@@ -260,8 +260,12 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
             err = ERR_INVALID_DATA_INSTRUCTION;
             /* TODO: return err */
         }
-        /* TODO: just write string, and make sure a null byte is added */
-        /* TODO: also update out_size */
+
+        /* Copy including the null byte */
+        *out_size = strlen(line->args[0]) + 1;
+        buf = calloc(*out_size, 1);
+        memcpy(buf, line->args[0], *out_size);
+
     }
 
     else {
@@ -283,6 +287,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
 
         *out_size = line->arg_count * data_chunk_size;
         
+        /* TODO: i think this isn't needed anymore */
         /* Add 1 more byte for the null byte written by int_to_binary_string */
         buf = calloc(*out_size + 1 , 1);
         tmp = buf;
@@ -604,16 +609,39 @@ ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTab
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
         err = decodeIInstruction(line, inst, symtab, instruction_counter);
+        printf("i command\n");
+        int immed = inst->body.i_inst.immed;
+        int rt = inst->body.i_inst.rt;
+        int rs = inst->body.i_inst.rs;
+        int opcode = inst->body.i_inst.opcode;
+
+        printf("%d, %d, %d, %d\n", immed, rt, rs, opcode);
+        
     }
 
     /* is r instruction */
     else if (is_r_command(line->opcode_name)) {
         err = decodeRInstruction(line, inst);
+        printf("r command\n");
+        int unused = inst->body.r_inst.unused;
+        int funct = inst->body.r_inst.funct;
+        int rd = inst->body.r_inst.rd;
+        int rt = inst->body.r_inst.rt;
+        int rs = inst->body.r_inst.rs;
+        int opcode = inst->body.r_inst.opcode;
+
+        printf("%d, %d, %d, %d, %d, %d\n", unused, funct, rd, rt, rs, opcode);
     }
     
     /* is j instruction */
     else if (is_j_command(line->opcode_name)) {
         err = decodeJInstruction(line, inst, symtab);
+        printf("j command\n");
+        int address = inst->body.j_inst.address;
+        int reg = inst->body.j_inst.reg;
+        int opcode = inst->body.j_inst.opcode;
+
+        printf("%d, %d, %d\n", address, reg, opcode);
     }
 
     else {

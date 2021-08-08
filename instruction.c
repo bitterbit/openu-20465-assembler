@@ -12,7 +12,7 @@ const int r_commands_funct[] =  {1, 2, 3, 4, 5, 1, 2, 3};
 const int r_commands_opcode[] = {0, 0, 0, 0, 0, 1, 1, 1};
 const RInstructionSubType r_commands_subtype[] = {RArithmetic, RArithmetic, RArithmetic, RArithmetic, RArithmetic, RMove, RMove, RMove};
 
-const char* i_commands[] = {ADDI, SUBI, ANDI, ORI, NORI, BEQ, BNE, BLT, BGT, LB, SB, LW, SW, LH, SH};
+const char* i_commands[] = {ADDI, SUBI, ANDI, ORI, NORI, BNE, BEQ, BLT, BGT, LB, SB, LW, SW, LH, SH};
 const int i_commands_len = 15;
 const int i_commands_opcode[] = {10, 11, 12, 13, 14, 15, 16, 17 ,18 , 19, 20, 21 ,22, 23, 24};
 const IInstructionSubType i_commands_subtype[] = {IArithmetic, IArithmetic, IArithmetic, IArithmetic, IArithmetic, IBranch, IBranch, IBranch,

@@ -5,6 +5,7 @@
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
   /* printf("WriteData %p %lu \n", (void *)data, size); */
+  self->data_counter += size;
   return self->data->append(self->data, data, size);
 }
 

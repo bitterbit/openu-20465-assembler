@@ -47,9 +47,6 @@ bool handle_assembly_file(char* path) {
     queue->push(queue, line);
 
 
-    /* TODO: very ugly, to account for first addition */
-    memory->instruction_counter -= INSTRUCTION_SIZE;
-
     while (err != ERR_EOF) {
         switch(line->type) {
             case TypeEmpty:
@@ -85,16 +82,18 @@ bool handle_assembly_file(char* path) {
                 break;
 
             case TypeCode:
-                /* TODO: ugly */
-                memory->instruction_counter += INSTRUCTION_SIZE;
-
-                /* count instructions here so we know what the final code size is before second pass */
-                code_size += INSTRUCTION_SIZE;
 
                 if (line->flags & FlagSymbolDeclaration) {
                     Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
                 }
+
+                /* TODO: move to parse line? */
+                line->code_position = memory->instruction_counter;
+
+                /* count instructions here so we know what the final code size is before second pass */
+                code_size += INSTRUCTION_SIZE;
+                memory->instruction_counter += INSTRUCTION_SIZE;
 
                 break;
         }
@@ -155,7 +154,8 @@ bool handle_assembly_file(char* path) {
                         memset(&inst, 0, sizeof(Instruction));
                         /* TODO check if instruction references .data section and calculate offset to it */
                         printf("\n__PRINTING_LINE__\n");
-                        err = decodeInstructionLine(line, &inst, symtab, memory->instruction_counter);
+                        /* TODO: no need to pass code position here */
+                        err = decodeInstructionLine(line, &inst, symtab, line->code_position);
                         dumpAssemblyLine(line);
                         printf("%02x", (inst.body.inst >> (8*0)) & 0xff);
                         printf(" %02x", (inst.body.inst >> (8*1)) & 0xff);
