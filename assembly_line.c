@@ -569,14 +569,12 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
         register_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
         if (strcmp(line->opcode_name, JMP) == 0 && register_number != -1) {
-            printf("wooohooo1212\n");
             inst->body.j_inst.address = register_number;
             inst->body.j_inst.reg = 1;
         }
          
          /* JMP with label, LA, CALL */
         else {
-            printf("wooohooo 432\n");
             sym = symtab->find(symtab, line->args[0]);
 
             if (sym == NULL){
@@ -587,7 +585,6 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
                 inst->body.j_inst.address = 0;
             }
             else {
-                printf("wooohooo -%d-\n", sym->value);
                 inst->body.j_inst.address = sym->value;
             }
 
