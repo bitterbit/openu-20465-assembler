@@ -541,7 +541,7 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
 
 
 ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
-    int registed_number;
+    int register_number;
     Symbol *sym = NULL;
     inst->type = J;
 
@@ -566,15 +566,17 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
             return ERR_INVALID_CODE_INSTRUCTION;
         }
 
-        registed_number = registerFromString(line->args[0]);
+        register_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
-        if (strcmp(line->opcode_name, JMP) == 0 && registed_number != -1) {
-            inst->body.j_inst.address = registed_number;
+        if (strcmp(line->opcode_name, JMP) == 0 && register_number != -1) {
+            printf("wooohooo1212\n");
+            inst->body.j_inst.address = register_number;
             inst->body.j_inst.reg = 1;
         }
          
          /* JMP with label, LA, CALL */
         else {
+            printf("wooohooo 432\n");
             sym = symtab->find(symtab, line->args[0]);
 
             if (sym == NULL){
@@ -585,6 +587,7 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
                 inst->body.j_inst.address = 0;
             }
             else {
+                printf("wooohooo -%d-\n", sym->value);
                 inst->body.j_inst.address = sym->value;
             }
 

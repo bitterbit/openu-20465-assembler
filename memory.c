@@ -13,7 +13,8 @@ ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   /* printf("WriteCode %p \n", (void *)instruction); */
 
   err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
-  self->instruction_counter += INSTRUCTION_SIZE;
+  /* TODO: this need to be done in the first stage, so code labels are correctly registered */
+  /* self->instruction_counter += INSTRUCTION_SIZE; */
 
   return err;
 }
