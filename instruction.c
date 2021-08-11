@@ -2,8 +2,6 @@
 #include "instruction.h"
 #include "str_utils.h"
 
-/* TODO: probably not the nicest way to do this */
-
 /* funct opcode, and subtype mappings are based on the order of the commands
  * arrays */
 const char *r_commands[] = {ADD, SUB, AND, OR, NOR, MOVE, MVHI, MVLO};

@@ -28,7 +28,6 @@ struct DebugInfo {
     int line_number;
 };
 
-/* TODO implement allocation and free functions */
 typedef struct AssemblyLine AssemblyLine;
 struct AssemblyLine {
     LineType type;
