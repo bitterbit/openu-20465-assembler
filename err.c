@@ -3,7 +3,6 @@
 #include "assembly_line.h"
 
 
-/* TODO: maybe add parameter of the offending line to be printed as well */
 void print_error(ErrorType err) {
   /* print a string reflecting the error */
   char *str;

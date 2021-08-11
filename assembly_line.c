@@ -247,18 +247,15 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     Returns a buffer with the data that should be written to memory,
     Caller is responsible for freeing the buffer
 */
-unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
+unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size, ErrorType *out_err) {
     int i, number, data_chunk_size = -1;
 
-    /* TODO: Return the err somehow */
-    ErrorType err;
     unsigned char *buf = NULL;
     unsigned char *tmp;
 
     if (strcmp(ASCIZ, line->opcode_name) == 0) {
         if (line->arg_count != 1) {
-            err = ERR_INVALID_DATA_INSTRUCTION;
-            /* TODO: return err */
+            *out_err = ERR_INVALID_DATA_INSTRUCTION;
         }
 
         /* Copy including the null byte */
@@ -271,8 +268,7 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
     else {
 
         if (line->arg_count == 0) {
-            err = ERR_INVALID_DATA_INSTRUCTION;
-            /* TODO: return err */
+            *out_err = ERR_INVALID_DATA_INSTRUCTION;
         }
 
         if (strcmp(DB, line->opcode_name) == 0) {
@@ -293,10 +289,8 @@ unsigned char* decodeDataLine(AssemblyLine *line, size_t* out_size) {
         tmp = buf;
 
         for (i=0; i < line->arg_count; i++) {
-            /* TODO: handle error */
-            err = numberFromString(line->args[i], &number, data_chunk_size);
+            *out_err = numberFromString(line->args[i], &number, data_chunk_size);
 
-            /* TODO: If my impl has bugs, try itoa (copy source)*/
             write_binary_stream_to_buffer(number, data_chunk_size, tmp);
             tmp += data_chunk_size;
         }
@@ -432,25 +426,28 @@ ErrorType decodeIMem(AssemblyLine* line, Instruction* inst) {
 
 
 
-ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
+ErrorType decodeIInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
     ErrorType err = SUCCESS;
     inst->type = I;
 
-    /* TODO: handle_error */
-    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name, &err);
+
+    if(err != SUCCESS){
+        return err;
+    }
 
     /* Has 3 operands */
     if (line->arg_count != 3){
         return ERR_INVALID_CODE_INSTRUCTION;
     }
 
-    switch(i_command_to_subtype(line->opcode_name)) {
+    switch(i_command_to_subtype(line->opcode_name, &err)) {
         case IArithmetic:
             err = decodeIArithmetic(line, inst);
             break;
 
         case IBranch:
-            err = decodeIBranch(line, inst, symtab, instruction_counter);
+            err = decodeIBranch(line, inst, symtab, line->code_position);
             break;
 
         case IMem:
@@ -526,14 +523,19 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
     ErrorType err = SUCCESS;
     inst->type = R;
 
-    /* TODO: handle_error */
-    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.r_inst.opcode = command_to_opcode(line->opcode_name, &err);
 
-    /* TODO: handle_error */
-    inst->body.r_inst.funct = r_command_to_func(line->opcode_name);
+    if (err != SUCCESS){
+        return err;
+    }
 
+    inst->body.r_inst.funct = r_command_to_func(line->opcode_name, &err);
+
+    if (err != SUCCESS){
+        return err;
+    }
     
-    switch(r_command_to_subtype(line->opcode_name)) {
+    switch(r_command_to_subtype(line->opcode_name, &err)) {
         case RArithmetic:
             err = decodeRArithmetic(line, inst);
             break;
@@ -548,12 +550,16 @@ ErrorType decodeRInstruction(AssemblyLine* line, Instruction* inst) {
 
 
 ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
+    ErrorType err = SUCCESS;
     int register_number;
     Symbol *sym = NULL;
     inst->type = J;
 
-    /* TODO: handle_error */
-    inst->body.j_inst.opcode = command_to_opcode(line->opcode_name);
+    inst->body.j_inst.opcode = command_to_opcode(line->opcode_name, &err);
+
+    if (err != SUCCESS){
+        return err;
+    }
 
     /* Use reg = 0 as default as only jump to register changes it to 1 */
     inst->body.j_inst.reg = 0;
@@ -603,45 +609,42 @@ ErrorType decodeJInstruction(AssemblyLine* line, Instruction* inst, SymbolTable*
 
 
 
-ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab, int instruction_counter) {
+ErrorType decodeInstructionLine(AssemblyLine* line, Instruction* inst, SymbolTable* symtab) {
     ErrorType err = SUCCESS;
 
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
-        err = decodeIInstruction(line, inst, symtab, instruction_counter);
-        printf("i command\n");
-        int immed = inst->body.i_inst.immed;
+        err = decodeIInstruction(line, inst, symtab);
+/*         int immed = inst->body.i_inst.immed;
         int rt = inst->body.i_inst.rt;
         int rs = inst->body.i_inst.rs;
         int opcode = inst->body.i_inst.opcode;
 
-        printf("%d, %d, %d, %d\n", immed, rt, rs, opcode);
+        printf("%d, %d, %d, %d\n", immed, rt, rs, opcode); */
         
     }
 
     /* is r instruction */
     else if (is_r_command(line->opcode_name)) {
         err = decodeRInstruction(line, inst);
-        printf("r command\n");
-        int unused = inst->body.r_inst.unused;
+/*         int unused = inst->body.r_inst.unused;
         int funct = inst->body.r_inst.funct;
         int rd = inst->body.r_inst.rd;
         int rt = inst->body.r_inst.rt;
         int rs = inst->body.r_inst.rs;
         int opcode = inst->body.r_inst.opcode;
 
-        printf("%d, %d, %d, %d, %d, %d\n", unused, funct, rd, rt, rs, opcode);
+        printf("%d, %d, %d, %d, %d, %d\n", unused, funct, rd, rt, rs, opcode); */
     }
     
     /* is j instruction */
     else if (is_j_command(line->opcode_name)) {
         err = decodeJInstruction(line, inst, symtab);
-        printf("j command\n");
-        int address = inst->body.j_inst.address;
+/*         int address = inst->body.j_inst.address;
         int reg = inst->body.j_inst.reg;
         int opcode = inst->body.j_inst.opcode;
 
-        printf("%d, %d, %d\n", address, reg, opcode);
+        printf("%d, %d, %d\n", address, reg, opcode); */
     }
 
     else {

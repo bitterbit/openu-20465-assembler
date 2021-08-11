@@ -38,7 +38,6 @@ bool is_code_opcode(char* command){
 }
 
 
-/* TODO: make efficient? */
 bool is_reserved_keyword(char* str){
 
     bool is_reserved = is_code_opcode(str);
@@ -65,41 +64,42 @@ bool is_j_command(char *command){
     return strArrayIncludes(command, (char**)j_commands, j_commands_len);
 }
 
-int command_to_mapped_value(char *command, char **commands_array, int command_array_length, int *mapping){
+int command_to_mapped_value(char *command, char **commands_array, int command_array_length, int *mapping, ErrorType *out_err){
     int command_index = findInArray(command, (char**)commands_array, command_array_length);
     
     if (command_index >= 0){
         return mapping[command_index];
     }
-    /* TODO: return error somehow ? */
+    *out_err = ERR_INVALID_COMMAND_NAME;
     return 0;
 }
 
-int command_to_opcode(char *command){
+int command_to_opcode(char *command, ErrorType *out_err){
     if (is_i_command(command)){
-        return command_to_mapped_value(command, (char**)i_commands, i_commands_len, (int*)i_commands_opcode);
+        return command_to_mapped_value(command, (char**)i_commands, i_commands_len, (int*)i_commands_opcode, out_err);
     }
 
     if (is_r_command(command)){
-        return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_opcode);
+        return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_opcode, out_err);
     }
 
     if (is_j_command(command)){
-        return command_to_mapped_value(command, (char**)j_commands, j_commands_len, (int*)j_commands_opcode);
+        return command_to_mapped_value(command, (char**)j_commands, j_commands_len, (int*)j_commands_opcode, out_err);
     }
-    /* TODO: else? */
+
+    *out_err = ERR_INVALID_COMMAND_NAME;
     return 0;
 }
 
-int r_command_to_func(char *command){
-    return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_funct);
+int r_command_to_func(char *command, ErrorType *out_err){
+    return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_funct, out_err);
 }
 
-RInstructionSubType r_command_to_subtype(char *command){
-    return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_subtype);
+RInstructionSubType r_command_to_subtype(char *command, ErrorType *out_err){
+    return command_to_mapped_value(command, (char**)r_commands, r_commands_len, (int*)r_commands_subtype, out_err);
 }
 
-IInstructionSubType i_command_to_subtype(char *command){
-    return command_to_mapped_value(command, (char**)i_commands, i_commands_len, (int*)i_commands_subtype);
+IInstructionSubType i_command_to_subtype(char *command, ErrorType *out_err){
+    return command_to_mapped_value(command, (char**)i_commands, i_commands_len, (int*)i_commands_subtype, out_err);
 }
 

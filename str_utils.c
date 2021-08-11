@@ -166,7 +166,6 @@ FILE *openfile(char *path, ErrorType *err) {
   return file;
 }
 
-/* TODO: redundant when we have findInArray, or maybe can just wrap it */
 bool strArrayIncludes(char *str, char *str_arr[], int arr_len) {
   if (findInArray(str, str_arr, arr_len) == -1) {
     return false;

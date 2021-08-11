@@ -75,14 +75,13 @@ bool handle_assembly_file(char* path) {
                         err = symtab->insert(symtab, sym);
                     }
 
-                    data = decodeDataLine(line, &size);
+                    data = decodeDataLine(line, &size, &err);
                     memory->writeData(memory, data, size);
                     free(data);
                 }
                 break;
 
             case TypeCode:
-
                 if (line->flags & FlagSymbolDeclaration) {
                     Symbol* sym = newSymbol(line->label, memory->instruction_counter, false, false, SymbolSection_Code);
                     err = symtab->insert(symtab, sym);
@@ -110,6 +109,9 @@ bool handle_assembly_file(char* path) {
         queue->push(queue, line);
         line_counter++;
     }
+
+
+    /* TODO: fix data label locations */
 
     /* end of first pass, start second pass */
     printf("stage1 code_size=%lu\n", code_size);
@@ -152,10 +154,8 @@ bool handle_assembly_file(char* path) {
                     {
                         /* Clean inst */
                         memset(&inst, 0, sizeof(Instruction));
-                        /* TODO check if instruction references .data section and calculate offset to it */
                         printf("\n__PRINTING_LINE__\n");
-                        /* TODO: no need to pass code position here */
-                        err = decodeInstructionLine(line, &inst, symtab, line->code_position);
+                        err = decodeInstructionLine(line, &inst, symtab);
                         dumpAssemblyLine(line);
                         printf("%02x", (inst.body.inst >> (8*0)) & 0xff);
                         printf(" %02x", (inst.body.inst >> (8*1)) & 0xff);

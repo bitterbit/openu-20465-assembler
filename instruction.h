@@ -2,6 +2,7 @@
 #define _H_INSTRUCTION_
 
 #include "bool.h"
+#include "err.h"
 
 #define INSTRUCTION_SIZE 4
 
@@ -131,9 +132,9 @@ bool is_code_opcode(char* str);
 bool is_i_command(char *command);
 bool is_r_command(char *command);
 bool is_j_command(char *command);
-int command_to_opcode(char *command);
-int r_command_to_func(char *command);
-RInstructionSubType r_command_to_subtype(char *command);
-IInstructionSubType i_command_to_subtype(char *command);
+int command_to_opcode(char *command, ErrorType *out_err);
+int r_command_to_func(char *command, ErrorType *out_err);
+RInstructionSubType r_command_to_subtype(char *command, ErrorType *out_err);
+IInstructionSubType i_command_to_subtype(char *command, ErrorType *out_err);
 
 #endif
