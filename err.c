@@ -1,7 +1,6 @@
 #include "err.h"
-#include "bool.h"
 #include "assembly_line.h"
-
+#include "bool.h"
 
 void print_error(ErrorType err) {
   /* print a string reflecting the error */
@@ -17,7 +16,7 @@ void print_error(ErrorType err) {
   case LINE_TOO_LONG:
     str = "Line is longer than allowed length";
     break;
-    
+
   case INVALID_FILE_END:
     str = "Encounterd an invalid file end";
     break;
@@ -94,6 +93,6 @@ void print_error(ErrorType err) {
 
   printf("Error: %s\n", str);
   if (found == false) {
-      printf("Error number %d\n", err);
+    printf("Error number %d\n", err);
   }
 }

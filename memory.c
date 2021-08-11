@@ -14,7 +14,8 @@ ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
   /* printf("WriteCode %p \n", (void *)instruction); */
 
   err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
-  /* TODO: this need to be done in the first stage, so code labels are correctly registered */
+  /* TODO: this need to be done in the first stage, so code labels are correctly
+   * registered */
   /* self->instruction_counter += INSTRUCTION_SIZE; */
 
   return err;
@@ -72,7 +73,8 @@ Memory *newMemory() {
   return memory;
 }
 
-ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t size) {
+ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
+                              size_t size) {
   /* printf("ManagedArray data=%p size=%lu capacity=%lu \n", self->data, */
   /*        self->size, self->capacity); */
 
@@ -80,7 +82,7 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t si
   void *dst;
 
   if (self->size > self->capacity) {
-      return ERR_MEMORY_INVALID_STATE;
+    return ERR_MEMORY_INVALID_STATE;
   }
 
   leftover_size = self->capacity - self->size;
@@ -96,7 +98,7 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t si
   }
 
   if (self->data == NULL) {
-      return ERR_OUT_OF_MEMEORY;
+    return ERR_OUT_OF_MEMEORY;
   }
 
   dst = self->data + self->size;
@@ -107,7 +109,8 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data, size_t si
   return SUCCESS;
 }
 
-ErrorType ManagedArray_appendUnsignedInt(ManagedArray *self, unsigned int data) {
+ErrorType ManagedArray_appendUnsignedInt(ManagedArray *self,
+                                         unsigned int data) {
   return self->append(self, (unsigned char *)&data, sizeof(data));
 }
 

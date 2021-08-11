@@ -132,7 +132,7 @@ ErrorType readline(FILE *file, char *buf) {
 
   /* TODO: Is this needed? */
   if (buf == NULL) {
-      return ERR_EOF;
+    return ERR_EOF;
   }
 
   /* Remove trailing \n */
