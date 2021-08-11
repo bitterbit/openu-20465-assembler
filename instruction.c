@@ -39,80 +39,84 @@ const int extern_directive_commands_len = 1;
 
 /* TODO: change name */
 bool is_code_opcode(char *command) {
-  return is_i_command(command) | is_r_command(command) | is_j_command(command);
+    return is_i_command(command) | is_r_command(command) |
+           is_j_command(command);
 }
 
 bool is_reserved_keyword(char *str) {
 
-  bool is_reserved = is_code_opcode(str);
+    bool is_reserved = is_code_opcode(str);
 
-  /* is directive */
-  is_reserved |= strArrayIncludes(str, (char **)data_directive_commands,
-                                  data_directive_commands_len);
-  is_reserved |= strArrayIncludes(str, (char **)entry_directive_commands,
-                                  entry_directive_commands_len);
-  is_reserved |= strArrayIncludes(str, (char **)extern_directive_commands,
-                                  extern_directive_commands_len);
+    /* is directive */
+    is_reserved |= strArrayIncludes(str, (char **)data_directive_commands,
+                                    data_directive_commands_len);
+    is_reserved |= strArrayIncludes(str, (char **)entry_directive_commands,
+                                    entry_directive_commands_len);
+    is_reserved |= strArrayIncludes(str, (char **)extern_directive_commands,
+                                    extern_directive_commands_len);
 
-  return is_reserved;
+    return is_reserved;
 }
 
 bool is_i_command(char *command) {
-  return strArrayIncludes(command, (char **)i_commands, i_commands_len);
+    return strArrayIncludes(command, (char **)i_commands, i_commands_len);
 }
 
 bool is_r_command(char *command) {
-  return strArrayIncludes(command, (char **)r_commands, r_commands_len);
+    return strArrayIncludes(command, (char **)r_commands, r_commands_len);
 }
 
 bool is_j_command(char *command) {
-  return strArrayIncludes(command, (char **)j_commands, j_commands_len);
+    return strArrayIncludes(command, (char **)j_commands, j_commands_len);
 }
 
 int command_to_mapped_value(char *command, char **commands_array,
                             int command_array_length, int *mapping,
                             ErrorType *out_err) {
-  int command_index =
-      findInArray(command, (char **)commands_array, command_array_length);
+    int command_index =
+        findInArray(command, (char **)commands_array, command_array_length);
 
-  if (command_index >= 0) {
-    return mapping[command_index];
-  }
-  *out_err = ERR_INVALID_COMMAND_NAME;
-  return 0;
+    if (command_index >= 0) {
+        return mapping[command_index];
+    }
+    *out_err = ERR_INVALID_COMMAND_NAME;
+    return 0;
 }
 
 int command_to_opcode(char *command, ErrorType *out_err) {
-  if (is_i_command(command)) {
-    return command_to_mapped_value(command, (char **)i_commands, i_commands_len,
-                                   (int *)i_commands_opcode, out_err);
-  }
+    if (is_i_command(command)) {
+        return command_to_mapped_value(command, (char **)i_commands,
+                                       i_commands_len, (int *)i_commands_opcode,
+                                       out_err);
+    }
 
-  if (is_r_command(command)) {
-    return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
-                                   (int *)r_commands_opcode, out_err);
-  }
+    if (is_r_command(command)) {
+        return command_to_mapped_value(command, (char **)r_commands,
+                                       r_commands_len, (int *)r_commands_opcode,
+                                       out_err);
+    }
 
-  if (is_j_command(command)) {
-    return command_to_mapped_value(command, (char **)j_commands, j_commands_len,
-                                   (int *)j_commands_opcode, out_err);
-  }
+    if (is_j_command(command)) {
+        return command_to_mapped_value(command, (char **)j_commands,
+                                       j_commands_len, (int *)j_commands_opcode,
+                                       out_err);
+    }
 
-  *out_err = ERR_INVALID_COMMAND_NAME;
-  return 0;
+    *out_err = ERR_INVALID_COMMAND_NAME;
+    return 0;
 }
 
 int r_command_to_func(char *command, ErrorType *out_err) {
-  return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
-                                 (int *)r_commands_funct, out_err);
+    return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
+                                   (int *)r_commands_funct, out_err);
 }
 
 RInstructionSubType r_command_to_subtype(char *command, ErrorType *out_err) {
-  return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
-                                 (int *)r_commands_subtype, out_err);
+    return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
+                                   (int *)r_commands_subtype, out_err);
 }
 
 IInstructionSubType i_command_to_subtype(char *command, ErrorType *out_err) {
-  return command_to_mapped_value(command, (char **)i_commands, i_commands_len,
-                                 (int *)i_commands_subtype, out_err);
+    return command_to_mapped_value(command, (char **)i_commands, i_commands_len,
+                                   (int *)i_commands_subtype, out_err);
 }

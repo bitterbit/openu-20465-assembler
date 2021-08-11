@@ -32,6 +32,6 @@ check-style:
 style:
 	@for src in $(CFILES) ; do \
 		echo "Formatting $$src..." ; \
-		clang-format -i "$(SRC_DIR)/$$src" ; \
+		clang-format -i "$(SRC_DIR)/$$src" -style=file; \
 	done
 	@echo "Done"
