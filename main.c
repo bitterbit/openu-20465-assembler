@@ -16,7 +16,29 @@ void printError(ErrorType err, AssemblyLine *line) {
     dumpAssemblyLine(line);
 }
 
-/* TODO: we don't verify the semantics of entry and external lines? others? */
+/* TODO: we don't verify the semantics of entry and external lines? are there
+ * any others? */
+
+void fixDataSymbols(SymbolTable *symtab, size_t offset) {
+    Symbol *sym = NULL;
+    ListNode *node = NULL;
+    ListIterator *iterator = newListIterator(symtab->head);
+
+    while ((node = iterator->next(iterator)) != NULL) {
+        sym = node->data;
+
+        if (sym == NULL) {
+            continue;
+        }
+
+        if (sym->section != SymbolSection_Data || sym->is_external == true) {
+            continue;
+        }
+
+        sym->value += offset;
+    }
+    iterator->free(iterator);
+}
 
 bool handle_assembly_file(char *path) {
     FILE *outfile;
@@ -108,7 +130,7 @@ bool handle_assembly_file(char *path) {
         line_counter++;
     }
 
-    /* TODO: fix data label locations */
+    fixDataSymbols(symtab, memory->instruction_counter);
 
     /* end of first pass, start second pass */
     printf("stage1 code_size=%lu\n", code_size);
