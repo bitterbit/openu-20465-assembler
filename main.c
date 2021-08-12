@@ -15,7 +15,9 @@ void printError(ErrorType err, AssemblyLine *line) {
     print_error(err);
     dumpAssemblyLine(line);
 }
-
+/* TODO: check for memory leaks */
+/* TODO: Compile and check on the openu ubuntu */
+/* TODO: Verify all syscalls (memory, etc..) are done safely, checked for errors */
 /* TODO: we don't verify the semantics of entry and external lines? are there
  * any others? */
 
