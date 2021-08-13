@@ -336,7 +336,7 @@ ErrorType decodeIArithmetic(AssemblyLine *line, Instruction *inst) {
 }
 
 ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
-                        SymbolManager *syms, int instruction_counter) {
+                        SymbolManager *syms, size_t instruction_counter) {
     int temp;
     int relative_distance;
     Symbol *sym = NULL;
@@ -357,7 +357,7 @@ ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
 
     /* Third arg is a label */
 
-    sym = syms->useSymbol(syms, line->args[2]);
+    sym = syms->useSymbol(syms, line->args[2], instruction_counter);
 
     if (sym == NULL) {
         return ERR_UNKNOWN_LABEL_REFERENCED;
@@ -570,7 +570,7 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
 
         /* JMP with label, LA, CALL */
         else {
-            sym = syms->useSymbol(syms, line->args[0]);
+            sym = syms->useSymbol(syms, line->args[0], line->code_position);
 
             if (sym == NULL) {
                 return ERR_UNKNOWN_LABEL_REFERENCED;

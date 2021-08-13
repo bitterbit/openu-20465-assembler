@@ -5,7 +5,6 @@
 #include "memory.h"
 #include "str_utils.h"
 #include "symtab.h"
-#include "output.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +22,48 @@ void printError(ErrorType err, AssemblyLine *line) {
 /* TODO: Verify the semantics of entry and external lines? are there any others? */ 
 /* TODO: implement output table for external and entry symbols */
 
+
+ErrorType saveOutput(char* name, Memory *memory, SymbolManager *syms) {
+    char filename[MAX_FILENAME_LENGTH];
+    FILE *outfile;
+
+    if (strlen(name) + 4 > MAX_FILENAME_LENGTH) {
+        return ERR_FILENAME_TOO_LONG;
+    }
+
+    memset(filename, 0, MAX_FILENAME_LENGTH);
+    strcpy(filename, name);
+    strcat(filename, ".ob");
+    outfile = fopen(filename, "w");
+    if (outfile == NULL) {
+        return ERR_CREATING_OUTPUT_FILE;
+    }
+    memory->toFile(memory, outfile);
+    fclose(outfile);
+
+
+    memset(filename, 0, MAX_FILENAME_LENGTH);
+    strcpy(filename, name);
+    strcat(filename, ".ext");
+    outfile = fopen(filename, "w");
+    if (outfile == NULL) {
+        return ERR_CREATING_OUTPUT_FILE;
+    }
+    syms->writeExtFile(syms, outfile);
+    fclose(outfile);
+
+    memset(filename, 0, MAX_FILENAME_LENGTH);
+    strcpy(filename, name);
+    strcat(filename, ".ent");
+    outfile = fopen(filename, "w");
+    if (outfile == NULL) {
+        return ERR_CREATING_OUTPUT_FILE;
+    }
+    syms->writeEntFile(syms, outfile);
+    fclose(outfile);
+
+    return SUCCESS;
+}
 
 bool handle_assembly_file(char *path) {
     bool error_happened = false;
@@ -172,7 +213,7 @@ bool handle_assembly_file(char *path) {
         return ERR_CREATING_OUTPUT_FILE;
     }
 
-    /* saveOutout(output_name, memory, symtab); */
+    saveOutput(output_name, memory, syms);
 
     /* TODO clean up even if we stop after first pass */
     queue->free(queue);

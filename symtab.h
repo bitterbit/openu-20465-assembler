@@ -17,6 +17,8 @@ struct Symbol {
     size_t value; /* TODO make sure value is not bigger than 24bit? */
     bool is_entry;
     bool is_external;
+    size_t *dependent_offsets; /* code offsets that depend on this symbol */
+    size_t dependent_offsets_count;
     SymbolSection section;
     void (*free)(Symbol* self);
 };
@@ -42,14 +44,13 @@ struct SymbolTable {
 typedef struct SymbolManager SymbolManager;
 struct SymbolManager {
     SymbolTable* symtab;
-    ListNode *usedSymbolsHead;
 
     ErrorType (*insertSymbol)(SymbolManager *self, char* name, size_t value, bool is_extern, bool is_entry, SymbolSection section);
     ErrorType (*markSymEntry)(SymbolManager *self, char* name);
-    Symbol* (*useSymbol)(SymbolManager *self, char* name);
+    Symbol* (*useSymbol)(SymbolManager *self, char* name, size_t instruction_counter);
     void (*fixDataSymbolsOffset)(SymbolManager *self, size_t offset);
-    void (*writeExtFile)(SymbolManager *self);
-    void (*writeEntFile)(SymbolManager *self);
+    void (*writeExtFile)(SymbolManager *self, FILE* file);
+    void (*writeEntFile)(SymbolManager *self, FILE* file);
     void (*free)(SymbolManager *self);
 };
 

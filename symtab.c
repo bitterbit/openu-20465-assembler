@@ -15,6 +15,12 @@ void dumpSymbolTable(SymbolTable *symtab) {
     iter->free(iter);
 }
 
+void Symbol_free(Symbol *self) {
+    free(self->symbol);
+    free(self->dependent_offsets);
+    free(self);
+}
+
 Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
                   SymbolSection section) {
     Symbol *sym = malloc(sizeof(Symbol));
@@ -28,13 +34,9 @@ Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
     sym->is_entry = is_entry;
     sym->is_external = is_external;
     sym->section = section;
+    sym->free = Symbol_free;
 
     return sym;
-}
-
-void Symbol_free(Symbol *self) {
-    free(self->symbol);
-    free(self);
 }
 
 ErrorType SymbolTable_insert(SymbolTable *self, Symbol *sym) {
@@ -116,7 +118,6 @@ void SymbolTable_free(SymbolTable *self) {
             node = iterator->next(iterator);
         }
 
-        node->free(node);
         iterator->free(iterator);
     }
 
@@ -165,9 +166,23 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
     return SUCCESS;
 }
 
-Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name) {
-    /* TODO mark symbol as used */
-    return self->symtab->find(self->symtab, name);
+Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruction_counter) {
+    Symbol *sym = self->symtab->find(self->symtab, name);
+    if (sym == NULL) {
+        return NULL;
+    }
+
+    if (sym->dependent_offsets_count == 0) {
+        sym->dependent_offsets_count = 0;
+        sym->dependent_offsets = malloc(sizeof(size_t));
+    } else {
+        sym->dependent_offsets = realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
+    }
+
+    sym->dependent_offsets[sym->dependent_offsets_count] = instruction_counter;
+    sym->dependent_offsets_count += 1;
+
+    return sym;
 }
 
 void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, size_t offset) {
@@ -192,21 +207,61 @@ void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, size_t offset) {
     iterator->free(iterator);
 }
 
-void SymbolManager_free(SymbolManager *self) {}
+void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
+    ListNode *node = NULL;
+    ListIterator *iter = newListIterator(self->symtab->head);
+
+    while ((node = iter->next(iter)) != NULL) {
+        int i;
+
+        Symbol *sym = node->data;
+
+        if (sym == NULL || sym->is_external == false) {
+            continue;
+        }
+
+        for (i=0; i<sym->dependent_offsets_count; i++) {
+            fprintf(file, "%s %04lu\n", sym->symbol, sym->dependent_offsets[i]);
+        }
+    }
+
+    iter->free(iter);
+}
+
+void SymbolManager_writeEntFile(SymbolManager *self, FILE* file) {
+    ListNode *node = NULL;
+    ListIterator *iter = newListIterator(self->symtab->head);
+
+    while ((node = iter->next(iter)) != NULL) {
+        Symbol *sym = node->data;
+
+        if (sym == NULL || sym->is_entry == false) {
+            continue;
+        }
+
+        fprintf(file, "%s %04lu\n", sym->symbol, sym->value);
+    }
+
+    iter->free(iter);
+}
+
+void SymbolManager_free(SymbolManager *self) {
+    self->symtab->free(self->symtab);
+    memset(self, 0, sizeof(SymbolManager));
+    free(self);
+}
 
 SymbolManager *newSymbolManager() {
     SymbolManager *syms = malloc(sizeof(SymbolManager));
     syms->symtab = newSymbolTable();
-    syms->usedSymbolsHead = NULL;
 
     syms->insertSymbol = SymbolManager_insertSymbol;
     syms->markSymEntry = SymbolManager_markSymEntry;
     syms->useSymbol = SymbolManager_useSymbol;
     syms->fixDataSymbolsOffset = SymbolManager_fixDataSymbolsOffset;
-    syms->writeExtFile = NULL;
-    syms->writeEntFile = NULL;
-    syms->free = SymbolManager_free; /* TODO */
+    syms->writeExtFile = SymbolManager_writeExtFile;
+    syms->writeEntFile = SymbolManager_writeEntFile;
+    syms->free = SymbolManager_free;
 
     return syms;
 }
-
