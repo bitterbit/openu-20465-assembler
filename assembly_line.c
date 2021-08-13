@@ -244,7 +244,7 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
 */
 unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
                               ErrorType *out_err) {
-    int i, number, data_chunk_size = -1;
+    int i, j, number, data_chunk_size = -1;
 
     unsigned char *buf = NULL;
     unsigned char *tmp;
@@ -290,11 +290,13 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
         tmp = buf;
 
         for (i = 0; i < line->arg_count; i++) {
-            *out_err =
-                numberFromString(line->args[i], &number, data_chunk_size);
+            *out_err = numberFromString(line->args[i], &number, data_chunk_size * 8);
 
-            write_binary_stream_to_buffer(number, data_chunk_size, tmp);
-            tmp += data_chunk_size;
+            for(j=0; j < data_chunk_size; j++) {
+                *tmp = (unsigned char)(0x00FF & number);
+                number = number >> 8;
+                tmp++;
+            }
         }
     }
 

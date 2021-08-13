@@ -103,7 +103,6 @@ struct Instruction {
     } body;
 };
 
-/* TODO: Move */
 extern const char *data_directive_commands[];
 extern const int data_directive_commands_len;
 
