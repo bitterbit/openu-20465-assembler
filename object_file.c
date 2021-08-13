@@ -30,6 +30,10 @@ void ObjectFile_free(ObjectFile *self) {
 ObjectFile *newObjectFile(FILE *file, size_t base_address) {
     ObjectFile *objFile = (ObjectFile *)malloc(sizeof(ObjectFile));
 
+    if (objFile == NULL) {
+        return NULL;
+    }
+
     objFile->file = file;
 
     objFile->base_address = base_address;

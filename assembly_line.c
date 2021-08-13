@@ -143,6 +143,10 @@ char *handleToken(char **buf, ErrorType *err) {
     removeTrailingSpaces(&token);
 
     dynamic_token = malloc(strlen(token) + 1);
+    if (dynamic_token == NULL) {
+        *err = ERR_OUT_OF_MEMEORY;
+        return NULL;
+    }
     strcpy(dynamic_token, token);
 
     return dynamic_token;
@@ -159,6 +163,10 @@ ErrorType parseArgs(char *buf, AssemblyLine *line) {
         /* token is heap allocated and should be freed when AssemblyLine is
          * freed */
         token = handleToken(&buf, &err);
+        if (err != SUCCESS) {
+            return err;
+        }
+
         line->args =
             realloc(line->args, sizeof(void *) * (line->arg_count + 1));
         line->args[line->arg_count] = token;
@@ -208,7 +216,6 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     }
 
     err = parseLabel(&buf_p, line);
-    /* printf("line after parse label: %s\n", buf_p); */
 
     if (err != SUCCESS) {
         return err;
@@ -222,14 +229,12 @@ ErrorType parseLine(FILE *file, AssemblyLine *line) {
     /* Remove leading spaces before command type */
     removeLeadingSpaces(&buf_p);
     err = parseCommand(&buf_p, line);
-    /* printf("line after parse command: %s\n", buf_p); */
 
     if (err != SUCCESS) {
         return err;
     }
 
     err = parseArgs(buf_p, line);
-    /* printf("line after parse args: %s\n", buf_p); */
 
     return err;
 }
@@ -252,7 +257,12 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 
         /* Copy including the null byte */
         *out_size = strlen(line->args[0]) + 1;
+
         buf = calloc(*out_size, 1);
+        if (buf == NULL) {
+            *out_err = ERR_OUT_OF_MEMEORY;
+            return NULL;
+        }
         memcpy(buf, line->args[0], *out_size);
 
     }
@@ -273,9 +283,11 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 
         *out_size = line->arg_count * data_chunk_size;
 
-        /* TODO: i think this isn't needed anymore */
-        /* Add 1 more byte for the null byte written by int_to_binary_string */
-        buf = calloc(*out_size + 1, 1);
+        buf = calloc(*out_size, 1);
+        if (buf == NULL) {
+            *out_err = ERR_OUT_OF_MEMEORY;
+            return NULL;
+        }
         tmp = buf;
 
         for (i = 0; i < line->arg_count; i++) {

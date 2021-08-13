@@ -46,19 +46,27 @@ void fixDataSymbols(SymbolTable *symtab, size_t offset) {
 bool handle_assembly_file(char *path) {
     FILE *outfile;
     bool error_happened = false;
+    Symbol *sym;
     SymbolTable *symtab = newSymbolTable();
     Memory *memory = newMemory();
     LineQueue *queue = newLineQueue();
     /* lines are allocated on heap and owned by the queue */
     AssemblyLine *line = newLine();
     Instruction inst;
+    size_t size;
     int line_counter = 1;
+    unsigned char *data = NULL;
+
 
     ErrorType err = SUCCESS;
-
     size_t code_size = 0;
-
     FILE *file = openfile(path, &err);
+
+    if (symtab == NULL || memory == NULL || queue == NULL || line == NULL) {
+        print_error(ERR_OUT_OF_MEMEORY);
+        return false;
+    }
+
     if (err != SUCCESS) {
         printError(err, line);
         return err;
@@ -66,9 +74,11 @@ bool handle_assembly_file(char *path) {
 
     printf("starting stage 1\n");
 
+    /* TODO: i think errors are not handled nicelyyyy */
     err = parseLine(file, line);
     queue->push(queue, line);
 
+    /* TODO: check for memory errors - exit if they happen */
     while (err != ERR_EOF) {
         switch (line->type) {
         case TypeEmpty:
@@ -79,34 +89,53 @@ bool handle_assembly_file(char *path) {
             /* ignore on first pass */
             break;
 
-        case TypeExtern: {
+        case TypeExtern:
             /* The external label is the first arg */
-            Symbol *sym =
-                newSymbol(line->args[0], 0, false, true, SymbolSection_Data);
-            err = symtab->insert(symtab, sym);
-        } break;
+            sym = newSymbol(line->args[0], 0, false, true, SymbolSection_Data);
 
-        case TypeData: {
-            size_t size = 0;
-            unsigned char *data = NULL;
+            if (sym == NULL) {
+                err = ERR_OUT_OF_MEMEORY;
+            } else {
+                err = symtab->insert(symtab, sym);
+            }
+            break;
+
+        case TypeData:
+            size = 0;
+            data = NULL;
 
             if (line->flags & FlagSymbolDeclaration) {
-                Symbol *sym = newSymbol(line->label, memory->data_counter,
+                sym = newSymbol(line->label, memory->data_counter,
                                         false, false, SymbolSection_Data);
-                err = symtab->insert(symtab, sym);
+                if (sym == NULL) {
+                    err = ERR_OUT_OF_MEMEORY;
+                } else {
+                    err = symtab->insert(symtab, sym);
+                }
+            }
+
+            if (err != SUCCESS) {
+                break;
             }
 
             data = decodeDataLine(line, &size, &err);
-            memory->writeData(memory, data, size);
+
+            if (err != SUCCESS) {
+                break;
+            }
+
+            err = memory->writeData(memory, data, size);
             free(data);
-        } break;
+            break;
 
         case TypeCode:
             if (line->flags & FlagSymbolDeclaration) {
-                Symbol *sym =
-                    newSymbol(line->label, memory->instruction_counter, false,
-                              false, SymbolSection_Code);
-                err = symtab->insert(symtab, sym);
+                sym =newSymbol(line->label, memory->instruction_counter, false, false, SymbolSection_Code);
+                if (sym == NULL) {
+                    err = ERR_OUT_OF_MEMEORY;
+                } else {
+                    err = symtab->insert(symtab, sym);
+                }
             }
 
             /* TODO: move to parse line? */
@@ -120,6 +149,8 @@ bool handle_assembly_file(char *path) {
             break;
         }
 
+        /* TODO: check for memory error */
+        /* TODO: this hides errors from the loop itself */
         line = newLine();
         line->debug_info.line_number = line_counter;
         err = parseLine(file, line);
@@ -152,8 +183,8 @@ bool handle_assembly_file(char *path) {
                 break;
 
             /* .entry SYM_NAME */
-            case TypeEntry: {
-                Symbol *sym = NULL;
+            case TypeEntry:
+                sym = NULL;
                 if (line->arg_count < 1) {
                     err = ERR_INVALID_ENTRY;
                     break;
@@ -167,11 +198,9 @@ bool handle_assembly_file(char *path) {
                 }
 
                 sym->is_entry = true;
-            }
+                break;
 
-            break;
-
-            case TypeCode: {
+            case TypeCode:
                 /* Clean inst */
                 memset(&inst, 0, sizeof(Instruction));
                 printf("\n__PRINTING_LINE__\n");
@@ -183,10 +212,13 @@ bool handle_assembly_file(char *path) {
                 printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff);
                 printf("__FINSIHED_FINISHED__\n");
 
-                memory->writeCode(memory, &inst);
-            } break;
+                if (err == SUCCESS) {
+                    err = memory->writeCode(memory, &inst);
+                }
+                break;
             }
 
+            /* TODO: exit on memory error? */
             if (err != SUCCESS) {
                 error_happened = true;
                 printError(err, line);
@@ -197,6 +229,8 @@ bool handle_assembly_file(char *path) {
     }
 
     outfile = fopen("output.ob", "w");
+
+    /* TODO: check returned error */
     memory->toFile(memory, outfile);
     fclose(outfile);
 
@@ -207,6 +241,8 @@ bool handle_assembly_file(char *path) {
     /* ==== cleanup ==== */
     fclose(file);
 
+    /* TODO: isn't this the opposite? we return if there was an error? if there
+     * was a success? */
     return error_happened;
 }
 
@@ -217,6 +253,7 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; i++) {
         char *fname = argv[i];
         printf("parsing file %s\n", fname);
+        /* TODO: exit completely if memory error occured */
         handle_assembly_file(fname);
     }
 }

@@ -85,6 +85,15 @@ void print_error(ErrorType err) {
         str = "Invalid branch, label too far";
         break;
 
+    /* TODO: tashma - not sure what is the text for this */
+    case ERR_MEMORY_INVALID_STATE:
+        str = "Invalid branch, label too far";
+        break;
+
+    case ERR_OUT_OF_MEMEORY:
+        str = "Could not allocate memory, failing";
+        break;
+
     default:
         str = "Unknown error value";
         found = false;
