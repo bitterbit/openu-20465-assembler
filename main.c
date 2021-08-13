@@ -165,6 +165,8 @@ bool handle_assembly_file(char *path) {
         line_counter++;
     }
 
+    /* ensure first data and last code won't have the same address */
+    instruction_counter += INSTRUCTION_SIZE;
     syms->fixDataSymbolsOffset(syms, instruction_counter);
 
     /* end of first pass, start second pass */

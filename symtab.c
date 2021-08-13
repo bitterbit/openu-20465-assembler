@@ -8,7 +8,7 @@ void dumpSymbolTable(SymbolTable *symtab) {
 
     while (node != NULL) {
         Symbol *sym = node->data;
-        printf("symbol: %s\n", sym->symbol);
+        printf("symbol: %s value %lu\n", sym->symbol, sym->value);
         node = iter->next(iter);
     }
 
@@ -192,7 +192,7 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
     return sym;
 }
 
-void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, size_t offset) {
+void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, const size_t offset) {
     Symbol *sym = NULL;
     ListNode *node = NULL;
     ListIterator *iterator = newListIterator(self->symtab->head);
