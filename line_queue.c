@@ -20,7 +20,6 @@ void LineQueue_push(LineQueue *self, AssemblyLine *line) {
 }
 
 AssemblyLine *LineQueue_pop(LineQueue *self) {
-    /* printf("queue->pop\n"); */
     AssemblyLine *first_line;
     ListNode *next;
 
@@ -29,7 +28,6 @@ AssemblyLine *LineQueue_pop(LineQueue *self) {
     }
 
     next = self->head->next;
-    /* printf("next node: %p\n", next); */
     first_line = self->head->data;
 
     /* this will free only the node and not its data */
@@ -40,19 +38,11 @@ AssemblyLine *LineQueue_pop(LineQueue *self) {
 }
 
 void LineQueue_free(LineQueue *self) {
-    ListIterator *iterator = newListIterator(self->head);
-    ListNode *node = iterator->next(iterator);
-
-    while (node != NULL) {
-        AssemblyLine *line = node->data;
-        if (line != NULL) {
-            freeLine(line);
-        }
-
-        node->free(node);
+    AssemblyLine *line = self->pop(self);
+    while(line != NULL) {
+        freeLine(line);
+        line = self->pop(self);
     }
-
-    iterator->free(iterator);
 }
 
 LineQueue *newLineQueue() {

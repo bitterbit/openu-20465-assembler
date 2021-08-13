@@ -20,7 +20,6 @@ void printError(ErrorType err, AssemblyLine *line) {
 /* TODO: Compile and check on the openu ubuntu */
 /* TODO: Verify all syscalls (memory, etc..) are done safely, checked for errors */
 /* TODO: Verify the semantics of entry and external lines? are there any others? */ 
-/* TODO: implement output table for external and entry symbols */
 
 
 ErrorType saveOutput(char* name, Memory *memory, SymbolManager *syms) {
@@ -106,11 +105,19 @@ bool handle_assembly_file(char *path) {
             break;
 
         case TypeEntry:
-            /* ignore on first pass */
+            if (line->arg_count != 1) {
+                err = ERR_INVALID_ENTRY;
+            }
             break;
 
         case TypeExtern: {
-            err = syms->insertSymbol(syms, line->args[0], 0, false, true, SymbolSection_Data);
+            printf("extern arg_count: %lu\n", line->arg_count);
+            if (line->arg_count == 1) {
+                err = syms->insertSymbol(syms, line->args[0], 0, false, true, SymbolSection_Data);
+            }
+            else {
+                err = ERR_INVALID_EXTERNAL_LABEL_REFERENCE;
+            }
 
         } break;
 
@@ -150,9 +157,20 @@ bool handle_assembly_file(char *path) {
             break;
         }
 
+        if (err != SUCCESS && err != ERR_EOF) {
+            error_happened = true;
+            printError(err, line);
+        }
+
+
         /* TODO: check for memory error */
-        /* TODO: this hides errors from the loop itself */
         line = newLine();
+        if (line == NULL) {
+            err = ERR_OUT_OF_MEMEORY;
+            error_happened = true;
+            break;
+        }
+
         line->debug_info.line_number = line_counter;
         err = parseLine(file, line);
 
@@ -163,6 +181,7 @@ bool handle_assembly_file(char *path) {
 
         queue->push(queue, line);
         line_counter++;
+
     }
 
     /* ensure first data and last code won't have the same address */
@@ -200,14 +219,14 @@ bool handle_assembly_file(char *path) {
             case TypeCode:
                 /* Clean inst */
                 memset(&inst, 0, sizeof(Instruction));
-                printf("\n__PRINTING_LINE__\n");
-                err = decodeInstructionLine(line, &inst, syms);
-                dumpAssemblyLine(line);
-                printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff);
-                printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff);
-                printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff);
-                printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff);
-                printf("__FINSIHED_FINISHED__\n");
+                /* printf("\n__PRINTING_LINE__\n"); */
+                /* err = decodeInstructionLine(line, &inst, syms); */
+                /* dumpAssemblyLine(line); */
+                /* printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff); */
+                /* printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff); */
+                /* printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff); */
+                /* printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff); */
+                /* printf("__FINSIHED_FINISHED__\n"); */
 
                 if (err == SUCCESS) {
                     err = memory->writeCode(memory, &inst);
@@ -221,9 +240,10 @@ bool handle_assembly_file(char *path) {
                 printError(err, line);
             }
 
-            freeLine(line);
         }
+        freeLine(line);
     }
+
 
     output_name = toBasename(path);
     removeFileExtension(output_name);
@@ -234,7 +254,7 @@ bool handle_assembly_file(char *path) {
     saveOutput(output_name, memory, syms);
 
     /* TODO clean up even if we stop after first pass */
-    queue->free(queue);
+    queue->free(queue); /* queue owns the lines and will free them on queue->free */
     memory->free(memory);
     syms->free(syms);
 

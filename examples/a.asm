@@ -1,5 +1,6 @@
 
 
+.extern val1
 MAIN:   add $9,$5,$3
 
 LOOP:   ori $2,-5,$9 
@@ -18,5 +19,4 @@ LIST:   .db 6,-9
         .dh 27056
 .entry  K 
 K:     .dw -12,31
-.extern val1
 

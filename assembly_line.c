@@ -18,7 +18,6 @@ ErrorType parseLabel(char **buf, AssemblyLine *line) {
 
     /* splitString always returns a string even if delimiter not found */
     label = splitString(buf, ":");
-    /* printf("parseLabel label: %s \n", label); */
 
     if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) ||
         containsSpace(label)) {

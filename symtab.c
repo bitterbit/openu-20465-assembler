@@ -17,8 +17,13 @@ void dumpSymbolTable(SymbolTable *symtab) {
 
 void Symbol_free(Symbol *self) {
     free(self->symbol);
-    free(self->dependent_offsets);
+
+    if (self->dependent_offsets != NULL) {
+        free(self->dependent_offsets);
+    }
+
     free(self);
+    /* memset(self, 0, sizeof(Symbol)); */
 }
 
 Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
@@ -188,6 +193,8 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
 
     sym->dependent_offsets[sym->dependent_offsets_count] = instruction_counter;
     sym->dependent_offsets_count += 1;
+
+    printf("useSymbol %p %lu \n", sym->dependent_offsets, sym->dependent_offsets_count);
 
     return sym;
 }
