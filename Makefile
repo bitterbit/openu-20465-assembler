@@ -2,7 +2,7 @@ CFLAGS=-Wall -ansi -pedantic -g
 LDFLAGS=
 
 SRC_DIR=.
-CFILES=main.c list.c symtab.c memory.c err.c instruction.c assembly_line.c str_utils.c line_queue.c bit_utils.c object_file.c
+CFILES=main.c list.c symtab.c memory.c err.c instruction.c assembly_line.c str_utils.c line_queue.c bit_utils.c object_file.c output.c
 OBJS:=$(CFILES:%.c=%.o)
 
 

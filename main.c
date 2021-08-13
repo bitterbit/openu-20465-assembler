@@ -5,21 +5,23 @@
 #include "memory.h"
 #include "str_utils.h"
 #include "symtab.h"
+#include "output.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_SIZE 65535
 
+
 void printError(ErrorType err, AssemblyLine *line) {
     print_error(err);
     dumpAssemblyLine(line);
 }
-/* TODO: check for memory leaks */
+/* TODO: Check for memory leaks */
 /* TODO: Compile and check on the openu ubuntu */
 /* TODO: Verify all syscalls (memory, etc..) are done safely, checked for errors */
-/* TODO: we don't verify the semantics of entry and external lines? are there
- * any others? */
+/* TODO: Verify the semantics of entry and external lines? are there any others? */ 
+/* TODO: implement output table for external and entry symbols */
 
 void fixDataSymbols(SymbolTable *symtab, size_t offset) {
     Symbol *sym = NULL;
@@ -42,8 +44,8 @@ void fixDataSymbols(SymbolTable *symtab, size_t offset) {
     iterator->free(iterator);
 }
 
+
 bool handle_assembly_file(char *path) {
-    FILE *outfile;
     bool error_happened = false;
     SymbolTable *symtab = newSymbolTable();
     Memory *memory = newMemory();
@@ -52,12 +54,15 @@ bool handle_assembly_file(char *path) {
     AssemblyLine *line = newLine();
     Instruction inst;
     int line_counter = 1;
-
+    char *output_name = NULL;
     ErrorType err = SUCCESS;
-
     size_t code_size = 0;
 
     FILE *file = openfile(path, &err);
+    if (file == NULL) {
+        err = FILE_OPEN_ERROR;
+    }
+
     if (err != SUCCESS) {
         printError(err, line);
         return err;
@@ -195,9 +200,13 @@ bool handle_assembly_file(char *path) {
         }
     }
 
-    outfile = fopen("output.ob", "w");
-    memory->toFile(memory, outfile);
-    fclose(outfile);
+    output_name = toBasename(path);
+    removeFileExtension(output_name);
+    if (output_name == NULL) {
+        return ERR_CREATING_OUTPUT_FILE;
+    }
+
+    saveOutout(output_name, memory, symtab);
 
     /* TODO clean up even if we stop after first pass */
     queue->free(queue);

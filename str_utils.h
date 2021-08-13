@@ -6,6 +6,8 @@
 #include "err.h"
 #include "bool.h"
 
+#define MAX_FILENAME_LENGTH 255
+
 char *splitString(char **string, char *delimeters);
 void removeAllSpaces(char *str);
 void removeLeadingSpaces(char **str);
@@ -19,5 +21,7 @@ int findInArray(char *str, char *str_arr[], int arr_len);
 
 ErrorType readline(FILE *file, char *buf);
 FILE* openfile(char *path, ErrorType *err);
+char* toBasename(char *path);
+void removeFileExtension(char *filename);
 
 #endif

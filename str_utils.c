@@ -184,3 +184,29 @@ int findInArray(char *str, char *str_arr[], int arr_len) {
     }
     return -1;
 }
+
+char* toBasename(char *path) {
+    char* last_slash = NULL;
+
+    size_t len = strlen(path);
+    if (path[len-1] == '/') {
+        path[len-1] = '\0';
+    }
+
+    last_slash = strrchr(path, '/');
+    if (last_slash == NULL) {
+        return path;
+    }
+
+    return last_slash + 1;
+}
+
+void removeFileExtension(char *filename) {
+    char* ext = NULL;
+    ext = strrchr(filename, '.');
+    if (ext == NULL) {
+        return;
+    }
+
+    *ext = '\0';
+}
