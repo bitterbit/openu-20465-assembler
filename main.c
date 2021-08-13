@@ -78,7 +78,7 @@ bool handle_assembly_file(char *path) {
     unsigned char *data = NULL;
 
     ErrorType err = SUCCESS;
-    size_t instruction_counter = 0;
+    size_t instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
     FILE *file = openfile(path, &err);
     char* output_name = NULL;
 
@@ -168,7 +168,6 @@ bool handle_assembly_file(char *path) {
     syms->fixDataSymbolsOffset(syms, instruction_counter);
 
     /* end of first pass, start second pass */
-    printf("stage1 code_size=%lu\n", instruction_counter);
     printf("starting stage 2\n");
     err = SUCCESS;
 
