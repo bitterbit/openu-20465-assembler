@@ -218,8 +218,8 @@ bool handle_assembly_file(char *path) {
             case TypeCode:
                 /* Clean inst */
                 memset(&inst, 0, sizeof(Instruction));
+                err = decodeInstructionLine(line, &inst, syms);
                 /* printf("\n__PRINTING_LINE__\n"); */
-                /* err = decodeInstructionLine(line, &inst, syms); */
                 /* dumpAssemblyLine(line); */
                 /* printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff); */
                 /* printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff); */
