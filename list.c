@@ -3,6 +3,7 @@
 /* will free the node but not its data! */
 void ListNode_free(ListNode *self) { free(self); }
 
+/* TODO: doesn't return err */
 ListNode *newListNode(void *data) {
     ListNode *node = malloc(sizeof(ListNode));
     node->next = NULL;
@@ -26,6 +27,7 @@ ListNode *ListIterator_next(ListIterator *self) {
     return node;
 }
 
+/* TODO: doesn't return err */
 ListIterator *newListIterator(ListNode *head) {
     ListIterator *iter = malloc(sizeof(ListIterator));
     iter->head = head;

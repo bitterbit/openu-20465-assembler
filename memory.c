@@ -17,6 +17,10 @@ ErrorType Memory_toFile(Memory *self, FILE *file) {
     ObjectFile *objFile =
         newObjectFile(file, INSTRUCTION_COUNTER_INITIAL_VALUE);
 
+    if (objFile == NULL) {
+        return ERR_OUT_OF_MEMEORY;
+    }
+
     objFile->writeHeader(objFile, self->code->size, self->data->size);
     for (i = 0; i < self->code->size; i++) {
         objFile->writeByte(objFile, self->code->data[i]);
@@ -51,11 +55,18 @@ void Memory_free(Memory *self) {
 Memory *newMemory() {
     Memory *memory = (Memory *)malloc(sizeof(Memory));
 
+    ManagedArray *data_array = newManagedArray();
+    ManagedArray *code_array = newManagedArray();
+
+    if (memory == NULL || data_array == NULL || code_array == NULL) {
+        return NULL;
+    }
+
     memory->data_counter = DATA_COUNTER_INITIAL_VALUE;
     memory->instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
 
-    memory->data = newManagedArray();
-    memory->code = newManagedArray();
+    memory->data = data_array;
+    memory->code = code_array;
 
     memory->writeData = Memory_writeData;
     memory->writeCode = Memory_writeCode;
@@ -66,9 +77,6 @@ Memory *newMemory() {
 
 ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
                               size_t size) {
-    /* printf("ManagedArray data=%p size=%lu capacity=%lu \n", self->data, */
-    /*        self->size, self->capacity); */
-
     size_t leftover_size;
     void *dst;
 
@@ -88,6 +96,7 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
         self->data = realloc(self->data, self->capacity);
     }
 
+    /* TODO: make sure this breaks the program */
     if (self->data == NULL) {
         return ERR_OUT_OF_MEMEORY;
     }
@@ -124,6 +133,12 @@ void ManagedArray_free(ManagedArray *self) {
 ManagedArray *newManagedArray() {
     ManagedArray *arr = (ManagedArray *)malloc(sizeof(ManagedArray));
 
+    unsigned char *arr_data = malloc(MANAGED_ARRAY_MIN_CAPACITY);
+
+    if (arr == NULL || arr_data == NULL) {
+        return NULL;
+    }
+
     arr->free = ManagedArray_free;
     arr->append = ManagedArray_append;
     arr->appendUnsignedInt = ManagedArray_appendUnsignedInt;
@@ -131,6 +146,6 @@ ManagedArray *newManagedArray() {
 
     arr->capacity = MANAGED_ARRAY_MIN_CAPACITY;
     arr->size = 0;
-    arr->data = malloc(arr->capacity);
+    arr->data = arr_data;
     return arr;
 }

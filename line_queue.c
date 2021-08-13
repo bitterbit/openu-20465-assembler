@@ -1,7 +1,6 @@
 #include "line_queue.h"
 
 void LineQueue_push(LineQueue *self, AssemblyLine *line) {
-    /* printf("queue->push\n"); */
     ListNode *node = newListNode(line);
 
     /* add our item to the end of the list
@@ -58,6 +57,11 @@ void LineQueue_free(LineQueue *self) {
 
 LineQueue *newLineQueue() {
     LineQueue *queue = malloc(sizeof(LineQueue));
+
+    if (queue == NULL) {
+        return queue;
+    }
+
     queue->head = NULL;
     queue->tail = NULL;
     queue->push = LineQueue_push;

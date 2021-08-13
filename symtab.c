@@ -24,9 +24,12 @@ void Symbol_free(Symbol *self) {
 Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
                   SymbolSection section) {
     Symbol *sym = malloc(sizeof(Symbol));
+    char *symbols_name = calloc(1, strlen(name) + 1);
 
-    size_t len = strlen(name) + 1;
-    char *symbols_name = calloc(1, len);
+    if (sym == NULL || symbols_name == NULL) {
+        return NULL;
+    }
+
     strcpy(symbols_name, name);
 
     sym->symbol = symbols_name;
@@ -131,6 +134,10 @@ void SymbolTable_free(SymbolTable *self) {
 
 SymbolTable *newSymbolTable() {
     SymbolTable *list = malloc(sizeof(SymbolTable));
+
+    if (list == NULL) {
+        return list;
+    }
 
     list->head = NULL;
     list->insert = SymbolTable_insert;
