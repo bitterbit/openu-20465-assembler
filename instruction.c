@@ -35,15 +35,14 @@ const int entry_directive_commands_len = 1;
 const char *extern_directive_commands[] = {EXTERN};
 const int extern_directive_commands_len = 1;
 
-/* TODO: change name */
-bool is_code_opcode(char *command) {
+bool is_valid_command_name(char *command) {
     return is_i_command(command) | is_r_command(command) |
            is_j_command(command);
 }
 
 bool is_reserved_keyword(char *str) {
 
-    bool is_reserved = is_code_opcode(str);
+    bool is_reserved = is_valid_command_name(str);
 
     /* is directive */
     is_reserved |= strArrayIncludes(str, (char **)data_directive_commands,

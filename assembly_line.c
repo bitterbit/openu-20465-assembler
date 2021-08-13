@@ -84,7 +84,7 @@ ErrorType parseCommand(char **buf, AssemblyLine *line) {
     /* printf("buf=%s buf after splitString\n", *buf); */
 
     if (*command != '.') {
-        if (is_code_opcode(command)) {
+        if (is_valid_command_name(command)) {
             line->type = TypeCode;
             strcpy(line->opcode_name, command);
         } else {

@@ -4,14 +4,12 @@
 #include <string.h>
 
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
-    /* printf("WriteData %p %lu \n", (void *)data, size); */
     self->data_counter += size;
     return self->data->append(self->data, data, size);
 }
 
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
     ErrorType err;
-    /* printf("WriteCode %p \n", (void *)instruction); */
 
     err = self->code->appendUnsignedInt(self->code, instruction->body.inst);
     /* TODO: this need to be done in the first stage, so code labels are
