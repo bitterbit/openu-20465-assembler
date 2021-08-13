@@ -183,6 +183,11 @@ AssemblyLine *newLine() {
 void freeLine(AssemblyLine *line) {
     /* Clean a line and release the args pointers */
     int i;
+
+    if (line == NULL) {
+        return;
+    }
+
     for (i = 0; i < line->arg_count; i++) {
         free(line->args[i]);
     }
