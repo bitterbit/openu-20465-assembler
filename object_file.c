@@ -13,7 +13,7 @@ void ObjectFile_writeByte(ObjectFile *self, unsigned char byte) {
         fprintf(self->file, "\n %04lu", self->address);
     }
 
-    fprintf(self->file, " %02x", byte);
+    fprintf(self->file, " %02X", byte);
     self->address++;
 }
 
