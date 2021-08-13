@@ -336,7 +336,7 @@ ErrorType decodeIArithmetic(AssemblyLine *line, Instruction *inst) {
 }
 
 ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
-                        SymbolTable *symtab, int instruction_counter) {
+                        SymbolManager *syms, int instruction_counter) {
     int temp;
     int relative_distance;
     Symbol *sym = NULL;
@@ -357,7 +357,7 @@ ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
 
     /* Third arg is a label */
 
-    sym = symtab->find(symtab, line->args[2]);
+    sym = syms->useSymbol(syms, line->args[2]);
 
     if (sym == NULL) {
         return ERR_UNKNOWN_LABEL_REFERENCED;
@@ -412,7 +412,7 @@ ErrorType decodeIMem(AssemblyLine *line, Instruction *inst) {
 }
 
 ErrorType decodeIInstruction(AssemblyLine *line, Instruction *inst,
-                             SymbolTable *symtab) {
+                             SymbolManager *syms) {
     ErrorType err = SUCCESS;
     inst->type = I;
 
@@ -433,7 +433,7 @@ ErrorType decodeIInstruction(AssemblyLine *line, Instruction *inst,
         break;
 
     case IBranch:
-        err = decodeIBranch(line, inst, symtab, line->code_position);
+        err = decodeIBranch(line, inst, syms, line->code_position);
         break;
 
     case IMem:
@@ -531,7 +531,7 @@ ErrorType decodeRInstruction(AssemblyLine *line, Instruction *inst) {
 }
 
 ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
-                             SymbolTable *symtab) {
+                             SymbolManager *syms) {
     ErrorType err = SUCCESS;
     int register_number;
     Symbol *sym = NULL;
@@ -570,7 +570,7 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
 
         /* JMP with label, LA, CALL */
         else {
-            sym = symtab->find(symtab, line->args[0]);
+            sym = syms->useSymbol(syms, line->args[0]);
 
             if (sym == NULL) {
                 return ERR_UNKNOWN_LABEL_REFERENCED;
@@ -588,12 +588,12 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
 }
 
 ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
-                                SymbolTable *symtab) {
+                                SymbolManager *syms) {
     ErrorType err = SUCCESS;
 
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
-        err = decodeIInstruction(line, inst, symtab);
+        err = decodeIInstruction(line, inst, syms);
         /*         int immed = inst->body.i_inst.immed;
                 int rt = inst->body.i_inst.rt;
                 int rs = inst->body.i_inst.rs;
@@ -619,7 +619,7 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
 
     /* is j instruction */
     else if (is_j_command(line->opcode_name)) {
-        err = decodeJInstruction(line, inst, symtab);
+        err = decodeJInstruction(line, inst, syms);
         /*         int address = inst->body.j_inst.address;
                 int reg = inst->body.j_inst.reg;
                 int opcode = inst->body.j_inst.opcode;

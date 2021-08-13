@@ -23,31 +23,12 @@ void printError(ErrorType err, AssemblyLine *line) {
 /* TODO: Verify the semantics of entry and external lines? are there any others? */ 
 /* TODO: implement output table for external and entry symbols */
 
-void fixDataSymbols(SymbolTable *symtab, size_t offset) {
-    Symbol *sym = NULL;
-    ListNode *node = NULL;
-    ListIterator *iterator = newListIterator(symtab->head);
-
-    while ((node = iterator->next(iterator)) != NULL) {
-        sym = node->data;
-
-        if (sym == NULL) {
-            continue;
-        }
-
-        if (sym->section != SymbolSection_Data || sym->is_external == true) {
-            continue;
-        }
-
-        sym->value += offset;
-    }
-    iterator->free(iterator);
-}
-
 
 bool handle_assembly_file(char *path) {
     bool error_happened = false;
-    SymbolTable *symtab = newSymbolTable();
+
+    SymbolManager *syms = newSymbolManager();
+
     Memory *memory = newMemory();
     LineQueue *queue = newLineQueue();
     /* lines are allocated on heap and owned by the queue */
@@ -56,7 +37,7 @@ bool handle_assembly_file(char *path) {
     int line_counter = 1;
     char *output_name = NULL;
     ErrorType err = SUCCESS;
-    size_t code_size = 0;
+    size_t instruction_counter = 0;
 
     FILE *file = openfile(path, &err);
     if (file == NULL) {
@@ -84,10 +65,8 @@ bool handle_assembly_file(char *path) {
             break;
 
         case TypeExtern: {
-            /* The external label is the first arg */
-            Symbol *sym =
-                newSymbol(line->args[0], 0, false, true, SymbolSection_Data);
-            err = symtab->insert(symtab, sym);
+            err = syms->insertSymbol(syms, line->args[0], 0, false, true, SymbolSection_Data);
+
         } break;
 
         case TypeData: {
@@ -95,9 +74,7 @@ bool handle_assembly_file(char *path) {
             unsigned char *data = NULL;
 
             if (line->flags & FlagSymbolDeclaration) {
-                Symbol *sym = newSymbol(line->label, memory->data_counter,
-                                        false, false, SymbolSection_Data);
-                err = symtab->insert(symtab, sym);
+                err = syms->insertSymbol(syms, line->label, memory->data_counter, false, false, SymbolSection_Data);
             }
 
             data = decodeDataLine(line, &size, &err);
@@ -107,19 +84,15 @@ bool handle_assembly_file(char *path) {
 
         case TypeCode:
             if (line->flags & FlagSymbolDeclaration) {
-                Symbol *sym =
-                    newSymbol(line->label, memory->instruction_counter, false,
-                              false, SymbolSection_Code);
-                err = symtab->insert(symtab, sym);
+                err = syms->insertSymbol(syms, line->label, instruction_counter, false, false, SymbolSection_Code);
             }
 
             /* TODO: move to parse line? */
-            line->code_position = memory->instruction_counter;
+            line->code_position = instruction_counter;
 
             /* count instructions here so we know what the final code size is
              * before second pass */
-            code_size += INSTRUCTION_SIZE;
-            memory->instruction_counter += INSTRUCTION_SIZE;
+            instruction_counter += INSTRUCTION_SIZE;
 
             break;
         }
@@ -137,10 +110,10 @@ bool handle_assembly_file(char *path) {
         line_counter++;
     }
 
-    fixDataSymbols(symtab, memory->instruction_counter);
+    syms->fixDataSymbolsOffset(syms, instruction_counter);
 
     /* end of first pass, start second pass */
-    printf("stage1 code_size=%lu\n", code_size);
+    printf("stage1 code_size=%lu\n", instruction_counter);
     printf("starting stage 2\n");
     err = SUCCESS;
 
@@ -157,20 +130,13 @@ bool handle_assembly_file(char *path) {
 
             /* .entry SYM_NAME */
             case TypeEntry: {
-                Symbol *sym = NULL;
                 if (line->arg_count < 1) {
                     err = ERR_INVALID_ENTRY;
                     break;
                 }
 
                 /* The entry label is the first arg */
-                sym = symtab->find(symtab, line->args[0]);
-                if (sym == NULL) {
-                    err = ERR_ENTRY_SYM_NOT_FOUND;
-                    break;
-                }
-
-                sym->is_entry = true;
+                err = syms->markSymEntry(syms, line->args[0]);
             }
 
             break;
@@ -179,7 +145,7 @@ bool handle_assembly_file(char *path) {
                 /* Clean inst */
                 memset(&inst, 0, sizeof(Instruction));
                 printf("\n__PRINTING_LINE__\n");
-                err = decodeInstructionLine(line, &inst, symtab);
+                err = decodeInstructionLine(line, &inst, syms);
                 dumpAssemblyLine(line);
                 printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff);
                 printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff);
@@ -206,11 +172,12 @@ bool handle_assembly_file(char *path) {
         return ERR_CREATING_OUTPUT_FILE;
     }
 
-    saveOutout(output_name, memory, symtab);
+    /* saveOutout(output_name, memory, symtab); */
 
     /* TODO clean up even if we stop after first pass */
     queue->free(queue);
     memory->free(memory);
+    syms->free(syms);
 
     /* ==== cleanup ==== */
     fclose(file);
