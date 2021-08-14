@@ -27,11 +27,7 @@ ErrorType parseLabel(char **buf, AssemblyLine *line) {
         return ERR_LABEL_TOO_LONG;
     }
 
-    if (isOnlyLettersAndNumbers(label)) {
-        return ERR_LABEL_WITH_BAD_CHARACTERS;
-    }
-
-    if (containsSpace(label)) {
+    if (isOnlyLettersAndNumbers(label) == false) {
         return ERR_LABEL_WITH_BAD_CHARACTERS;
     }
 
