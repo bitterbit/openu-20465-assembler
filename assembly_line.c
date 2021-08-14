@@ -31,7 +31,6 @@ ErrorType parseLabel(char **buf, AssemblyLine *line) {
     return SUCCESS;
 }
 
-/* TODO: can be replaced with sscanf? */
 /* Check if a token is a valid number in the assembly spec */
 bool isNumber(char *token) {
     if (token == NULL || *token == '\0')
@@ -398,8 +397,6 @@ ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
 }
 
 /* TODO: check after fix in definitions (page 23) */
-
-/* TODO: Duplicate of IArithmetic */
 ErrorType decodeIMem(AssemblyLine *line, Instruction *inst) {
     int temp;
     ErrorType err = SUCCESS;

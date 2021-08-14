@@ -32,13 +32,13 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
             /* Clean inst */
             memset(&inst, 0, sizeof(Instruction));
             err = decodeInstructionLine(line, &inst, syms);
-            /* printf("\n__PRINTING_LINE__\n"); */
-            /* dumpAssemblyLine(line); */
-            /* printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff); */
-            /* printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff); */
-            /* printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff); */
-            /* printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff); */
-            /* printf("__FINSIHED_FINISHED__\n"); */
+        /*  printf("\n__PRINTING_LINE__\n");
+            dumpAssemblyLine(line);
+            printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff);
+            printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff);
+            printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff);
+            printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff);
+            printf("__FINSIHED_FINISHED__\n"); */
 
             if (err == SUCCESS) {
                 err = memory->writeCode(memory, &inst);

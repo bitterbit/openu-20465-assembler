@@ -8,7 +8,7 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
 
     switch (line->type) {
     case TypeEmpty:
-        /* ignore on Empty or comment lines */
+        /* ignore Empty and comment lines */
         break;
 
     case TypeEntry:
@@ -72,6 +72,8 @@ bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue
 
     while (err != ERR_EOF) {
         err = firstPassHandleLine(line, syms, memory, instruction_counter);
+
+        /* TODO: memory error not handled */
         if (err != SUCCESS && err != ERR_EOF) {
             printLineError(err, line);
             errored = true;
@@ -84,7 +86,7 @@ bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue
             break;
         }
 
-        /* TODO remove debug info struct */
+        /* TODO: remove debug info struct */
         line->debug_info.line_number = line_counter;
         err = parseLine(file, line);
 
@@ -98,8 +100,10 @@ bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue
     }
 
     /* ensure first data and last code won't have the same address */
-    instruction_counter += INSTRUCTION_SIZE;
-    syms->fixDataSymbolsOffset(syms, instruction_counter);
+
+    /* TODO: i think the bug solved itself - can we remoev next line? */
+    /* *instruction_counter += INSTRUCTION_SIZE; */
+    syms->fixDataSymbolsOffset(syms, *instruction_counter);
 
     return errored == false;
 }
