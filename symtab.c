@@ -156,9 +156,9 @@ SymbolTable *newSymbolTable() {
 
 ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
                                      size_t value, bool is_extern,
-                                     bool is_entry, SymbolSection section) {
+                                     SymbolSection section) {
 
-    Symbol *sym = newSymbol(name, value, is_extern, is_entry, section);
+    Symbol *sym = newSymbol(name, value, is_extern, false, section);
     ErrorType err = self->symtab->insert(self->symtab, sym);
 
     if (err != SUCCESS) {
@@ -173,6 +173,10 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
 
     if (sym == NULL) {
         return ERR_ENTRY_SYM_NOT_FOUND;
+    }
+
+    if (sym->is_external == true) {
+        return ERR_SYMBOL_CANNOT_BE_ENTRY_AND_EXTERN;
     }
 
     sym->is_entry = true;
@@ -194,8 +198,6 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
 
     sym->dependent_offsets[sym->dependent_offsets_count] = instruction_counter;
     sym->dependent_offsets_count += 1;
-
-    /* printf("useSymbol %p %lu \n", sym->dependent_offsets, sym->dependent_offsets_count); */
 
     return sym;
 }
