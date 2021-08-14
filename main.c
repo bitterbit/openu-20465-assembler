@@ -82,7 +82,8 @@ bool handleAssemblyFile(char *path, ErrorType *err) {
     *err = SUCCESS;
 
     if (syms == NULL || memory == NULL || queue == NULL) {
-        printErr(ERR_OUT_OF_MEMEORY);
+        *err = ERR_OUT_OF_MEMEORY;
+        printErr(*err);
         return false;
     }
 
@@ -147,7 +148,7 @@ int main(int argc, char **argv) {
         if (file_success == false){
             printf("Failed parsing file %s\n", fname);
             if (err == ERR_OUT_OF_MEMEORY) {
-                printf("Failed because of memory issue - exiting");
+                printf("Failed because of memory issue - exiting\n");
                 return 1;
             }
         }

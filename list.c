@@ -8,7 +8,7 @@ void ListNode_free(ListNode *self) {
     free(self); 
 }
 
-/* TODO: make sure all users check if pointer is null */
+/* TODO: actually handle memory error until main */
 ListNode *newListNode(void *data) {
     ListNode *node = malloc(sizeof(ListNode));
 

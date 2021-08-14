@@ -23,7 +23,6 @@ void Symbol_free(Symbol *self) {
     }
 
     free(self);
-    /* memset(self, 0, sizeof(Symbol)); */
 }
 
 Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
@@ -159,6 +158,9 @@ ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
                                      SymbolSection section) {
 
     Symbol *sym = newSymbol(name, value, false, is_extern, section);
+    if (sym == NULL){
+        return ERR_OUT_OF_MEMEORY;
+    }
     ErrorType err = self->symtab->insert(self->symtab, sym);
 
     if (err != SUCCESS) {
