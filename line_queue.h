@@ -11,6 +11,10 @@
 
 typedef struct LineQueue LineQueue;
 
+/* LineQueue can hold AsseblyLines, this can be used to store parsed lines for processing in a later stage
+ * this queue is FIFO 
+ * if any AssemblyLines are left in queue when deallocated they will be deallocated too
+ * */
 struct LineQueue {
     ListNode *head;
     ListNode *tail;

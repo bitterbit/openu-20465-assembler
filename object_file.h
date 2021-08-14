@@ -7,6 +7,8 @@
 #define BYTES_PER_LINE 4
 
 typedef struct ObjectFile ObjectFile;
+/* ObjectFile is a utility to simplfy writing an .ob file.
+ * One can use it as if it is writing raw data and the output will match the guides format (hexdump like) */
 struct ObjectFile {
     FILE* file;
     size_t base_address;

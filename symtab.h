@@ -11,10 +11,10 @@ typedef enum { SymbolSection_Code, SymbolSection_Data } SymbolSection;
 typedef struct Symbol Symbol;
 struct Symbol {
     char *symbol;
-    size_t value; /* TODO: make sure value is not bigger than 24bit? */
+    size_t value;
     bool is_entry;
     bool is_external;
-    size_t *dependent_offsets; /* code offsets that depend on this symbol */
+    size_t *dependent_offsets; /* list of all instruction offsets that depend on this symbol */
     size_t dependent_offsets_count;
     SymbolSection section;
     void (*free)(Symbol *self);
@@ -24,6 +24,8 @@ Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
                   SymbolSection section);
 
 typedef struct SymbolTable SymbolTable;
+
+/* SymbolTable keeps track of all symbols and their values */
 struct SymbolTable {
     ListNode *head;
 
@@ -41,6 +43,7 @@ struct SymbolTable {
 };
 
 typedef struct SymbolManager SymbolManager;
+/* wrapper around SymbolTable keeping track of external and entry symbols */
 struct SymbolManager {
     SymbolTable *symtab;
     bool has_external;

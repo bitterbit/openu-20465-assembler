@@ -13,6 +13,8 @@ struct ListNode {
 
 
 typedef struct ListIterator ListIterator;
+
+/* iterator to make iterating over a linked list easier */
 struct ListIterator {
     ListNode* head;
     ListNode* (*next)(ListIterator *self);

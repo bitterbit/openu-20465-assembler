@@ -68,7 +68,7 @@ Memory *newMemory() {
         return NULL;
     }
 
-    memory->data_counter = DATA_COUNTER_INITIAL_VALUE;
+    memory->data_counter = 0;
     memory->instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
 
     memory->data = data_array;
