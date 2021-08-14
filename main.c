@@ -90,10 +90,6 @@ bool handleAssemblyFile(char *path) {
         return false;
     }
 
-    /* ensure first data and last code won't have the same address */
-    instruction_counter += INSTRUCTION_SIZE;
-    syms->fixDataSymbolsOffset(syms, instruction_counter);
-
     /* end of first pass, start second pass */
     printf("[!] second pass\n");
     if (secondPass(syms, memory, queue) == false) {

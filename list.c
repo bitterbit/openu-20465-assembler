@@ -32,7 +32,7 @@ ListNode *ListIterator_next(ListIterator *self) {
     return node;
 }
 
-/* TODO: doesn't return err */
+/* TODO: handle malloc failure*/
 ListIterator *newListIterator(ListNode *head) {
     ListIterator *iter = malloc(sizeof(ListIterator));
     iter->head = head;
