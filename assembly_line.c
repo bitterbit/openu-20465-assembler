@@ -330,6 +330,10 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
             *out_err =
                 numberFromString(line->args[i], &number, data_chunk_size * 8);
 
+            if (*out_err != SUCCESS) {
+                return NULL;
+            }
+
             for (j = 0; j < data_chunk_size; j++) {
                 *tmp = (unsigned char)(0x00FF & number);
                 number = number >> 8;
@@ -344,6 +348,10 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 /* TODO: bug - we assume numbers is less than int  */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     int sscanf_success;
+
+    if (strlen(str) == 0) {
+        return ERR_INVALID_NUMBER_TOKEN;
+    }
 
     sscanf_success = sscanf(str, "%d", number);
 
