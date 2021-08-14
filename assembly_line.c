@@ -356,16 +356,21 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 /* TODO: bug - we assume numbers is less than int  */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     int sscanf_success;
+    long temporary_number;
 
-    sscanf_success = sscanf(str, "%d", number);
+    sscanf_success = sscanf(str, "%ld", &temporary_number);
 
     if (sscanf_success != 1) {
         return ERR_INVALID_NUMBER_TOKEN;
     }
 
-    if (!number_fits_in_bits(*number, number_of_bits)) {
+    /* we support negative numbers, which means we can fit one bit less then usigned */
+    if (!number_fits_in_bits(temporary_number, number_of_bits-1)) {
         return ERR_INVALID_NUMBER_SIZE;
     }
+
+    /* it is ok to cast down to int because no data command supports more than 32 bit */
+    *number = temporary_number; 
 
     return SUCCESS;
 }
