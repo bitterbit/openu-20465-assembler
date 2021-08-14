@@ -110,8 +110,8 @@ ErrorType parseCommand(char **buf, AssemblyLine *line) {
     return err;
 }
 
-/* this function will skip over until after two quotes 
- * it will advance buf to after the two quotes 
+/* this function will skip over until after two quotes
+ * it will advance buf to after the two quotes
  * and will return a pointer to the whole string (including the quotes)
  * */
 char *handleStringToken(char **buf, ErrorType *err) {
@@ -128,7 +128,7 @@ char *handleStringToken(char **buf, ErrorType *err) {
     tmp = strchr(token, '"');
     if (tmp == NULL) {
         /* we found only one quote, advance buf to the end of the string */
-        *buf = strchr(token, '\0'); 
+        *buf = strchr(token, '\0');
         return token;
     }
 
@@ -138,9 +138,10 @@ char *handleStringToken(char **buf, ErrorType *err) {
 
 /* Returns a new pointer to a token,
     caller is responsible for freeing */
-char *handleToken(char **buf, ErrorType *err) {
+char *handleToken(char **buf, ErrorType *err, bool *is_last_token) {
     char *token;
     char *dynamic_token = NULL;
+    *is_last_token = false;
 
     /* Remove leading spaces before arg */
     removeLeadingSpaces(buf);
@@ -152,6 +153,10 @@ char *handleToken(char **buf, ErrorType *err) {
 
     /* Handle non string tokens */
     token = splitString(buf, ",");
+    if (*buf == NULL) {
+        /* if splitString did not find a comma, it will set buf to be null */
+        *is_last_token = true;
+    }
 
     removeTrailingSpaces(&token);
 
@@ -167,15 +172,17 @@ char *handleToken(char **buf, ErrorType *err) {
 
 ErrorType parseArgs(char *buf, AssemblyLine *line) {
     char *token = NULL;
+    bool is_last_token = false;
 
     ErrorType err = SUCCESS;
     line->arg_count = 0;
     line->args = NULL;
 
-    while (checkForEmptyLine(buf) != 0) {
+    while (is_last_token == false && buf != NULL) {
         /* token is heap allocated and should be freed when AssemblyLine is
          * freed */
-        token = handleToken(&buf, &err);
+        removeLeadingAndTrailingSpaces(&buf);
+        token = handleToken(&buf, &err, &is_last_token);
         if (err != SUCCESS) {
             return err;
         }
@@ -285,7 +292,7 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
         arg = line->args[0];
         len = strlen(line->args[0]);
 
-        if (len < 2 || arg[0] != '"' || arg[len-1] != '"') {
+        if (len < 2 || arg[0] != '"' || arg[len - 1] != '"') {
             *out_err = ERR_ASCIZ_WITHOUT_QUOTES;
             return NULL;
         }
