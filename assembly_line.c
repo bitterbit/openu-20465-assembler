@@ -191,6 +191,10 @@ void freeLine(AssemblyLine *line) {
         free(line->args[i]);
     }
 
+    if (line->args != NULL) {
+        free(line->args);
+    }
+
     free(line);
 }
 
