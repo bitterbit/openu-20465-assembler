@@ -7,8 +7,8 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
     void *data = NULL;
     size_t size = 0;
 
-    if (isOnlyLettersAndNumbers(line->label) == false) {
-        return ERR_LABEL_WITH_BAD_CHARACTERS;
+    if (err != SUCCESS) {
+        return err;
     }
 
     switch (line->type) {

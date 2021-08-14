@@ -19,37 +19,30 @@ ErrorType parseLabel(char **buf, AssemblyLine *line) {
     /* splitString always returns a string even if delimiter not found */
     label = splitString(buf, ":");
 
-    if (is_reserved_keyword(label) || strlen(label) > 31 || !isalpha(*label) ||
-        containsSpace(label)) {
-        /* printf("invalid label: %s\n", label); */
-        return ERR_INVALID_LABEL;
+    if (is_reserved_keyword(label)) {
+        return ERR_INVALID_LABEL_USING_RESERVED_NAME;
+    }
+
+    if (strlen(label) > 31) {
+        return ERR_LABEL_TOO_LONG;
+    }
+
+    if (isOnlyLettersAndNumbers(label)) {
+        return ERR_LABEL_WITH_BAD_CHARACTERS;
+    }
+
+    if (containsSpace(label)) {
+        return ERR_LABEL_WITH_BAD_CHARACTERS;
+    }
+
+    if (isLetter(label[0]) == false) {
+        return ERR_LABEL_MUST_START_WITH_LETTERS;
     }
 
     line->flags |= FlagSymbolDeclaration;
     strcpy(line->label, label);
 
     return SUCCESS;
-}
-
-/* Check if a token is a valid number in the assembly spec */
-bool isNumber(char *token) {
-    if (token == NULL || *token == '\0')
-        return false;
-    /* Numbers can start with a sign, but never contain only a sign */
-    if (*token == '+' || *token == '-') {
-        token++;
-        if (!isdigit(*token++)) {
-            return false;
-        }
-    }
-
-    /* All other chars should represent digits */
-    while (*token != '\0') {
-        if (!isdigit(*token++)) {
-            return false;
-        }
-    }
-    return true;
 }
 
 /* Return the register number if it is a valid register, -1 otherways */

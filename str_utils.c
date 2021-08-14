@@ -182,12 +182,12 @@ int findInArray(char *str, char *str_arr[], int arr_len) {
     return -1;
 }
 
-char* toBasename(char *path) {
-    char* last_slash = NULL;
+char *toBasename(char *path) {
+    char *last_slash = NULL;
 
     size_t len = strlen(path);
-    if (path[len-1] == '/') {
-        path[len-1] = '\0';
+    if (path[len - 1] == '/') {
+        path[len - 1] = '\0';
     }
 
     last_slash = strrchr(path, '/');
@@ -199,7 +199,7 @@ char* toBasename(char *path) {
 }
 
 void removeFileExtension(char *filename) {
-    char* ext = NULL;
+    char *ext = NULL;
     ext = strrchr(filename, '.');
     if (ext == NULL) {
         return;
@@ -208,14 +208,34 @@ void removeFileExtension(char *filename) {
     *ext = '\0';
 }
 
+bool isNumber(char c) {
+    if (c >= '0' && c <= '9') {
+        return true;
+    }
+
+    return false;
+}
+
+bool isLetter(char c) {
+    if (c >= 'a' && c <= 'z') {
+        return true;
+    }
+
+    if (c >= 'A' && c <= 'Z') {
+        return true;
+    }
+
+    return false;
+}
+
 bool isOnlyNumbers(char *str) {
     size_t len = strlen(str);
     int i;
 
-    for(i=0; i<len; i++) {
+    for (i = 0; i < len; i++) {
         char c = str[i];
 
-        if (c >= '0' && c <= '9') {
+        if (isNumber(c) == true) {
             continue;
         }
 
@@ -229,18 +249,10 @@ bool isOnlyLettersAndNumbers(char *str) {
     size_t len = strlen(str);
     int i;
 
-    for(i=0; i<len; i++) {
+    for (i = 0; i < len; i++) {
         char c = str[i];
 
-        if (c >= '0' && c <= '9') {
-            continue;
-        }
-
-        if (c >= 'a' && c <= 'z') {
-            continue;
-        }
-
-        if (c >= 'A' && c <= 'Z') {
+        if (isLetter(c) == true || isNumber(c) == true) {
             continue;
         }
 

@@ -125,6 +125,18 @@ void printErr(ErrorType err) {
         str = "Labels are allowed to contain only letters or numbers";
         break;
 
+    case ERR_LABEL_MUST_START_WITH_LETTERS:
+        str = "Labels must start with letters a-zA-Z";
+        break;
+
+    case ERR_LABEL_TOO_LONG:
+        str = "Label must not be longer than 31 letters";
+        break;
+
+    case ERR_INVALID_LABEL_USING_RESERVED_NAME:
+        str = "Label name is a reserved keyword";
+        break;
+
     default:
         str = "Unknown error value";
         found = false;
