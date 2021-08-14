@@ -29,7 +29,7 @@ void printErr(ErrorType err) {
         str = "The same symbol was decleared twice";
         break;
 
-    case ERR_INVALID_ENTRY:
+    case ERR_INVALID_SYNTAX_ENTRY_DECLERATION:
         str = "Invalid entry";
         break;
 

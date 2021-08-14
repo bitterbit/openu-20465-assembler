@@ -13,22 +13,22 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
 
     case TypeEntry:
         if (line->arg_count != 1) {
-            return ERR_INVALID_ENTRY;
+            return ERR_INVALID_SYNTAX_ENTRY_DECLERATION;
         }
         break;
 
     case TypeExtern: {
         if (line->arg_count != 1) {
-            return ERR_INVALID_EXTERNAL_LABEL_REFERENCE;
+            return ERR_INVALID_SYNTAX_EXTERN_DECLERATION;
         }
-        err = syms->insertSymbol(syms, line->args[0], 0, false, true,
+        err = syms->insertSymbol(syms, line->args[0], 0, true,
                                  SymbolSection_Data);
     } break;
 
     case TypeData:
         if (line->flags & FlagSymbolDeclaration) {
             err = syms->insertSymbol(syms, line->label, memory->data_counter,
-                                     false, false, SymbolSection_Data);
+                                     false, SymbolSection_Data);
         }
 
         if (err != SUCCESS) {
@@ -47,7 +47,7 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
     case TypeCode:
         if (line->flags & FlagSymbolDeclaration) {
             err = syms->insertSymbol(syms, line->label, *instruction_counter,
-                                     false, false, SymbolSection_Code);
+                                     false, SymbolSection_Code);
         }
 
         line->code_position = *instruction_counter;
@@ -60,7 +60,8 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
     return err;
 }
 
-bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue, size_t *instruction_counter) {
+bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
+               LineQueue *queue, size_t *instruction_counter) {
     ErrorType err = SUCCESS;
     AssemblyLine *line = NULL;
     size_t line_counter = 0;

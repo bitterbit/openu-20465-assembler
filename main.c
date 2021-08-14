@@ -15,8 +15,6 @@
 #define MAX_SIZE 65535
 
 /* TODO: Compile and check on the openu ubuntu */
-/* TODO: Verify the semantics of entry and external lines? are there any others?
- */
 
 ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     char filename[MAX_FILENAME_LENGTH];
