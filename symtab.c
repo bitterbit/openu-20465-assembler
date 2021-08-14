@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void dumpSymbolTable(SymbolTable *symtab) {
+
+/* TODO: remove me */
+/* void dumpSymbolTable(SymbolTable *symtab) {
     ListIterator *iter = newListIterator(symtab->head);
     ListNode *node = iter->next(iter);
 
@@ -13,8 +15,9 @@ void dumpSymbolTable(SymbolTable *symtab) {
     }
 
     iter->free(iter);
-}
+} */
 
+/* Free a symbol object */
 void Symbol_free(Symbol *self) {
     free(self->symbol);
 
@@ -25,6 +28,7 @@ void Symbol_free(Symbol *self) {
     free(self);
 }
 
+/* Create a symbol object */
 Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
                   SymbolSection section) {
     Symbol *sym = malloc(sizeof(Symbol));
@@ -46,6 +50,7 @@ Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
     return sym;
 }
 
+/* Insert a symbol into the symbol table */
 ErrorType SymbolTable_insert(SymbolTable *self, Symbol *sym) {
     ListNode *node = NULL;
 
@@ -67,10 +72,13 @@ ErrorType SymbolTable_insert(SymbolTable *self, Symbol *sym) {
     return SUCCESS;
 }
 
+/* Check if a symbol_name string exists in a symbol table */
 bool SymbolTable_exists(SymbolTable *self, char *symbol_name) {
     return (bool)(self->find(self, symbol_name) != NULL);
 }
 
+/* find the symbol with a specefied symbol_name in the symbol table,
+   Return NULL if it isn't found */
 Symbol *SymbolTable_find(SymbolTable *self, char *symbol_name) {
     ListIterator *iterator = NULL;
     ListNode *node = NULL;
@@ -111,6 +119,7 @@ Symbol *SymbolTable_find(SymbolTable *self, char *symbol_name) {
     return NULL;
 }
 
+/* Free a symbol table */
 void SymbolTable_free(SymbolTable *self) {
     if (self->head != NULL) {
         ListIterator *iterator = newListIterator(self->head);
@@ -137,6 +146,7 @@ void SymbolTable_free(SymbolTable *self) {
     free(self);
 }
 
+/* Create a symbol table */
 SymbolTable *newSymbolTable() {
     SymbolTable *list = malloc(sizeof(SymbolTable));
 
@@ -153,15 +163,17 @@ SymbolTable *newSymbolTable() {
     return list;
 }
 
+/* Insert a symbol into the symbol manager */
 ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
                                      size_t value, bool is_extern,
                                      SymbolSection section) {
+    ErrorType err;
 
     Symbol *sym = newSymbol(name, value, false, is_extern, section);
     if (sym == NULL){
         return ERR_OUT_OF_MEMEORY;
     }
-    ErrorType err = self->symtab->insert(self->symtab, sym);
+    err = self->symtab->insert(self->symtab, sym);
 
     if (sym->is_external) {
         self->has_external = true;
@@ -174,6 +186,7 @@ ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
     return err;
 }
 
+/* Mark a symbol as entry */
 ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
     Symbol *sym = self->symtab->find(self->symtab, name);
 
@@ -189,6 +202,7 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
     return SUCCESS;
 }
 
+/* Mark that an instruction is using a symbol */
 Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruction_counter, ErrorType *out_err) {
     Symbol *sym = self->symtab->find(self->symtab, name);
     if (sym == NULL) {
@@ -213,6 +227,7 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
     return sym;
 }
 
+/* Fix the offsets of the data symbols - at the end of the first pass */
 void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, const size_t offset) {
     Symbol *sym = NULL;
     ListNode *node = NULL;
@@ -235,6 +250,7 @@ void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, const size_t offset
     iterator->free(iterator);
 }
 
+/* Write the ext file from the symbol table */
 void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
     ListNode *node = NULL;
     ListIterator *iter = newListIterator(self->symtab->head);
@@ -256,6 +272,7 @@ void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
     iter->free(iter);
 }
 
+/* Write the ent file from the symbol table */
 void SymbolManager_writeEntFile(SymbolManager *self, FILE* file) {
     ListNode *node = NULL;
     ListIterator *iter = newListIterator(self->symtab->head);
@@ -273,12 +290,14 @@ void SymbolManager_writeEntFile(SymbolManager *self, FILE* file) {
     iter->free(iter);
 }
 
+/* Free a symbol manager object */
 void SymbolManager_free(SymbolManager *self) {
     self->symtab->free(self->symtab);
     memset(self, 0, sizeof(SymbolManager));
     free(self);
 }
 
+/* create a symbol manager object */
 SymbolManager *newSymbolManager() {
     SymbolManager *syms = malloc(sizeof(SymbolManager));
     syms->has_external = false;

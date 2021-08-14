@@ -1,5 +1,6 @@
 #include "line_queue.h"
 
+/* Push the the line queue */
 void LineQueue_push(LineQueue *self, AssemblyLine *line) {
     ListNode *node = newListNode(line);
 
@@ -19,6 +20,7 @@ void LineQueue_push(LineQueue *self, AssemblyLine *line) {
     }
 }
 
+/* Pop the the line queue */
 AssemblyLine *LineQueue_pop(LineQueue *self) {
     AssemblyLine *first_line;
     ListNode *next;
@@ -37,6 +39,7 @@ AssemblyLine *LineQueue_pop(LineQueue *self) {
     return first_line;
 }
 
+/* Free the LineQueue and its contents */
 void LineQueue_free(LineQueue *self) {
     AssemblyLine *line = self->pop(self);
     while(line != NULL) {
@@ -47,6 +50,7 @@ void LineQueue_free(LineQueue *self) {
     free(self);
 }
 
+/* Create a new lineQueue object */
 LineQueue *newLineQueue() {
     LineQueue *queue = malloc(sizeof(LineQueue));
 

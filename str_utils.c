@@ -7,6 +7,7 @@
 #include "err.h"
 #include "str_utils.h"
 
+/* Split string by a list of delimter characters */
 char *splitString(char **string, char *delimeters) {
     char *string_start = *string;
     char *string_end;
@@ -30,8 +31,8 @@ char *splitString(char **string, char *delimeters) {
     return string_start;
 }
 
+/* Remove all spaces from a string, to simplify parsing */
 void removeAllSpaces(char *str) {
-    /* Remove all spaces from a string, to simplify parsing */
     char *index = str;
     if (str == NULL) {
         return;
@@ -44,19 +45,19 @@ void removeAllSpaces(char *str) {
     } while ((*str++ = *index++) != 0);
 }
 
+/* Remove the leading spaces of a string */
 void removeLeadingSpaces(char **str) {
     if (str == NULL || *str == NULL) {
         return;
     }
 
-    /* Remove leading spaces */
     while (**str != '\0' && isspace(**str)) {
         (*str)++;
     }
 }
 
+/* Remove the trailing spaces of a string */
 void removeTrailingSpaces(char **str) {
-    /* Remove trailing spaces */
     char *string_end;
     if (str == NULL || *str == NULL) {
         return;
@@ -78,8 +79,8 @@ void removeLeadingAndTrailingSpaces(char **str) {
     removeTrailingSpaces(str);
 }
 
+/* return true if str contains space, false otherwise */
 bool containsSpace(char *str) {
-    /* return true if str contains space, false otherwise */
     bool ret = false;
     if (str != NULL) {
         while (*str != '\0') {
@@ -94,6 +95,7 @@ bool containsSpace(char *str) {
     return ret;
 }
 
+/* Return true if a string contains a char */
 bool containsChar(char *str, char c) {
     if (str == NULL) {
         return false;
@@ -106,9 +108,9 @@ bool containsChar(char *str, char c) {
     return true;
 }
 
+/* Return 0 if line is empty or contains only space chars,
+    * non zero int otherwise */
 int checkForEmptyLine(char *line_str) {
-    /* Return 0 if line is empty or contains only space chars,
-     * non zero int otherwise */
     char cmd_copy[BUFFER_SIZE];
     int len;
 
@@ -124,8 +126,8 @@ int checkForEmptyLine(char *line_str) {
     return len;
 }
 
+/* Read a line from stdin, and check for the end of input */
 ErrorType readline(FILE *file, char *buf) {
-    /* Read a line from stdin, and check for the end of input */
     char *string_end;
     size_t len;
 
@@ -155,6 +157,7 @@ ErrorType readline(FILE *file, char *buf) {
     return SUCCESS;
 }
 
+/* Open a file safely, caller should close the file when finished */
 FILE *openfile(char *path, ErrorType *err) {
     FILE *file = fopen(path, "r");
 
@@ -164,6 +167,7 @@ FILE *openfile(char *path, ErrorType *err) {
     return file;
 }
 
+/* Check if an array of string includes a string */
 bool strArrayIncludes(char *str, char *str_arr[], int arr_len) {
     if (findInArray(str, str_arr, arr_len) == -1) {
         return false;
@@ -182,6 +186,7 @@ int findInArray(char *str, char *str_arr[], int arr_len) {
     return -1;
 }
 
+/* get the base name from a path */
 char *toBasename(char *path) {
     char *last_slash = NULL;
 
@@ -198,6 +203,7 @@ char *toBasename(char *path) {
     return last_slash + 1;
 }
 
+/* Remove the file extension from a file */
 void removeFileExtension(char *filename) {
     char *ext = NULL;
     ext = strrchr(filename, '.');
@@ -245,6 +251,7 @@ bool isOnlyNumbers(char *str) {
     return true;
 }
 
+/* Check if a string contains only numbers and letters */
 bool isOnlyLettersAndNumbers(char *str) {
     size_t len = strlen(str);
     int i;

@@ -7,6 +7,7 @@
 #include "err.h"
 #include "str_utils.h"
 
+/* given a line, parse the label and verify it is valid */
 ErrorType parseLabel(char **buf, AssemblyLine *line) {
     char *label;
 
@@ -73,12 +74,12 @@ int registerFromString(char *str) {
     return number;
 }
 
+/* Parse the command name from a line, and validate it */
 ErrorType parseCommand(char **buf, AssemblyLine *line) {
     ErrorType err = SUCCESS;
 
     /* split by space or tab */
     char *command = splitString(buf, " \t");
-    /* printf("buf=%s buf after splitString\n", *buf); */
 
     if (*command != '.') {
         if (is_valid_command_name(command)) {
@@ -169,6 +170,7 @@ char *handleToken(char **buf, ErrorType *err, bool *is_last_token) {
     return dynamic_token;
 }
 
+/* Parse the arguemnts of an assembly line */
 ErrorType parseArgs(char *buf, AssemblyLine *line) {
     char *token = NULL;
     bool is_last_token = false;
@@ -195,11 +197,13 @@ ErrorType parseArgs(char *buf, AssemblyLine *line) {
     return err;
 }
 
+/* Create a new assembly line, freeing it is the responsibilty of the caller */
 AssemblyLine *newLine() {
     AssemblyLine *line = calloc(1, sizeof(AssemblyLine));
     return line;
 }
 
+/* Free a line object */
 void freeLine(AssemblyLine *line) {
     /* Clean a line and release the args pointers */
     int i;
@@ -357,6 +361,7 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
     return buf;
 }
 
+/* Parse a number from a string */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     int sscanf_success;
     long temporary_number;
@@ -378,6 +383,8 @@ ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     return SUCCESS;
 }
 
+
+/* Decode an I command of type arithmetic */
 ErrorType decodeIArithmetic(AssemblyLine *line, Instruction *inst) {
     int temp;
     ErrorType err = SUCCESS;
@@ -407,6 +414,7 @@ ErrorType decodeIArithmetic(AssemblyLine *line, Instruction *inst) {
     return SUCCESS;
 }
 
+/* Decode an I command of type branch */
 ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
                         SymbolManager *syms, size_t instruction_counter) {
     int temp;
@@ -457,6 +465,7 @@ ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
 }
 
 /* TODO: check after fix in definitions (page 23) */
+/* Decode an I command of type memory */
 ErrorType decodeIMem(AssemblyLine *line, Instruction *inst) {
     int temp;
     ErrorType err = SUCCESS;
@@ -486,6 +495,7 @@ ErrorType decodeIMem(AssemblyLine *line, Instruction *inst) {
     return SUCCESS;
 }
 
+/* Decode an I command */
 ErrorType decodeIInstruction(AssemblyLine *line, Instruction *inst,
                              SymbolManager *syms) {
     ErrorType err = SUCCESS;
@@ -519,6 +529,7 @@ ErrorType decodeIInstruction(AssemblyLine *line, Instruction *inst,
     return err;
 }
 
+/* Decode an R command of type arithmetic */
 ErrorType decodeRArithmetic(AssemblyLine *line, Instruction *inst) {
     int temp;
     /* Has 3 operands */
@@ -550,6 +561,7 @@ ErrorType decodeRArithmetic(AssemblyLine *line, Instruction *inst) {
     return SUCCESS;
 }
 
+/* Decode an R command of type move */
 ErrorType decodeRMove(AssemblyLine *line, Instruction *inst) {
     int temp;
     /* Has 2 operands */
@@ -576,6 +588,7 @@ ErrorType decodeRMove(AssemblyLine *line, Instruction *inst) {
     return SUCCESS;
 }
 
+/* Decode an R command*/
 ErrorType decodeRInstruction(AssemblyLine *line, Instruction *inst) {
     ErrorType err = SUCCESS;
     inst->type = R;
@@ -605,6 +618,8 @@ ErrorType decodeRInstruction(AssemblyLine *line, Instruction *inst) {
     return err;
 }
 
+
+/* Decode a J command */
 ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
                              SymbolManager *syms) {
     ErrorType err = SUCCESS;
@@ -672,6 +687,8 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
     return SUCCESS;
 }
 
+
+/* Decode data from a general frist step assembly line to an instruction */
 ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
                                 SymbolManager *syms) {
     ErrorType err = SUCCESS;
@@ -679,37 +696,16 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
     /* is i instruction */
     if (is_i_command(line->opcode_name)) {
         err = decodeIInstruction(line, inst, syms);
-        /*         int immed = inst->body.i_inst.immed;
-                int rt = inst->body.i_inst.rt;
-                int rs = inst->body.i_inst.rs;
-                int opcode = inst->body.i_inst.opcode;
-
-                printf("%d, %d, %d, %d\n", immed, rt, rs, opcode); */
-
     }
 
     /* is r instruction */
     else if (is_r_command(line->opcode_name)) {
         err = decodeRInstruction(line, inst);
-        /*         int unused = inst->body.r_inst.unused;
-                int funct = inst->body.r_inst.funct;
-                int rd = inst->body.r_inst.rd;
-                int rt = inst->body.r_inst.rt;
-                int rs = inst->body.r_inst.rs;
-                int opcode = inst->body.r_inst.opcode;
-
-                printf("%d, %d, %d, %d, %d, %d\n", unused, funct, rd, rt, rs,
-           opcode); */
     }
 
     /* is j instruction */
     else if (is_j_command(line->opcode_name)) {
         err = decodeJInstruction(line, inst, syms);
-        /*         int address = inst->body.j_inst.address;
-                int reg = inst->body.j_inst.reg;
-                int opcode = inst->body.j_inst.opcode;
-
-                printf("%d, %d, %d\n", address, reg, opcode); */
     }
 
     else {
@@ -719,7 +715,9 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
     return err;
 }
 
-void dumpAssemblyLine(AssemblyLine *line) {
+
+/* TODO: remove me! */
+/* void dumpAssemblyLine(AssemblyLine *line) {
     int i;
 
     printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n",
@@ -733,10 +731,10 @@ void dumpAssemblyLine(AssemblyLine *line) {
     }
     printf("\n");
     printf("\tLineNumber: %d\n", line->debug_info.line_number);
-}
+} */
 
+/* Print a line and the error that occured in it  */
 void printLineError(ErrorType err, AssemblyLine *line) {
     printf("Line: %d ", line->debug_info.line_number);
     printErr(err);
-    /* dumpAssemblyLine(line); */
 }

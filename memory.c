@@ -3,15 +3,19 @@
 
 #include <string.h>
 
+/* Write the content of a data directive to the memory */
 ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
     self->data_counter += size;
     return self->data->append(self->data, data, size);
 }
 
+
+/* Write the content of a code line to the memory */
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
     return self->code->appendUnsignedInt(self->code, instruction->body.inst);
 }
 
+/* Dump the memory to a file, with the .ob format specified */
 ErrorType Memory_toFile(Memory *self, FILE *file) {
     int i;
     ObjectFile *objFile =
@@ -39,6 +43,7 @@ ErrorType Memory_toFile(Memory *self, FILE *file) {
     return SUCCESS;
 }
 
+/* Free the memory structure */
 void Memory_free(Memory *self) {
     self->code->free(self->code);
     self->data->free(self->data);
@@ -52,6 +57,7 @@ void Memory_free(Memory *self) {
     free(self);
 }
 
+/* Create a memory structure */
 Memory *newMemory() {
     Memory *memory = (Memory *)malloc(sizeof(Memory));
 
@@ -75,6 +81,7 @@ Memory *newMemory() {
     return memory;
 }
 
+/* Append data to a managed arary instance */
 ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
                               size_t size) {
     size_t leftover_size;
@@ -108,15 +115,18 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
     return SUCCESS;
 }
 
+/* Append an unsigned int to a managed arary instance */
 ErrorType ManagedArray_appendUnsignedInt(ManagedArray *self,
                                          unsigned int data) {
     return self->append(self, (unsigned char *)&data, sizeof(data));
 }
 
+/* Write the content of a managed array to a file */
 void ManagedArray_writeToFile(ManagedArray *self, FILE *file) {
     fwrite(self->data, self->size, 1, file);
 }
 
+/* Free a managed array instance */
 void ManagedArray_free(ManagedArray *self) {
     free(self->data);
     self->data = NULL;
@@ -129,6 +139,7 @@ void ManagedArray_free(ManagedArray *self) {
     free(self);
 }
 
+/* Create a managed array, which grows as you append data to it, and remembers its size and capacity*/
 ManagedArray *newManagedArray() {
     ManagedArray *arr = (ManagedArray *)malloc(sizeof(ManagedArray));
 

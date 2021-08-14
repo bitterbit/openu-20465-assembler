@@ -1,10 +1,12 @@
 #include "object_file.h"
 
+/* Write the header of the object file */
 void ObjectFile_writeHeader(ObjectFile *self, size_t code_size,
                             size_t data_size) {
     fprintf(self->file, "      %lu %lu", code_size, data_size);
 }
 
+/* Write a byte to the object file */
 void ObjectFile_writeByte(ObjectFile *self, unsigned char byte) {
     int count = self->address - self->base_address;
 
@@ -17,6 +19,7 @@ void ObjectFile_writeByte(ObjectFile *self, unsigned char byte) {
     self->address++;
 }
 
+/* Free and object file instance */
 void ObjectFile_free(ObjectFile *self) {
     self->file = NULL;
     self->address = self->base_address = 0;
@@ -27,6 +30,7 @@ void ObjectFile_free(ObjectFile *self) {
     free(self);
 }
 
+/* Create an object file instance */
 ObjectFile *newObjectFile(FILE *file, size_t base_address) {
     ObjectFile *objFile = (ObjectFile *)malloc(sizeof(ObjectFile));
 

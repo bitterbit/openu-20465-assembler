@@ -35,11 +35,13 @@ const int entry_directive_commands_len = 1;
 const char *extern_directive_commands[] = {EXTERN};
 const int extern_directive_commands_len = 1;
 
+/* Check if a command name is a valid command name */
 bool is_valid_command_name(char *command) {
     return is_i_command(command) | is_r_command(command) |
            is_j_command(command);
 }
 
+/* Check if a string is a reserved keyword (command name, directive name) */
 bool is_reserved_keyword(char *str) {
 
     bool is_reserved = is_valid_command_name(str);
@@ -55,18 +57,22 @@ bool is_reserved_keyword(char *str) {
     return is_reserved;
 }
 
+/* Check if a command is an i command */
 bool is_i_command(char *command) {
     return strArrayIncludes(command, (char **)i_commands, i_commands_len);
 }
 
+/* Check if a command is an r command */
 bool is_r_command(char *command) {
     return strArrayIncludes(command, (char **)r_commands, r_commands_len);
 }
 
+/* Check if a command is an j command */
 bool is_j_command(char *command) {
     return strArrayIncludes(command, (char **)j_commands, j_commands_len);
 }
 
+/* return the value of a string from a mapping, mostly command to a conencted value */
 int command_to_mapped_value(char *command, char **commands_array,
                             int command_array_length, int *mapping,
                             ErrorType *out_err) {
@@ -80,6 +86,7 @@ int command_to_mapped_value(char *command, char **commands_array,
     return 0;
 }
 
+/* Return the opcode number of a command name */
 int command_to_opcode(char *command, ErrorType *out_err) {
     if (is_i_command(command)) {
         return command_to_mapped_value(command, (char **)i_commands,
@@ -103,16 +110,20 @@ int command_to_opcode(char *command, ErrorType *out_err) {
     return 0;
 }
 
+
+/* Return the funct number of a command name */
 int r_command_to_func(char *command, ErrorType *out_err) {
     return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
                                    (int *)r_commands_funct, out_err);
 }
 
+/* Return the subtype of an r command from a command name */
 RInstructionSubType r_command_to_subtype(char *command, ErrorType *out_err) {
     return command_to_mapped_value(command, (char **)r_commands, r_commands_len,
                                    (int *)r_commands_subtype, out_err);
 }
 
+/* Return the subtype of an i command from a command name */
 IInstructionSubType i_command_to_subtype(char *command, ErrorType *out_err) {
     return command_to_mapped_value(command, (char **)i_commands, i_commands_len,
                                    (int *)i_commands_subtype, out_err);

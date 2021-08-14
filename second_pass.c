@@ -1,5 +1,7 @@
 #include "second_pass.h"
 
+
+/* Main function for the second pass. finish parsing the assembly, and pop each line from the queue */
 bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue, ErrorType *err) {
     AssemblyLine *line;
     Instruction inst;
@@ -34,13 +36,6 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue, ErrorType
             /* Clean inst */
             memset(&inst, 0, sizeof(Instruction));
             *err = decodeInstructionLine(line, &inst, syms);
-            /*  printf("\n__PRINTING_LINE__\n");
-                dumpAssemblyLine(line);
-                printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff);
-                printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff);
-                printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff);
-                printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff);
-                printf("__FINSIHED_FINISHED__\n"); */
 
             if (*err == SUCCESS) {
                 *err = memory->writeCode(memory, &inst);

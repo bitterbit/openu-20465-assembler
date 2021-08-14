@@ -9,6 +9,7 @@ void ListNode_free(ListNode *self) {
 }
 
 /* TODO: actually handle memory error until main */
+/* Create a new List Node */
 ListNode *newListNode(void *data) {
     ListNode *node = malloc(sizeof(ListNode));
 
@@ -22,12 +23,14 @@ ListNode *newListNode(void *data) {
     return node;
 }
 
+/* Free the list iterator */
 void ListIterator_free(ListIterator *self) {
     self->head = NULL;
     self->next = NULL;
     free(self);
 }
 
+/* Free Get next node from the iterator */
 ListNode *ListIterator_next(ListIterator *self) {
     ListNode *node = self->head;
     if (node != NULL) {
@@ -38,6 +41,7 @@ ListNode *ListIterator_next(ListIterator *self) {
 }
 
 /* TODO: handle malloc failure*/
+/* Create a new list iterator, given a list head */
 ListIterator *newListIterator(ListNode *head) {
     ListIterator *iter = malloc(sizeof(ListIterator));
 

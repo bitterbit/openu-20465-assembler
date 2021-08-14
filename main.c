@@ -16,6 +16,7 @@
 
 /* TODO: Compile and check on the openu ubuntu */
 
+/* Save output files */
 ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     char filename[MAX_FILENAME_LENGTH];
     FILE *outfile;
@@ -61,6 +62,7 @@ ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     return SUCCESS;
 }
 
+/* Cleanup all created objects */
 void cleanup(SymbolManager **p_syms, Memory **p_memory, LineQueue **p_queue) {
     SymbolManager *syms = *p_syms;
     Memory *memory = *p_memory;
@@ -75,6 +77,7 @@ void cleanup(SymbolManager **p_syms, Memory **p_memory, LineQueue **p_queue) {
     *p_queue = NULL;
 }
 
+/* Handle an assembly file, first and second passes + create outputs */
 bool handleAssemblyFile(char *path, ErrorType *err) {
     /* lines are allocated on heap and owned by the queue */
     LineQueue *queue = newLineQueue();
@@ -138,6 +141,8 @@ bool handleAssemblyFile(char *path, ErrorType *err) {
     return true;
 }
 
+/* Main function for the program. 
+   For every input file, parse it and create the needed output files */
 int main(int argc, char **argv) {
     int i;
     ErrorType err = SUCCESS;
