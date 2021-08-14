@@ -258,8 +258,9 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
     unsigned char *tmp;
 
     if (strcmp(ASCIZ, line->opcode_name) == 0) {
-        if (line->arg_count != 1) {
+        if (line->arg_count != 1 || line->args == NULL || line->args[0] == NULL) {
             *out_err = ERR_INVALID_DATA_INSTRUCTION;
+            return NULL;
         }
 
         /* Copy including the null byte */
@@ -278,6 +279,7 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 
         if (line->arg_count == 0) {
             *out_err = ERR_INVALID_DATA_INSTRUCTION;
+            return NULL;
         }
 
         if (strcmp(DB, line->opcode_name) == 0) {

@@ -68,6 +68,11 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
     bool errored = false;
 
     line = newLine();
+    if (line == NULL) {
+        printErr(ERR_OUT_OF_MEMEORY);
+        return false;
+    }
+
     err = parseLine(file, line);
     queue->push(queue, line);
 
