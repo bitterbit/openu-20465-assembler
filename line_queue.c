@@ -43,6 +43,8 @@ void LineQueue_free(LineQueue *self) {
         freeLine(line);
         line = self->pop(self);
     }
+
+    free(self);
 }
 
 LineQueue *newLineQueue() {
