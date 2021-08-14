@@ -119,6 +119,7 @@ void SymbolTable_free(SymbolTable *self) {
 
         while (node != NULL) {
             Symbol *sym = node->data;
+            node->free(node);
             if (sym != NULL) {
                 sym->free(sym);
             }
