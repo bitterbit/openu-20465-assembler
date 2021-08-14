@@ -99,10 +99,6 @@ bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue
         line_counter++;
     }
 
-    /* ensure first data and last code won't have the same address */
-
-    /* TODO: i think the bug solved itself - can we remoev next line? */
-    /* *instruction_counter += INSTRUCTION_SIZE; */
     syms->fixDataSymbolsOffset(syms, *instruction_counter);
 
     return errored == false;
