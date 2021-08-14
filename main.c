@@ -1,11 +1,12 @@
 #include "assembly_line.h"
 #include "err.h"
+#include "first_pass.h"
 #include "instruction.h"
 #include "line_queue.h"
 #include "memory.h"
+#include "second_pass.h"
 #include "str_utils.h"
 #include "symtab.h"
-#include "first_pass.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,16 +60,15 @@ ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     return SUCCESS;
 }
 
-
 bool handleAssemblyFile(char *path) {
     bool error_happened = false;
+    ErrorType err = SUCCESS;
 
     SymbolManager *syms = newSymbolManager();
     Memory *memory = newMemory();
-    LineQueue *queue = newLineQueue(); /* lines are allocated on heap and owned by the queue */
+    LineQueue *queue =
+        newLineQueue(); /* lines are allocated on heap and owned by the queue */
     AssemblyLine *line;
-    Instruction inst;
-    ErrorType err = SUCCESS;
     size_t instruction_counter;
     FILE *file;
     char *output_name;
@@ -97,58 +97,15 @@ bool handleAssemblyFile(char *path) {
 
     /* end of first pass, start second pass */
     printf("starting stage 2\n");
-    err = SUCCESS;
-
-    /* TODO: ugly, move stages to functions? */
-    if (!error_happened) {
-        while ((line = queue->pop(queue))) {
-            switch (line->type) {
-            case TypeEmpty:
-            case TypeData:
-            case TypeExtern:
-                /* ignore empty, data, and extern lines in second pass */
-                err = SUCCESS;
-                break;
-
-            /* .entry SYM_NAME */
-            case TypeEntry: {
-                if (line->arg_count < 1) {
-                    err = ERR_INVALID_ENTRY;
-                    break;
-                }
-
-                /* The entry label is the first arg */
-                err = syms->markSymEntry(syms, line->args[0]);
-            }
-
-            break;
-
-            case TypeCode:
-                /* Clean inst */
-                memset(&inst, 0, sizeof(Instruction));
-                err = decodeInstructionLine(line, &inst, syms);
-                /* printf("\n__PRINTING_LINE__\n"); */
-                /* dumpAssemblyLine(line); */
-                /* printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff); */
-                /* printf(" %02x", (inst.body.inst >> (8 * 1)) & 0xff); */
-                /* printf(" %02x", (inst.body.inst >> (8 * 2)) & 0xff); */
-                /* printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff); */
-                /* printf("__FINSIHED_FINISHED__\n"); */
-
-                if (err == SUCCESS) {
-                    err = memory->writeCode(memory, &inst);
-                }
-                break;
-            }
-
-            /* TODO: exit on memory error? */
-            if (err != SUCCESS) {
-                error_happened = true;
-                printLineError(err, line);
-            }
-        }
-        freeLine(line);
+    if (err == ERR_EOF) {
+        err = SUCCESS;
     }
+
+    if (err != SUCCESS) {
+        return false;
+    }
+
+    secondPass(syms, memory, queue);
 
     output_name = toBasename(path);
     removeFileExtension(output_name);
@@ -159,8 +116,8 @@ bool handleAssemblyFile(char *path) {
     saveOutput(output_name, memory, syms);
 
     /* TODO clean up even if we stop after first pass */
-    queue->free(
-        queue); /* queue owns the lines and will free them on queue->free */
+    /* queue owns the lines and will free them on queue->free */
+    queue->free(queue);
     memory->free(memory);
     syms->free(syms);
 
