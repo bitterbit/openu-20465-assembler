@@ -63,11 +63,12 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
 bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
                LineQueue *queue, size_t *instruction_counter, ErrorType *err) {
     AssemblyLine *line = NULL;
-    size_t line_counter = 0;
+    size_t line_counter = 1;
     bool errored = false;
     *err = SUCCESS;
 
     line = newLine();
+    line->debug_info.line_number = line_counter++;
     if (line == NULL) {
         printErr(ERR_OUT_OF_MEMEORY);
         return false;
@@ -97,7 +98,8 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
         }
 
         /* TODO: remove debug info struct */
-        line->debug_info.line_number = line_counter;
+        /* TODO: why? its used in prints */
+        line->debug_info.line_number = line_counter++;
         *err = parseLine(file, line);
 
         if (*err != SUCCESS && *err != ERR_EOF) {
@@ -110,7 +112,6 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
         }
 
         queue->push(queue, line);
-        line_counter++;
     }
 
     syms->fixDataSymbolsOffset(syms, *instruction_counter);
