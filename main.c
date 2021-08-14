@@ -73,7 +73,7 @@ bool handleAssemblyFile(char *path) {
     char *output_name;
 
     if (syms == NULL || memory == NULL || queue == NULL) {
-        print_error(ERR_OUT_OF_MEMEORY);
+        printErr(ERR_OUT_OF_MEMEORY);
         return false;
     }
 
@@ -83,7 +83,7 @@ bool handleAssemblyFile(char *path) {
 
     file = openfile(path, &err);
     if (err != SUCCESS) {
-        print_error(err);
+        printErr(err);
         return false;
     }
 
@@ -105,13 +105,13 @@ bool handleAssemblyFile(char *path) {
     output_name = toBasename(path);
     removeFileExtension(output_name);
     if (output_name == NULL) {
-        print_error(ERR_CREATING_OUTPUT_FILE);
+        printErr(ERR_CREATING_OUTPUT_FILE);
         return false;
     }
 
     err = saveOutput(output_name, memory, syms);
     if (err != SUCCESS) {
-        print_error(err);
+        printErr(err);
         return false;
     }
 

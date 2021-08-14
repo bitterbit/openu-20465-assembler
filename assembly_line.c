@@ -669,6 +669,6 @@ void dumpAssemblyLine(AssemblyLine *line) {
 }
 
 void printLineError(ErrorType err, AssemblyLine *line) {
-    print_error(err);
+    printErr(err);
     dumpAssemblyLine(line);
 }

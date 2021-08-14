@@ -2,7 +2,7 @@
 #include "assembly_line.h"
 #include "bool.h"
 
-void print_error(ErrorType err) {
+void printErr(ErrorType err) {
     /* print a string reflecting the error */
     char *str;
     bool found = true;

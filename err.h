@@ -32,6 +32,6 @@ typedef enum {
     ERR_CREATING_OUTPUT_FILE = 25
 } ErrorType;
 
-void print_error(ErrorType err);
+void printErr(ErrorType err);
 
 #endif
