@@ -6,15 +6,20 @@
 
 /* Check if the number can fit as a signed integer in a specific number of bits
  */
-bool number_fits_in_bits(int number, int number_of_bits) {
+bool number_fits_in_bits(long number, int number_of_bits) {
+    unsigned long mask;
 
-    int max_number = pow(2, number_of_bits-1);
-    /* Positive numbers reach 1 less */
-    if (number > 0) {
-        return (number <= max_number - 1);
+    if (number < 0) {
+        number = -number + 1;
     }
-    else {
-        return (abs(number) <= max_number);
+    
+    /* create a mask of the shape 0b11...11110000 for number_of_bits=4*/
+    mask = ~((1UL << number_of_bits) - 1);
+
+    if ((mask & number) != 0) {
+        return false;
     }
+
+    return true;
 }
 

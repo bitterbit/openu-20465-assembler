@@ -110,8 +110,8 @@ ErrorType parseCommand(char **buf, AssemblyLine *line) {
     return err;
 }
 
-/* this function will skip over until after two quotes 
- * it will advance buf to after the two quotes 
+/* this function will skip over until after two quotes
+ * it will advance buf to after the two quotes
  * and will return a pointer to the whole string (including the quotes)
  * */
 char *handleStringToken(char **buf, ErrorType *err) {
@@ -128,7 +128,7 @@ char *handleStringToken(char **buf, ErrorType *err) {
     tmp = strchr(token, '"');
     if (tmp == NULL) {
         /* we found only one quote, advance buf to the end of the string */
-        *buf = strchr(token, '\0'); 
+        *buf = strchr(token, '\0');
         return token;
     }
 
@@ -138,9 +138,10 @@ char *handleStringToken(char **buf, ErrorType *err) {
 
 /* Returns a new pointer to a token,
     caller is responsible for freeing */
-char *handleToken(char **buf, ErrorType *err) {
+char *handleToken(char **buf, ErrorType *err, bool *is_last_token) {
     char *token;
     char *dynamic_token = NULL;
+    *is_last_token = false;
 
     /* Remove leading spaces before arg */
     removeLeadingSpaces(buf);
@@ -152,6 +153,10 @@ char *handleToken(char **buf, ErrorType *err) {
 
     /* Handle non string tokens */
     token = splitString(buf, ",");
+    if (*buf == NULL) {
+        /* if splitString did not find a comma, it will set buf to be null */
+        *is_last_token = true;
+    }
 
     removeTrailingSpaces(&token);
 
@@ -167,15 +172,17 @@ char *handleToken(char **buf, ErrorType *err) {
 
 ErrorType parseArgs(char *buf, AssemblyLine *line) {
     char *token = NULL;
+    bool is_last_token = false;
 
     ErrorType err = SUCCESS;
     line->arg_count = 0;
     line->args = NULL;
 
-    while (checkForEmptyLine(buf) != 0) {
+    while (is_last_token == false && buf != NULL) {
         /* token is heap allocated and should be freed when AssemblyLine is
          * freed */
-        token = handleToken(&buf, &err);
+        removeLeadingAndTrailingSpaces(&buf);
+        token = handleToken(&buf, &err, &is_last_token);
         if (err != SUCCESS) {
             return err;
         }
@@ -285,20 +292,25 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
         arg = line->args[0];
         len = strlen(line->args[0]);
 
-        if (len < 2 || arg[0] != '"' || arg[len-1] != '"') {
+        if (len < 2 || arg[0] != '"' || arg[len - 1] != '"') {
             *out_err = ERR_ASCIZ_WITHOUT_QUOTES;
             return NULL;
         }
 
+        /* remove quotes, is safe as we just checked there are quotes */
+        arg[0] = '\0';
+        arg[len-1] = '\0';
+        arg += 1;
+
         /* Copy including the null byte */
-        *out_size = strlen(line->args[0]) + 1;
+        *out_size = strlen(arg) + 1;
 
         buf = calloc(*out_size, 1);
         if (buf == NULL) {
             *out_err = ERR_OUT_OF_MEMEORY;
             return NULL;
         }
-        memcpy(buf, line->args[0], *out_size);
+        memcpy(buf, arg, *out_size);
 
     }
 
@@ -331,6 +343,7 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
                 numberFromString(line->args[i], &number, data_chunk_size * 8);
 
             if (*out_err != SUCCESS) {
+                free(buf);
                 return NULL;
             }
 
@@ -348,20 +361,21 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 /* TODO: bug - we assume numbers is less than int  */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     int sscanf_success;
+    long temporary_number;
 
-    if (strlen(str) == 0) {
-        return ERR_INVALID_NUMBER_TOKEN;
-    }
-
-    sscanf_success = sscanf(str, "%d", number);
+    sscanf_success = sscanf(str, "%ld", &temporary_number);
 
     if (sscanf_success != 1) {
         return ERR_INVALID_NUMBER_TOKEN;
     }
 
-    if (!number_fits_in_bits(*number, number_of_bits)) {
+    /* we support negative numbers, which means we can fit one bit less then usigned */
+    if (!number_fits_in_bits(temporary_number, number_of_bits-1)) {
         return ERR_INVALID_NUMBER_SIZE;
     }
+
+    /* it is ok to cast down to int because no data command supports more than 32 bit */
+    *number = temporary_number; 
 
     return SUCCESS;
 }
