@@ -1,10 +1,15 @@
 #include "first_pass.h"
+#include "str_utils.h"
 
 ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
                               Memory *memory, size_t *instruction_counter) {
     ErrorType err = SUCCESS;
     void *data = NULL;
     size_t size = 0;
+
+    if (isOnlyLettersAndNumbers(line->label) == false) {
+        return ERR_LABEL_WITH_BAD_CHARACTERS;
+    }
 
     switch (line->type) {
     case TypeEmpty:

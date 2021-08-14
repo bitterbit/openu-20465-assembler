@@ -121,6 +121,10 @@ void printErr(ErrorType err) {
         str = "Data command asciz parameter missing quotes";
         break;
 
+    case ERR_LABEL_WITH_BAD_CHARACTERS:
+        str = "Labels are allowed to contain only letters or numbers";
+        break;
+
     default:
         str = "Unknown error value";
         found = false;

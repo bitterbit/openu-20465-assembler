@@ -23,5 +23,6 @@ ErrorType readline(FILE *file, char *buf);
 FILE* openfile(char *path, ErrorType *err);
 char* toBasename(char *path);
 void removeFileExtension(char *filename);
+bool isOnlyLettersAndNumbers(char *str);
 
 #endif
