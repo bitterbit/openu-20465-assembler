@@ -43,6 +43,8 @@ struct SymbolTable {
 typedef struct SymbolManager SymbolManager;
 struct SymbolManager {
     SymbolTable *symtab;
+    bool has_external;
+    bool has_entry;
 
     ErrorType (*insertSymbol)(SymbolManager *self, char *name, size_t value,
                               bool is_extern, SymbolSection section);

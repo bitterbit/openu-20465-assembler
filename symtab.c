@@ -163,6 +163,10 @@ ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
     }
     ErrorType err = self->symtab->insert(self->symtab, sym);
 
+    if (sym->is_external) {
+        self->has_external = true;
+    }
+
     if (err != SUCCESS) {
         sym->free(sym);
     }
@@ -180,7 +184,7 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
     if (sym->is_external == true) {
         return ERR_SYMBOL_CANNOT_BE_ENTRY_AND_EXTERN;
     }
-
+    self->has_entry = true;
     sym->is_entry = true;
     return SUCCESS;
 }
@@ -277,6 +281,8 @@ void SymbolManager_free(SymbolManager *self) {
 
 SymbolManager *newSymbolManager() {
     SymbolManager *syms = malloc(sizeof(SymbolManager));
+    syms->has_external = false;
+    syms->has_entry = false;
 
     if (syms == NULL) {
         return NULL;

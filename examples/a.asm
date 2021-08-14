@@ -1,6 +1,6 @@
 
 
-.extern val1
+
 MAIN:   add $9,$5,$3
 
 LOOP:   ori $2,-5,$9 
@@ -8,7 +8,7 @@ LOOP:   ori $2,-5,$9
         jmp Next
 Next:   move $20,$4
         bgt $4,$2,END
-        la K
+val1:   la K
         sw $0,4, $10
         bne $31,$9,LOOP 
         call val1

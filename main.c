@@ -34,25 +34,29 @@ ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     memory->toFile(memory, outfile);
     fclose(outfile);
 
-    memset(filename, 0, MAX_FILENAME_LENGTH);
-    strcpy(filename, name);
-    strcat(filename, ".ext");
-    outfile = fopen(filename, "w");
-    if (outfile == NULL) {
-        return ERR_CREATING_OUTPUT_FILE;
+    if (syms->has_external) {
+        memset(filename, 0, MAX_FILENAME_LENGTH);
+        strcpy(filename, name);
+        strcat(filename, ".ext");
+        outfile = fopen(filename, "w");
+        if (outfile == NULL) {
+            return ERR_CREATING_OUTPUT_FILE;
+        }
+        syms->writeExtFile(syms, outfile);
+        fclose(outfile);
     }
-    syms->writeExtFile(syms, outfile);
-    fclose(outfile);
 
-    memset(filename, 0, MAX_FILENAME_LENGTH);
-    strcpy(filename, name);
-    strcat(filename, ".ent");
-    outfile = fopen(filename, "w");
-    if (outfile == NULL) {
-        return ERR_CREATING_OUTPUT_FILE;
+    if (syms->has_entry) {
+        memset(filename, 0, MAX_FILENAME_LENGTH);
+        strcpy(filename, name);
+        strcat(filename, ".ent");
+        outfile = fopen(filename, "w");
+        if (outfile == NULL) {
+            return ERR_CREATING_OUTPUT_FILE;
+        }
+        syms->writeEntFile(syms, outfile);
+        fclose(outfile);
     }
-    syms->writeEntFile(syms, outfile);
-    fclose(outfile);
 
     return SUCCESS;
 }
