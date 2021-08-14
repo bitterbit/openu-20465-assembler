@@ -110,12 +110,29 @@ ErrorType parseCommand(char **buf, AssemblyLine *line) {
     return err;
 }
 
+/* this function will skip over until after two quotes 
+ * it will advance buf to after the two quotes 
+ * and will return a pointer to the whole string (including the quotes)
+ * */
 char *handleStringToken(char **buf, ErrorType *err) {
-    char *token;
-    splitString(buf, "\""); /* skip the first quote char */
-    token = splitString(
-        buf,
-        "\""); /* take the value from current buf pointer until next quote */
+    char *token = *buf;
+    char *tmp = *buf;
+
+    token = strchr(*buf, '"');
+
+    if (token == NULL) {
+        /* no quote found */
+        return token;
+    }
+
+    tmp = strchr(token, '"');
+    if (tmp == NULL) {
+        /* we found only one quote, advance buf to the end of the string */
+        *buf = strchr(token, '\0'); 
+        return token;
+    }
+
+    *buf = tmp;
     return token;
 }
 
@@ -134,9 +151,7 @@ char *handleToken(char **buf, ErrorType *err) {
     }
 
     /* Handle non string tokens */
-    else {
-        token = splitString(buf, ",");
-    }
+    token = splitString(buf, ",");
 
     removeTrailingSpaces(&token);
 
@@ -258,8 +273,20 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
     unsigned char *tmp;
 
     if (strcmp(ASCIZ, line->opcode_name) == 0) {
-        if (line->arg_count != 1 || line->args == NULL || line->args[0] == NULL) {
+        char *arg;
+        size_t len = 0;
+
+        if (line->arg_count != 1 || line->args == NULL ||
+            line->args[0] == NULL) {
             *out_err = ERR_INVALID_DATA_INSTRUCTION;
+            return NULL;
+        }
+
+        arg = line->args[0];
+        len = strlen(line->args[0]);
+
+        if (len < 2 || arg[0] != '"' || arg[len-1] != '"') {
+            *out_err = ERR_ASCIZ_WITHOUT_QUOTES;
             return NULL;
         }
 
@@ -300,9 +327,10 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
         tmp = buf;
 
         for (i = 0; i < line->arg_count; i++) {
-            *out_err = numberFromString(line->args[i], &number, data_chunk_size * 8);
+            *out_err =
+                numberFromString(line->args[i], &number, data_chunk_size * 8);
 
-            for(j=0; j < data_chunk_size; j++) {
+            for (j = 0; j < data_chunk_size; j++) {
                 *tmp = (unsigned char)(0x00FF & number);
                 number = number >> 8;
                 tmp++;
@@ -597,7 +625,8 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
 
         /* JMP with label, LA, CALL */
         else {
-            sym = syms->useSymbol(syms, line->args[0], line->code_position, &err);
+            sym =
+                syms->useSymbol(syms, line->args[0], line->code_position, &err);
 
             if (err != SUCCESS) {
                 return err;

@@ -117,6 +117,10 @@ void printErr(ErrorType err) {
         str = "Invalid .extern syntax";
         break;
 
+    case ERR_ASCIZ_WITHOUT_QUOTES:
+        str = "Data command asciz parameter missing quotes";
+        break;
+
     default:
         str = "Unknown error value";
         found = false;
