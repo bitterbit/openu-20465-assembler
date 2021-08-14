@@ -67,10 +67,15 @@ int registerFromString(char *str) {
         return -1;
     }
 
-    /* TODO: bug with trailing zeroes */
     if (number < 0 || number > 32) {
         return -1;
     }
+
+    /* Verify number doesn't have leading zeroes. eg. $002 */
+    if (number != 0 && *str == '0'){
+        return -1;
+    }
+
     return number;
 }
 
