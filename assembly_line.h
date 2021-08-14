@@ -19,7 +19,6 @@ typedef enum {
     TypeEmpty
 } LineType;
 
-/* TODO: can just be bool? */
 typedef enum { FlagSymbolDeclaration = 1 << 0 } LineFlags;
 
 typedef struct DebugInfo DebugInfo;

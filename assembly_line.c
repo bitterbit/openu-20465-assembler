@@ -358,7 +358,6 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
     return buf;
 }
 
-/* TODO: bug - we assume numbers is less than int  */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
     int sscanf_success;
     long temporary_number;

@@ -88,7 +88,6 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
     while (*err != ERR_EOF) {
         *err = firstPassHandleLine(line, syms, memory, instruction_counter);
 
-        /* TODO: not sure if ERR_EOF is possible here */
         if (*err != SUCCESS && *err != ERR_EOF) {
             printLineError(*err, line);
             errored = true;
@@ -105,8 +104,6 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
             break;
         }
 
-        /* TODO: remove debug info struct */
-        /* TODO: why? its used in prints */
         line->debug_info.line_number = line_counter++;
         *err = parseLine(file, line);
 

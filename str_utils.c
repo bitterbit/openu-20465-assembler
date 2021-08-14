@@ -136,10 +136,8 @@ ErrorType readline(FILE *file, char *buf) {
         return ERR_EOF;
     }
 
-    /* Remove trailing \n */
     len = strlen(buf);
     string_end = (buf) + len - 1;
-    /* TODO: why do i need to len read is more than 0? */
     if (len > 0 && *string_end == '\n') {
         *string_end = '\0';
     }
