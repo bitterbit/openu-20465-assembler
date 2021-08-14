@@ -290,15 +290,20 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
             return NULL;
         }
 
+        /* remove quotes, is safe as we just checked there are quotes */
+        arg[0] = '\0';
+        arg[len-1] = '\0';
+        arg += 1;
+
         /* Copy including the null byte */
-        *out_size = strlen(line->args[0]) + 1;
+        *out_size = strlen(arg) + 1;
 
         buf = calloc(*out_size, 1);
         if (buf == NULL) {
             *out_err = ERR_OUT_OF_MEMEORY;
             return NULL;
         }
-        memcpy(buf, line->args[0], *out_size);
+        memcpy(buf, arg, *out_size);
 
     }
 
