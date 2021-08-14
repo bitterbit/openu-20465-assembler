@@ -71,9 +71,7 @@ void cleanup(SymbolManager **p_syms, Memory **p_memory, LineQueue **p_queue) {
     *p_queue = NULL;
 }
 
-bool handleAssemblyFile(char *path) {
-    ErrorType err = SUCCESS;
-
+bool handleAssemblyFile(char *path, ErrorType *err) {
     /* lines are allocated on heap and owned by the queue */
     LineQueue *queue = newLineQueue();
     SymbolManager *syms = newSymbolManager();
@@ -81,6 +79,7 @@ bool handleAssemblyFile(char *path) {
     size_t instruction_counter;
     FILE *file;
     char *output_name;
+    *err = SUCCESS;
 
     if (syms == NULL || memory == NULL || queue == NULL) {
         printErr(ERR_OUT_OF_MEMEORY);
@@ -90,15 +89,15 @@ bool handleAssemblyFile(char *path) {
     output_name = NULL;
     instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
 
-    file = openfile(path, &err);
-    if (err != SUCCESS) {
-        printErr(err);
+    file = openfile(path, err);
+    if (*err != SUCCESS) {
+        printErr(*err);
         cleanup(&syms, &memory, &queue);
         return false;
     }
 
     printf("[!] first pass\n");
-    if (firstPass(file, syms, memory, queue, &instruction_counter) == false) {
+    if (firstPass(file, syms, memory, queue, &instruction_counter, err) == false) {
         cleanup(&syms, &memory, &queue);
         fclose(file);
         return false;
@@ -108,7 +107,8 @@ bool handleAssemblyFile(char *path) {
 
     /* end of first pass, start second pass */
     printf("[!] second pass\n");
-    if (secondPass(syms, memory, queue) == false) {
+
+    if (secondPass(syms, memory, queue, err) == false) {
         cleanup(&syms, &memory, &queue);
         return false;
     }
@@ -121,9 +121,9 @@ bool handleAssemblyFile(char *path) {
         return false;
     }
 
-    err = saveOutput(output_name, memory, syms);
-    if (err != SUCCESS) {
-        printErr(err);
+    *err = saveOutput(output_name, memory, syms);
+    if (*err != SUCCESS) {
+        printErr(*err);
         cleanup(&syms, &memory, &queue);
         return false;
     }
@@ -135,13 +135,24 @@ bool handleAssemblyFile(char *path) {
 
 int main(int argc, char **argv) {
     int i;
+    ErrorType err = SUCCESS;
+    bool file_success;
 
     /* skip first argument as it is binary name */
     for (i = 1; i < argc; i++) {
         char *fname = argv[i];
         printf("parsing file %s\n", fname);
         /* TODO: exit completely if memory error occured */
-        handleAssemblyFile(fname);
+        file_success = handleAssemblyFile(fname, &err);
+
+        if (file_success == false){
+            printf("Failed parsing file %s\n", fname);
+            if (err == ERR_OUT_OF_MEMEORY) {
+                printf("Failed because of memory issue - exiting");
+                return 1;
+            }
+        }
+
     }
 
     return 0;

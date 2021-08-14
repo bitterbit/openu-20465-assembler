@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue);
+bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue,
+                ErrorType *err);
 
 #endif

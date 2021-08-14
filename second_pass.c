@@ -1,10 +1,10 @@
 #include "second_pass.h"
 
-bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
-    ErrorType err = SUCCESS;
+bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue, ErrorType *err) {
     AssemblyLine *line;
     Instruction inst;
     bool had_errord = false;
+    *err = SUCCESS;
 
     while ((line = queue->pop(queue))) {
         switch (line->type) {
@@ -12,7 +12,7 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
         case TypeData:
         case TypeExtern:
             /* ignore empty, data, and extern lines in second pass */
-            err = SUCCESS;
+            *err = SUCCESS;
             break;
 
         /* .entry SYM_NAME */
@@ -20,12 +20,12 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
             /* we mark symbol as entry on second pass to make sure this symbol
              * will be already loaded into the symbol table */
             if (line->arg_count < 1) {
-                err = ERR_INVALID_SYNTAX_ENTRY_DECLERATION;
+                *err = ERR_INVALID_SYNTAX_ENTRY_DECLERATION;
                 break;
             }
 
             /* The entry label is the first arg */
-            err = syms->markSymEntry(syms, line->args[0]);
+            *err = syms->markSymEntry(syms, line->args[0]);
         }
 
         break;
@@ -33,7 +33,7 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
         case TypeCode:
             /* Clean inst */
             memset(&inst, 0, sizeof(Instruction));
-            err = decodeInstructionLine(line, &inst, syms);
+            *err = decodeInstructionLine(line, &inst, syms);
             /*  printf("\n__PRINTING_LINE__\n");
                 dumpAssemblyLine(line);
                 printf("%02x", (inst.body.inst >> (8 * 0)) & 0xff);
@@ -42,17 +42,22 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
                 printf(" %02x\n", (inst.body.inst >> (8 * 3)) & 0xff);
                 printf("__FINSIHED_FINISHED__\n"); */
 
-            if (err == SUCCESS) {
-                err = memory->writeCode(memory, &inst);
+            if (*err == SUCCESS) {
+                *err = memory->writeCode(memory, &inst);
             }
             break;
         }
 
-        /* TODO: exit on memory error? */
-        if (err != SUCCESS) {
-            printLineError(err, line);
+        if (*err != SUCCESS) {
+            printLineError(*err, line);
             had_errord = true;
-            err = SUCCESS;
+            if (*err == ERR_OUT_OF_MEMEORY) {
+                /* If its a memory error, break out of the loop */
+                freeLine(line);
+                break;
+            }
+            /* For any other error, continue looping */
+            *err = SUCCESS;
         }
 
         freeLine(line);

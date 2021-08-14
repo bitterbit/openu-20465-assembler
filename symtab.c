@@ -191,6 +191,7 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
 
     if (sym->dependent_offsets_count == 0) {
         sym->dependent_offsets_count = 0;
+        /* TODO: handle malloc and realloc failures? */
         sym->dependent_offsets = malloc(sizeof(size_t));
     } else {
         sym->dependent_offsets = realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
@@ -268,8 +269,11 @@ void SymbolManager_free(SymbolManager *self) {
     free(self);
 }
 
+/* TODO: handle malloc failure */
 SymbolManager *newSymbolManager() {
     SymbolManager *syms = malloc(sizeof(SymbolManager));
+
+    /* TODO: check for memory errors */
     syms->symtab = newSymbolTable();
 
     syms->insertSymbol = SymbolManager_insertSymbol;

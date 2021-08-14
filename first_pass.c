@@ -61,11 +61,11 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
 }
 
 bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
-               LineQueue *queue, size_t *instruction_counter) {
-    ErrorType err = SUCCESS;
+               LineQueue *queue, size_t *instruction_counter, ErrorType *err) {
     AssemblyLine *line = NULL;
     size_t line_counter = 0;
     bool errored = false;
+    *err = SUCCESS;
 
     line = newLine();
     if (line == NULL) {
@@ -73,32 +73,40 @@ bool firstPass(FILE *file, SymbolManager *syms, Memory *memory,
         return false;
     }
 
-    err = parseLine(file, line);
+    *err = parseLine(file, line);
     queue->push(queue, line);
 
-    while (err != ERR_EOF) {
-        err = firstPassHandleLine(line, syms, memory, instruction_counter);
+    while (*err != ERR_EOF) {
+        *err = firstPassHandleLine(line, syms, memory, instruction_counter);
 
-        /* TODO: memory error not handled */
-        if (err != SUCCESS && err != ERR_EOF) {
-            printLineError(err, line);
+        /* TODO: not sure if ERR_EOF is possible here */
+        if (*err != SUCCESS && *err != ERR_EOF) {
+            printLineError(*err, line);
             errored = true;
+            /* If a memory error occured, exit immediately */
+            if (*err == ERR_OUT_OF_MEMEORY) {
+                break;
+            }
         }
 
         line = newLine();
         if (line == NULL) {
-            err = ERR_OUT_OF_MEMEORY;
+            *err = ERR_OUT_OF_MEMEORY;
             errored = true;
             break;
         }
 
         /* TODO: remove debug info struct */
         line->debug_info.line_number = line_counter;
-        err = parseLine(file, line);
+        *err = parseLine(file, line);
 
-        if (err != SUCCESS && err != ERR_EOF) {
-            printLineError(err, line);
+        if (*err != SUCCESS && *err != ERR_EOF) {
+            printLineError(*err, line);
             errored = true;
+            /* If a memory error occured, exit immediately */
+            if (*err == ERR_OUT_OF_MEMEORY) {
+                break;
+            }
         }
 
         queue->push(queue, line);
