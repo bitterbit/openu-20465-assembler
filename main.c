@@ -67,7 +67,6 @@ bool handleAssemblyFile(char *path) {
     LineQueue *queue = newLineQueue();
     SymbolManager *syms = newSymbolManager();
     Memory *memory = newMemory();
-    AssemblyLine *line;
     size_t instruction_counter;
     FILE *file;
     char *output_name;
@@ -77,7 +76,6 @@ bool handleAssemblyFile(char *path) {
         return false;
     }
 
-    line = NULL;
     output_name = NULL;
     instruction_counter = INSTRUCTION_COUNTER_INITIAL_VALUE;
 
@@ -137,4 +135,6 @@ int main(int argc, char **argv) {
         /* TODO: exit completely if memory error occured */
         handleAssemblyFile(fname);
     }
+
+    return 0;
 }
