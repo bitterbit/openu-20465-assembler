@@ -37,6 +37,7 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
 
         data = decodeDataLine(line, &size, &err);
         if (err != SUCCESS) {
+            free(data);
             return err;
         }
 
