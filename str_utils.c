@@ -209,6 +209,23 @@ void removeFileExtension(char *filename) {
     *ext = '\0';
 }
 
+bool isOnlyNumbers(char *str) {
+    size_t len = strlen(str);
+    int i;
+
+    for(i=0; i<len; i++) {
+        char c = str[i];
+
+        if (c >= '0' && c <= '9') {
+            continue;
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
 bool isOnlyLettersAndNumbers(char *str) {
     size_t len = strlen(str);
     int i;

@@ -61,6 +61,11 @@ int registerFromString(char *str) {
         return -1;
     }
 
+    /* Registers only contain numbers, and scanf is ok with spaces */
+    if (isOnlyNumbers(str) != true) {
+        return -1;
+    }
+
     sscanf_success = sscanf(str, "%d", &number);
 
     if (sscanf_success == 0) {
@@ -642,11 +647,16 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
             return ERR_INVALID_CODE_INSTRUCTION;
         }
 
-        register_number = registerFromString(line->args[0]);
         /* if JMP and first arg is a register */
-        if (strcmp(line->opcode_name, JMP) == 0 && register_number != -1) {
-            inst->body.j_inst.address = register_number;
-            inst->body.j_inst.reg = 1;
+        if (strcmp(line->opcode_name, JMP) == 0 && *(line->args[0]) == '$') {
+            register_number = registerFromString(line->args[0]);
+            if (register_number != -1) {
+                inst->body.j_inst.address = register_number;
+                inst->body.j_inst.reg = 1;
+            }
+            else {
+                return ERR_INVALID_REGISTER;
+            }
         }
 
         /* JMP with label, LA, CALL */

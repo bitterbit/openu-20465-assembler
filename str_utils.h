@@ -3,8 +3,8 @@
 
 #include <string.h>
 
-#include "err.h"
 #include "bool.h"
+#include "err.h"
 
 #define MAX_FILENAME_LENGTH 255
 
@@ -16,13 +16,14 @@ void removeLeadingAndTrailingSpaces(char **str);
 int containsSpace(char *str);
 int containsChar(char *str, char c);
 int checkForEmptyLine(char *command_str);
-bool strArrayIncludes(char* str, char* str_arr[], int arr_len);
+bool strArrayIncludes(char *str, char *str_arr[], int arr_len);
 int findInArray(char *str, char *str_arr[], int arr_len);
 
 ErrorType readline(FILE *file, char *buf);
-FILE* openfile(char *path, ErrorType *err);
-char* toBasename(char *path);
+FILE *openfile(char *path, ErrorType *err);
+char *toBasename(char *path);
 void removeFileExtension(char *filename);
+bool isOnlyNumbers(char *str);
 bool isOnlyLettersAndNumbers(char *str);
 
 #endif
