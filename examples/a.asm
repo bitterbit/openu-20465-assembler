@@ -1,6 +1,6 @@
 
 
-.extern val1
+.extern val1, 1
 MAIN:   add $9,$5,$3
 
 LOOP:   ori $2,-5,$9 

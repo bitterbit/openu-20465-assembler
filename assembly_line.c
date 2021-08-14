@@ -667,3 +667,8 @@ void dumpAssemblyLine(AssemblyLine *line) {
     printf("\n");
     printf("\tLineNumber: %d\n", line->debug_info.line_number);
 }
+
+void printLineError(ErrorType err, AssemblyLine *line) {
+    print_error(err);
+    dumpAssemblyLine(line);
+}
