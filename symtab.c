@@ -183,7 +183,7 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
     return SUCCESS;
 }
 
-Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruction_counter) {
+Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruction_counter, ErrorType *out_err) {
     Symbol *sym = self->symtab->find(self->symtab, name);
     if (sym == NULL) {
         return NULL;
@@ -191,10 +191,14 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
 
     if (sym->dependent_offsets_count == 0) {
         sym->dependent_offsets_count = 0;
-        /* TODO: handle malloc and realloc failures? */
         sym->dependent_offsets = malloc(sizeof(size_t));
     } else {
         sym->dependent_offsets = realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
+    }
+
+    if (sym->dependent_offsets == NULL) {
+        *out_err = ERR_OUT_OF_MEMEORY;
+        return NULL;
     }
 
     sym->dependent_offsets[sym->dependent_offsets_count] = instruction_counter;
@@ -269,12 +273,18 @@ void SymbolManager_free(SymbolManager *self) {
     free(self);
 }
 
-/* TODO: handle malloc failure */
 SymbolManager *newSymbolManager() {
     SymbolManager *syms = malloc(sizeof(SymbolManager));
 
-    /* TODO: check for memory errors */
+    if (syms == NULL) {
+        return NULL;
+    }
+
     syms->symtab = newSymbolTable();
+
+    if (syms->symtab == NULL) {
+        return NULL;
+    }
 
     syms->insertSymbol = SymbolManager_insertSymbol;
     syms->markSymEntry = SymbolManager_markSymEntry;

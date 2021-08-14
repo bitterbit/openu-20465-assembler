@@ -142,7 +142,6 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; i++) {
         char *fname = argv[i];
         printf("parsing file %s\n", fname);
-        /* TODO: exit completely if memory error occured */
         file_success = handleAssemblyFile(fname, &err);
 
         if (file_success == false){

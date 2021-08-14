@@ -96,7 +96,6 @@ ErrorType ManagedArray_append(ManagedArray *self, unsigned char *data,
         self->data = realloc(self->data, self->capacity);
     }
 
-    /* TODO: make sure this breaks the program */
     if (self->data == NULL) {
         return ERR_OUT_OF_MEMEORY;
     }
