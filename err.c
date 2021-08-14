@@ -69,6 +69,14 @@ void printErr(ErrorType err) {
         str = "Invalid number size";
         break;
 
+    case ERR_INVALID_INSTRUCTION_TYPE:
+        str = "Invalid instruction type";
+        break;
+    
+    case ERR_INVALID_DATA_INSTRUCTION:
+        str = "Invalid data instruction";
+        break;
+
     case ERR_EOF:
         str = "Encountered end of file";
         break;

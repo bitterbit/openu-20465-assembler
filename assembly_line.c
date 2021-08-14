@@ -672,6 +672,7 @@ void dumpAssemblyLine(AssemblyLine *line) {
 }
 
 void printLineError(ErrorType err, AssemblyLine *line) {
+    printf("Line: %d ", line->debug_info.line_number);
     printErr(err);
-    dumpAssemblyLine(line);
+    /* dumpAssemblyLine(line); */
 }
