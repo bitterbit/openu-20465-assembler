@@ -61,13 +61,12 @@ ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
 }
 
 bool handleAssemblyFile(char *path) {
-    bool error_happened = false;
     ErrorType err = SUCCESS;
 
+    /* lines are allocated on heap and owned by the queue */
+    LineQueue *queue = newLineQueue();
     SymbolManager *syms = newSymbolManager();
     Memory *memory = newMemory();
-    LineQueue *queue =
-        newLineQueue(); /* lines are allocated on heap and owned by the queue */
     AssemblyLine *line;
     size_t instruction_counter;
     FILE *file;
@@ -88,32 +87,33 @@ bool handleAssemblyFile(char *path) {
         return false;
     }
 
-    printf("starting stage 1\n");
-    firstPass(file, syms, memory, queue, &instruction_counter);
+    printf("[!] first pass\n");
+    if (firstPass(file, syms, memory, queue, &instruction_counter) == false) {
+        return false;
+    }
 
     /* ensure first data and last code won't have the same address */
     instruction_counter += INSTRUCTION_SIZE;
     syms->fixDataSymbolsOffset(syms, instruction_counter);
 
     /* end of first pass, start second pass */
-    printf("starting stage 2\n");
-    if (err == ERR_EOF) {
-        err = SUCCESS;
-    }
-
-    if (err != SUCCESS) {
+    printf("[!] second pass\n");
+    if (secondPass(syms, memory, queue) == false) {
         return false;
     }
-
-    secondPass(syms, memory, queue);
 
     output_name = toBasename(path);
     removeFileExtension(output_name);
     if (output_name == NULL) {
-        return ERR_CREATING_OUTPUT_FILE;
+        print_error(ERR_CREATING_OUTPUT_FILE);
+        return false;
     }
 
-    saveOutput(output_name, memory, syms);
+    err = saveOutput(output_name, memory, syms);
+    if (err != SUCCESS) {
+        print_error(err);
+        return false;
+    }
 
     /* TODO clean up even if we stop after first pass */
     /* queue owns the lines and will free them on queue->free */
@@ -124,9 +124,7 @@ bool handleAssemblyFile(char *path) {
     /* ==== cleanup ==== */
     fclose(file);
 
-    /* TODO: isn't this the opposite? we return if there was an error? if
-     * there was a success? */
-    return error_happened;
+    return true;
 }
 
 int main(int argc, char **argv) {

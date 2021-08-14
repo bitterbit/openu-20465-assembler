@@ -8,6 +8,6 @@
 
 #include <stdio.h>
 
-ErrorType firstPass(FILE* asm_file, SymbolManager *syms, Memory *memory, LineQueue *queue, size_t *instruction_counter);
+bool firstPass(FILE* asm_file, SymbolManager *syms, Memory *memory, LineQueue *queue, size_t *instruction_counter);
 
 #endif

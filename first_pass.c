@@ -60,10 +60,11 @@ ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
     return err;
 }
 
-ErrorType firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue, size_t *instruction_counter) {
+bool firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *queue, size_t *instruction_counter) {
     ErrorType err = SUCCESS;
     AssemblyLine *line = NULL;
     size_t line_counter = 0;
+    bool errored = false;
 
     line = newLine();
     err = parseLine(file, line);
@@ -73,11 +74,13 @@ ErrorType firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *
         err = firstPassHandleLine(line, syms, memory, instruction_counter);
         if (err != SUCCESS && err != ERR_EOF) {
             printLineError(err, line);
+            errored = true;
         }
 
         line = newLine();
         if (line == NULL) {
             err = ERR_OUT_OF_MEMEORY;
+            errored = true;
             break;
         }
 
@@ -87,11 +90,12 @@ ErrorType firstPass(FILE* file, SymbolManager *syms, Memory *memory, LineQueue *
 
         if (err != SUCCESS && err != ERR_EOF) {
             printLineError(err, line);
+            errored = true;
         }
 
         queue->push(queue, line);
         line_counter++;
     }
 
-    return err;
+    return errored == false;
 }
