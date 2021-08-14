@@ -14,7 +14,6 @@
 
 #define MAX_SIZE 65535
 
-/* TODO: Check for memory leaks */
 /* TODO: Compile and check on the openu ubuntu */
 /* TODO: Verify the semantics of entry and external lines? are there any others?
  */
