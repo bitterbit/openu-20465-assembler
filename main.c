@@ -60,6 +60,20 @@ ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     return SUCCESS;
 }
 
+void cleanup(SymbolManager **p_syms, Memory **p_memory, LineQueue **p_queue) {
+    SymbolManager *syms = *p_syms;
+    Memory *memory = *p_memory;
+    LineQueue *queue = *p_queue;
+
+    queue->free(queue);
+    memory->free(memory);
+    syms->free(syms);
+
+    *p_syms = NULL;
+    *p_memory = NULL;
+    *p_queue = NULL;
+}
+
 bool handleAssemblyFile(char *path) {
     ErrorType err = SUCCESS;
 
@@ -82,17 +96,23 @@ bool handleAssemblyFile(char *path) {
     file = openfile(path, &err);
     if (err != SUCCESS) {
         printErr(err);
+        cleanup(&syms, &memory, &queue);
         return false;
     }
 
     printf("[!] first pass\n");
     if (firstPass(file, syms, memory, queue, &instruction_counter) == false) {
+        cleanup(&syms, &memory, &queue);
+        fclose(file);
         return false;
     }
+
+    fclose(file);
 
     /* end of first pass, start second pass */
     printf("[!] second pass\n");
     if (secondPass(syms, memory, queue) == false) {
+        cleanup(&syms, &memory, &queue);
         return false;
     }
 
@@ -100,23 +120,18 @@ bool handleAssemblyFile(char *path) {
     removeFileExtension(output_name);
     if (output_name == NULL) {
         printErr(ERR_CREATING_OUTPUT_FILE);
+        cleanup(&syms, &memory, &queue);
         return false;
     }
 
     err = saveOutput(output_name, memory, syms);
     if (err != SUCCESS) {
         printErr(err);
+        cleanup(&syms, &memory, &queue);
         return false;
     }
 
-    /* TODO clean up even if we stop after first pass */
-    /* queue owns the lines and will free them on queue->free */
-    queue->free(queue);
-    memory->free(memory);
-    syms->free(syms);
-
-    /* ==== cleanup ==== */
-    fclose(file);
+    cleanup(&syms, &memory, &queue);
 
     return true;
 }
