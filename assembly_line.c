@@ -342,6 +342,11 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
             *out_err =
                 numberFromString(line->args[i], &number, data_chunk_size * 8);
 
+            if (*out_err != SUCCESS) {
+                free(buf);
+                return NULL;
+            }
+
             for (j = 0; j < data_chunk_size; j++) {
                 *tmp = (unsigned char)(0x00FF & number);
                 number = number >> 8;
