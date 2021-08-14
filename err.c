@@ -30,7 +30,7 @@ void printErr(ErrorType err) {
         break;
 
     case ERR_INVALID_SYNTAX_ENTRY_DECLERATION:
-        str = "Invalid entry";
+        str = "Invalid .entry syntax";
         break;
 
     case ERR_ENTRY_SYM_NOT_FOUND:
@@ -91,6 +91,22 @@ void printErr(ErrorType err) {
 
     case ERR_OUT_OF_MEMEORY:
         str = "Could not allocate memory, failing";
+        break;
+
+    case ERR_FILENAME_TOO_LONG:
+        str = "Filname too long";
+        break;
+
+    case ERR_CREATING_OUTPUT_FILE:
+        str = "Error while creating output file";
+        break;
+
+    case ERR_SYMBOL_CANNOT_BE_ENTRY_AND_EXTERN:
+        str = "Cannot declare symbol to be both entry and external";
+        break;
+
+    case ERR_INVALID_SYNTAX_EXTERN_DECLERATION:
+        str = "Invalid .extern syntax";
         break;
 
     default:
