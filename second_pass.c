@@ -17,6 +17,7 @@ bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue) {
 
         /* .entry SYM_NAME */
         case TypeEntry: {
+                            /* we mark symbol as entry on second pass to make sure this symbol will be already loaded into the symbol table */
             if (line->arg_count < 1) {
                 err = ERR_INVALID_ENTRY;
                 break;

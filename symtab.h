@@ -45,7 +45,7 @@ typedef struct SymbolManager SymbolManager;
 struct SymbolManager {
     SymbolTable* symtab;
 
-    ErrorType (*insertSymbol)(SymbolManager *self, char* name, size_t value, bool is_extern, bool is_entry, SymbolSection section);
+    ErrorType (*insertSymbol)(SymbolManager *self, char* name, size_t value, bool is_extern, SymbolSection section);
     ErrorType (*markSymEntry)(SymbolManager *self, char* name);
     Symbol* (*useSymbol)(SymbolManager *self, char* name, size_t instruction_counter);
     void (*fixDataSymbolsOffset)(SymbolManager *self, size_t offset);
