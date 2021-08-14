@@ -9,9 +9,13 @@ void ListNode_free(ListNode *self) {
 }
 
 /* TODO: make sure all users check if pointer is null */
-/* TODO: handle malloc failure */
 ListNode *newListNode(void *data) {
     ListNode *node = malloc(sizeof(ListNode));
+
+    if (node == NULL) {
+        return NULL;
+    }
+
     node->next = NULL;
     node->data = data;
     node->free = ListNode_free;
@@ -36,6 +40,11 @@ ListNode *ListIterator_next(ListIterator *self) {
 /* TODO: handle malloc failure*/
 ListIterator *newListIterator(ListNode *head) {
     ListIterator *iter = malloc(sizeof(ListIterator));
+
+    if (iter == NULL) {
+        return NULL;
+    }
+
     iter->head = head;
     iter->next = ListIterator_next;
     iter->free = ListIterator_free;

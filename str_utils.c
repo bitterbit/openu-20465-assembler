@@ -131,7 +131,6 @@ ErrorType readline(FILE *file, char *buf) {
 
     buf = fgets(buf, BUFFER_SIZE, file);
 
-    /* TODO: Is this needed? */
     if (buf == NULL) {
         return ERR_EOF;
     }
