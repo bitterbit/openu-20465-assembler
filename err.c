@@ -9,16 +9,8 @@ void printErr(ErrorType err) {
 
     switch (err) {
 
-    case INVALID_LABEL_NAME:
-        str = "Invalid label name encountered";
-        break;
-
     case LINE_TOO_LONG:
         str = "Line is longer than allowed length";
-        break;
-
-    case INVALID_FILE_END:
-        str = "Encounterd an invalid file end";
         break;
 
     case FILE_OPEN_ERROR:
@@ -37,20 +29,12 @@ void printErr(ErrorType err) {
         str = "No entry specified, must specify an .entry";
         break;
 
-    case ERR_INVALID_LABEL:
-        str = "Invalid label";
-        break;
-
     case ERR_INVALID_COMMAND_NAME:
         str = "Invalid command name";
         break;
 
     case ERR_INVALID_COMMAND_FORMAT:
         str = "Invalid command format";
-        break;
-
-    case ERR_UNTERMINATED_STRING_ARG:
-        str = "Unterminated string argument";
         break;
 
     case ERR_INVALID_CODE_INSTRUCTION:
