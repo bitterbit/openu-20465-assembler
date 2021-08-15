@@ -201,7 +201,7 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name,
         sym->dependent_offsets = malloc(sizeof(size_t));
     } else {
         sym->dependent_offsets =
-            realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
+            realloc(sym->dependent_offsets, sizeof(size_t) * (sym->dependent_offsets_count + 1));
     }
 
     if (sym->dependent_offsets == NULL) {
