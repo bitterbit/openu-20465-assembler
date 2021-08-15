@@ -14,8 +14,6 @@
 
 #define MAX_SIZE 65535
 
-/* TODO: remove other examples except book */
-
 /* Save output files */
 ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
     char filename[MAX_FILENAME_LENGTH];
