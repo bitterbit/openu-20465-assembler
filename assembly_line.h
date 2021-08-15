@@ -50,7 +50,6 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
 
 AssemblyLine *newLine();
 void freeLine(AssemblyLine *line);
-void dumpAssemblyLine(AssemblyLine *line);
 
 void printLineError(ErrorType err, AssemblyLine *line);
 

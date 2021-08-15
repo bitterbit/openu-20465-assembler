@@ -8,7 +8,6 @@ void ListNode_free(ListNode *self) {
     free(self); 
 }
 
-/* TODO: actually handle memory error until main */
 /* Create a new List Node */
 ListNode *newListNode(void *data) {
     ListNode *node = malloc(sizeof(ListNode));
@@ -40,7 +39,6 @@ ListNode *ListIterator_next(ListIterator *self) {
     return node;
 }
 
-/* TODO: handle malloc failure*/
 /* Create a new list iterator, given a list head */
 ListIterator *newListIterator(ListNode *head) {
     ListIterator *iter = malloc(sizeof(ListIterator));

@@ -464,7 +464,6 @@ ErrorType decodeIBranch(AssemblyLine *line, Instruction *inst,
     return SUCCESS;
 }
 
-/* TODO: check after fix in definitions (page 23) */
 /* Decode an I command of type memory */
 ErrorType decodeIMem(AssemblyLine *line, Instruction *inst) {
     int temp;

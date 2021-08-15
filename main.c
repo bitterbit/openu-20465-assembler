@@ -14,9 +14,8 @@
 
 #define MAX_SIZE 65535
 
-/* TODO: Compile and check on the openu ubuntu */
-/* TODO: Remove uneeded functions */
-/* TODO: Check only needed functions are exposed in h files */
+
+/* TODO: remove other examples except book */
 
 /* Save output files */
 ErrorType saveOutput(char *name, Memory *memory, SymbolManager *syms) {
