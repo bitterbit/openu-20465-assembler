@@ -1,6 +1,8 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "assembly_line.h"
 #include "bit_utils.h"
@@ -363,14 +365,17 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 
 /* Parse a number from a string */
 ErrorType numberFromString(char *str, int *number, int number_of_bits) {
-    int sscanf_success;
+    char *string_number_end;
     long temporary_number;
 
-    sscanf_success = sscanf(str, "%ld", &temporary_number);
+    temporary_number = strtol(str, &string_number_end, 10);
 
-    if (sscanf_success != 1) {
+    if (string_number_end == str)
         return ERR_INVALID_NUMBER_TOKEN;
-    }
+    
+    /* Verify number fits in a long, which is also maximum supported number in our assembly */
+    else if ((temporary_number == LONG_MIN || temporary_number == LONG_MAX) && errno == ERANGE)
+        return ERR_INVALID_NUMBER_SIZE;
 
     /* we support negative numbers, which means we can fit one bit less then usigned */
     if (!number_fits_in_bits(temporary_number, number_of_bits-1)) {
