@@ -14,7 +14,6 @@
 
 #define MAX_SIZE 65535
 
-
 /* TODO: remove other examples except book */
 
 /* Save output files */
@@ -106,7 +105,8 @@ bool handleAssemblyFile(char *path, ErrorType *err) {
     }
 
     printf("[!] first pass\n");
-    if (firstPass(file, syms, memory, queue, &instruction_counter, err) == false) {
+    if (firstPass(file, syms, memory, queue, &instruction_counter, err) ==
+        false) {
         cleanup(&syms, &memory, &queue);
         fclose(file);
         return false;
@@ -142,7 +142,7 @@ bool handleAssemblyFile(char *path, ErrorType *err) {
     return true;
 }
 
-/* Main function for the program. 
+/* Main function for the program.
    For every input file, parse it and create the needed output files */
 int main(int argc, char **argv) {
     int i;
@@ -155,14 +155,13 @@ int main(int argc, char **argv) {
         printf("parsing file %s\n", fname);
         file_success = handleAssemblyFile(fname, &err);
 
-        if (file_success == false){
+        if (file_success == false) {
             printf("Failed parsing file %s\n", fname);
             if (err == ERR_OUT_OF_MEMEORY) {
                 printf("Failed because of memory issue - exiting\n");
                 return 1;
             }
         }
-
     }
 
     return 0;

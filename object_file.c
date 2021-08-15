@@ -3,7 +3,8 @@
 /* Write the header of the object file */
 void ObjectFile_writeHeader(ObjectFile *self, size_t code_size,
                             size_t data_size) {
-    fprintf(self->file, "      %lu %lu", (unsigned long)code_size, (unsigned long)data_size);
+    fprintf(self->file, "      %lu %lu", (unsigned long)code_size,
+            (unsigned long)data_size);
 }
 
 /* Write a byte to the object file */

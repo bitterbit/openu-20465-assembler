@@ -72,7 +72,8 @@ bool is_j_command(char *command) {
     return strArrayIncludes(command, (char **)j_commands, j_commands_len);
 }
 
-/* return the value of a string from a mapping, mostly command to a conencted value */
+/* return the value of a string from a mapping, mostly command to a conencted
+ * value */
 int command_to_mapped_value(char *command, char **commands_array,
                             int command_array_length, int *mapping,
                             ErrorType *out_err) {
@@ -109,7 +110,6 @@ int command_to_opcode(char *command, ErrorType *out_err) {
     *out_err = ERR_INVALID_COMMAND_NAME;
     return 0;
 }
-
 
 /* Return the funct number of a command name */
 int r_command_to_func(char *command, ErrorType *out_err) {

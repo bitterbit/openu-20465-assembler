@@ -1,7 +1,6 @@
 #include "first_pass.h"
 #include "str_utils.h"
 
-
 /* Handle a specific line for the first pass */
 ErrorType firstPassHandleLine(AssemblyLine *line, SymbolManager *syms,
                               Memory *memory, size_t *instruction_counter) {

@@ -42,7 +42,7 @@ AssemblyLine *LineQueue_pop(LineQueue *self) {
 /* Free the LineQueue and its contents */
 void LineQueue_free(LineQueue *self) {
     AssemblyLine *line = self->pop(self);
-    while(line != NULL) {
+    while (line != NULL) {
         freeLine(line);
         line = self->pop(self);
     }

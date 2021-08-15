@@ -1,12 +1,8 @@
 #include "list.h"
 #include <stdio.h>
 
-
-
 /* will free the node but not its data! */
-void ListNode_free(ListNode *self) { 
-    free(self); 
-}
+void ListNode_free(ListNode *self) { free(self); }
 
 /* Create a new List Node */
 ListNode *newListNode(void *data) {

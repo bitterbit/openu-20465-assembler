@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /* Free a symbol object */
 void Symbol_free(Symbol *self) {
     free(self->symbol);
@@ -156,7 +155,7 @@ ErrorType SymbolManager_insertSymbol(SymbolManager *self, char *name,
     ErrorType err;
 
     Symbol *sym = newSymbol(name, value, false, is_extern, section);
-    if (sym == NULL){
+    if (sym == NULL) {
         return ERR_OUT_OF_MEMEORY;
     }
     err = self->symtab->insert(self->symtab, sym);
@@ -189,7 +188,9 @@ ErrorType SymbolManager_markSymEntry(SymbolManager *self, char *name) {
 }
 
 /* Mark that an instruction is using a symbol */
-Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruction_counter, ErrorType *out_err) {
+Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name,
+                                size_t instruction_counter,
+                                ErrorType *out_err) {
     Symbol *sym = self->symtab->find(self->symtab, name);
     if (sym == NULL) {
         return NULL;
@@ -199,7 +200,8 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
         sym->dependent_offsets_count = 0;
         sym->dependent_offsets = malloc(sizeof(size_t));
     } else {
-        sym->dependent_offsets = realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
+        sym->dependent_offsets =
+            realloc(sym->dependent_offsets, sym->dependent_offsets_count + 1);
     }
 
     if (sym->dependent_offsets == NULL) {
@@ -214,7 +216,8 @@ Symbol *SymbolManager_useSymbol(SymbolManager *self, char *name, size_t instruct
 }
 
 /* Fix the offsets of the data symbols - at the end of the first pass */
-void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, const size_t offset) {
+void SymbolManager_fixDataSymbolsOffset(SymbolManager *self,
+                                        const size_t offset) {
     Symbol *sym = NULL;
     ListNode *node = NULL;
     ListIterator *iterator = newListIterator(self->symtab->head);
@@ -237,7 +240,7 @@ void SymbolManager_fixDataSymbolsOffset(SymbolManager *self, const size_t offset
 }
 
 /* Write the ext file from the symbol table */
-void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
+void SymbolManager_writeExtFile(SymbolManager *self, FILE *file) {
     ListNode *node = NULL;
     ListIterator *iter = newListIterator(self->symtab->head);
 
@@ -250,8 +253,9 @@ void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
             continue;
         }
 
-        for (i=0; i<sym->dependent_offsets_count; i++) {
-            fprintf(file, "%s %04lu\n", sym->symbol, (unsigned long)sym->dependent_offsets[i]);
+        for (i = 0; i < sym->dependent_offsets_count; i++) {
+            fprintf(file, "%s %04lu\n", sym->symbol,
+                    (unsigned long)sym->dependent_offsets[i]);
         }
     }
 
@@ -259,7 +263,7 @@ void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
 }
 
 /* Write the ent file from the symbol table */
-void SymbolManager_writeEntFile(SymbolManager *self, FILE* file) {
+void SymbolManager_writeEntFile(SymbolManager *self, FILE *file) {
     ListNode *node = NULL;
     ListIterator *iter = newListIterator(self->symtab->head);
 

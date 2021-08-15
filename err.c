@@ -72,7 +72,7 @@ void printErr(ErrorType err) {
     case ERR_INVALID_INSTRUCTION_TYPE:
         str = "Invalid instruction type";
         break;
-    
+
     case ERR_INVALID_DATA_INSTRUCTION:
         str = "Invalid data instruction";
         break;

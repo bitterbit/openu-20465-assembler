@@ -9,7 +9,6 @@ ErrorType Memory_writeData(Memory *self, unsigned char *data, size_t size) {
     return self->data->append(self->data, data, size);
 }
 
-
 /* Write the content of a code line to the memory */
 ErrorType Memory_writeCode(Memory *self, Instruction *instruction) {
     return self->code->appendUnsignedInt(self->code, instruction->body.inst);
@@ -139,7 +138,8 @@ void ManagedArray_free(ManagedArray *self) {
     free(self);
 }
 
-/* Create a managed array, which grows as you append data to it, and remembers its size and capacity*/
+/* Create a managed array, which grows as you append data to it, and remembers
+ * its size and capacity*/
 ManagedArray *newManagedArray() {
     ManagedArray *arr = (ManagedArray *)malloc(sizeof(ManagedArray));
 

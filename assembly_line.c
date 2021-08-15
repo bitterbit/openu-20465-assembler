@@ -1,8 +1,8 @@
 
 #include <ctype.h>
-#include <stdlib.h>
-#include <limits.h>
 #include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 
 #include "assembly_line.h"
 #include "bit_utils.h"
@@ -69,7 +69,7 @@ int registerFromString(char *str) {
     }
 
     /* Verify number doesn't have leading zeroes. eg. $002 */
-    if (number != 0 && *str == '0'){
+    if (number != 0 && *str == '0') {
         return -1;
     }
 
@@ -304,7 +304,7 @@ unsigned char *decodeDataLine(AssemblyLine *line, size_t *out_size,
 
         /* remove quotes, is safe as we just checked there are quotes */
         arg[0] = '\0';
-        arg[len-1] = '\0';
+        arg[len - 1] = '\0';
         arg += 1;
 
         /* Copy including the null byte */
@@ -372,22 +372,25 @@ ErrorType numberFromString(char *str, int *number, int number_of_bits) {
 
     if (string_number_end == str)
         return ERR_INVALID_NUMBER_TOKEN;
-    
-    /* Verify number fits in a long, which is also maximum supported number in our assembly */
-    else if ((temporary_number == LONG_MIN || temporary_number == LONG_MAX) && errno == ERANGE)
+
+    /* Verify number fits in a long, which is also maximum supported number in
+     * our assembly */
+    else if ((temporary_number == LONG_MIN || temporary_number == LONG_MAX) &&
+             errno == ERANGE)
         return ERR_INVALID_NUMBER_SIZE;
 
-    /* we support negative numbers, which means we can fit one bit less then usigned */
-    if (!number_fits_in_bits(temporary_number, number_of_bits-1)) {
+    /* we support negative numbers, which means we can fit one bit less then
+     * usigned */
+    if (!number_fits_in_bits(temporary_number, number_of_bits - 1)) {
         return ERR_INVALID_NUMBER_SIZE;
     }
 
-    /* it is ok to cast down to int because no data command supports more than 32 bit */
-    *number = temporary_number; 
+    /* it is ok to cast down to int because no data command supports more than
+     * 32 bit */
+    *number = temporary_number;
 
     return SUCCESS;
 }
-
 
 /* Decode an I command of type arithmetic */
 ErrorType decodeIArithmetic(AssemblyLine *line, Instruction *inst) {
@@ -574,11 +577,9 @@ ErrorType decodeRMove(AssemblyLine *line, Instruction *inst) {
     }
 
     /*
-     * in case one is not sure of the currect assigment of source and destination registers. 
-     * move {src} {dst}
-     * rs = 1st arg
-     * ds = 2nd arg
-     * see: https://opal.openu.ac.il/mod/ouilforum/discuss.php?d=2958479
+     * in case one is not sure of the currect assigment of source and
+     * destination registers. move {src} {dst} rs = 1st arg ds = 2nd arg see:
+     * https://opal.openu.ac.il/mod/ouilforum/discuss.php?d=2958479
      */
 
     /* First arg is a register */
@@ -628,7 +629,6 @@ ErrorType decodeRInstruction(AssemblyLine *line, Instruction *inst) {
     return err;
 }
 
-
 /* Decode a J command */
 ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
                              SymbolManager *syms) {
@@ -667,8 +667,7 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
             if (register_number != -1) {
                 inst->body.j_inst.address = register_number;
                 inst->body.j_inst.reg = 1;
-            }
-            else {
+            } else {
                 return ERR_INVALID_REGISTER;
             }
         }
@@ -697,7 +696,6 @@ ErrorType decodeJInstruction(AssemblyLine *line, Instruction *inst,
     return SUCCESS;
 }
 
-
 /* Decode data from a general frist step assembly line to an instruction */
 ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
                                 SymbolManager *syms) {
@@ -724,7 +722,6 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
 
     return err;
 }
-
 
 /* Print a line and the error that occured in it  */
 void printLineError(ErrorType err, AssemblyLine *line) {

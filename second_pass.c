@@ -1,8 +1,9 @@
 #include "second_pass.h"
 
-
-/* Main function for the second pass. finish parsing the assembly, and pop each line from the queue */
-bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue, ErrorType *err) {
+/* Main function for the second pass. finish parsing the assembly, and pop each
+ * line from the queue */
+bool secondPass(SymbolManager *syms, Memory *memory, LineQueue *queue,
+                ErrorType *err) {
     AssemblyLine *line;
     Instruction inst;
     bool had_errord = false;

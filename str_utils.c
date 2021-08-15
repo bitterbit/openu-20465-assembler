@@ -109,7 +109,7 @@ bool containsChar(char *str, char c) {
 }
 
 /* Return 0 if line is empty or contains only space chars,
-    * non zero int otherwise */
+ * non zero int otherwise */
 int checkForEmptyLine(char *line_str) {
     char cmd_copy[BUFFER_SIZE];
     int len;

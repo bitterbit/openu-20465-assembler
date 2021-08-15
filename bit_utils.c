@@ -12,7 +12,7 @@ bool number_fits_in_bits(long number, int number_of_bits) {
     if (number < 0) {
         number = -number + 1;
     }
-    
+
     /* create a mask of the shape 0b11...11110000 for number_of_bits=4*/
     mask = ~((1UL << number_of_bits) - 1);
 
@@ -22,4 +22,3 @@ bool number_fits_in_bits(long number, int number_of_bits) {
 
     return true;
 }
-
