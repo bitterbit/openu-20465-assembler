@@ -251,7 +251,7 @@ void SymbolManager_writeExtFile(SymbolManager *self, FILE* file) {
         }
 
         for (i=0; i<sym->dependent_offsets_count; i++) {
-            fprintf(file, "%s %04lu\n", sym->symbol, sym->dependent_offsets[i]);
+            fprintf(file, "%s %04lu\n", sym->symbol, (unsigned long)sym->dependent_offsets[i]);
         }
     }
 
@@ -270,7 +270,7 @@ void SymbolManager_writeEntFile(SymbolManager *self, FILE* file) {
             continue;
         }
 
-        fprintf(file, "%s %04lu\n", sym->symbol, sym->value);
+        fprintf(file, "%s %04lu\n", sym->symbol, (unsigned long)sym->value);
     }
 
     iter->free(iter);

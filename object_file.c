@@ -12,7 +12,7 @@ void ObjectFile_writeByte(ObjectFile *self, unsigned char byte) {
 
     /* check if we need to start a new line */
     if (count % BYTES_PER_LINE == 0) {
-        fprintf(self->file, "\n %04lu", self->address);
+        fprintf(self->file, "\n %04lu", (unsigned long)self->address);
     }
 
     fprintf(self->file, " %02X", byte);
