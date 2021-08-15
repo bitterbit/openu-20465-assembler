@@ -31,6 +31,8 @@ Symbol *newSymbol(char *name, size_t value, bool is_entry, bool is_external,
     sym->is_external = is_external;
     sym->section = section;
     sym->free = Symbol_free;
+    sym->dependent_offsets_count = 0;
+    sym->dependent_offsets = NULL;
 
     return sym;
 }
