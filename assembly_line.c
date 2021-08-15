@@ -569,7 +569,13 @@ ErrorType decodeRMove(AssemblyLine *line, Instruction *inst) {
         return ERR_INVALID_CODE_INSTRUCTION;
     }
 
-    /* TODO: rd and rs are confused in the explanation?! i switched them now*/
+    /*
+     * in case one is not sure of the currect assigment of source and destination registers. 
+     * move {src} {dst}
+     * rs = 1st arg
+     * ds = 2nd arg
+     * see: https://opal.openu.ac.il/mod/ouilforum/discuss.php?d=2958479
+     */
 
     /* First arg is a register */
     temp = registerFromString(line->args[0]);
