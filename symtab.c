@@ -3,20 +3,6 @@
 #include <string.h>
 
 
-/* TODO: remove me */
-/* void dumpSymbolTable(SymbolTable *symtab) {
-    ListIterator *iter = newListIterator(symtab->head);
-    ListNode *node = iter->next(iter);
-
-    while (node != NULL) {
-        Symbol *sym = node->data;
-        printf("symbol: %s value %lu\n", sym->symbol, sym->value);
-        node = iter->next(iter);
-    }
-
-    iter->free(iter);
-} */
-
 /* Free a symbol object */
 void Symbol_free(Symbol *self) {
     free(self->symbol);

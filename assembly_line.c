@@ -716,23 +716,6 @@ ErrorType decodeInstructionLine(AssemblyLine *line, Instruction *inst,
 }
 
 
-/* TODO: remove me! */
-/* void dumpAssemblyLine(AssemblyLine *line) {
-    int i;
-
-    printf("### line ###\n \tcmd: %s\n\tlabel: %s\n\t#args %lu\n",
-           line->opcode_name, line->label, line->arg_count);
-
-    for (i = 0; i < line->arg_count; i++) {
-        if (i == 0) {
-            printf("\t");
-        }
-        printf("arg: %s ", line->args[i]);
-    }
-    printf("\n");
-    printf("\tLineNumber: %d\n", line->debug_info.line_number);
-} */
-
 /* Print a line and the error that occured in it  */
 void printLineError(ErrorType err, AssemblyLine *line) {
     printf("Line: %d ", line->debug_info.line_number);
