@@ -6,7 +6,7 @@ CFILES=main.c list.c symtab.c memory.c err.c instruction.c assembly_line.c str_u
 OBJS:=$(CFILES:%.c=%.o)
 
 
-a.out:$(OBJS)
+assembler_20465:$(OBJS)
 	${CC} $(OBJS) ${LDFLAGS} -o $@
 
 %.o: %.c
@@ -14,7 +14,7 @@ a.out:$(OBJS)
 
 
 clean:
-	rm -f a.out
+	rm -f assembler_20465
 	rm -f -- *.o
 
 .PHONY: clean
